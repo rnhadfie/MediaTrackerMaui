@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="MauiApp1.Front.Components.Shared.TextField"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    <Grid x:Name="ControlGrid" HeightRequest="60" Padding="10,0">
+        <Label
+            x:Name="textfieldLabel"
+            Padding="{Binding Padding}"
+            Text="{Binding Text}"
+            FontSize="{Binding FontSize}"
+            HorizontalOptions="{Binding HorizontalOptions}"
+            HorizontalTextAlignment="{Binding HorizontalTextAlignment}"
+            TextColor="Gray"
+            VerticalOptions="{Binding VerticalOptions}"
+            WidthRequest="{Binding WidthRequest}" />
+        <Entry
+            x:Name="textfieldInput"
+            Margin="0,15,0,0"
+            BackgroundColor="Transparent"
+            Focused="OnEntryFocused"
+            HorizontalOptions="Fill"
+            HorizontalTextAlignment="Start"
+            TextChanged="OnEntryTextChanged"
+            Unfocused="OnEntryUnfocused"
+            WidthRequest="260" />
+    </Grid>
+</ContentView>
