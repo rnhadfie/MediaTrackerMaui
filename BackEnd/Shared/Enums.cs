@@ -13,6 +13,7 @@ namespace MauiApp1.Shared
          Video = 2,
          Cd = 3,
          Games = 4,
+         Series = 5,
         }
 
         public enum DisplayOptions { 
@@ -20,6 +21,13 @@ namespace MauiApp1.Shared
             book = 2,
             Video = 3,
             Cd = 4,
+        }
+
+        public enum CollectionStatus { 
+            NotCompleting = 1,
+            OnHold = 2,
+            Collecting = 3,
+            Completed = 4,
         }
     }
 }

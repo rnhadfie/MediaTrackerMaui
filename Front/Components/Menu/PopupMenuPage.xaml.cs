@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui.Views;
 using MauiApp1.Components.Books;
+using MauiApp1.Front.Components.Series;
 using MauiApp1.Shared;
 using System.Threading.Tasks;
 using static MauiApp1.Shared.Enums;
@@ -23,24 +24,11 @@ public partial class PopupMenuPage
         if (MediaDataType.Book == mediaDataType) {
             await Shell.Current.GoToAsync(nameof(AddBook));
         }
-        /*
-        //Clear Menu
-       MenuLayout.Children.Clear();
 
-
-        ImageButton backButton = new ImageButton
+        if (MediaDataType.Series == mediaDataType)
         {
-            Source = "icons_back_50.png",
-            HorizontalOptions = LayoutOptions.Start,
-            VerticalOptions = LayoutOptions.Center,
-            WidthRequest = 16,
-            HeightRequest =16
-        };
-        backButton.Clicked += onBackMenuClicked;
-
-        MenuLayout.Children.Add(backButton);
-
-        MenuLayout.Children.Add(new SubMenuItem(mediaDataType));*/
+            await Shell.Current.GoToAsync(nameof(AddSeries));
+        }
     }
 
     public void onBackMenuClicked(object sender, EventArgs e)
@@ -52,6 +40,7 @@ public partial class PopupMenuPage
     public void AddMenus()
     {
         MenuLayout.Children.Clear();
+        MenuLayout.Children.Add(CreateMenuItem(MediaDataType.Series));
         MenuLayout.Children.Add(CreateMenuItem(MediaDataType.Book));
         MenuLayout.Children.Add(CreateMenuItem(MediaDataType.Video));
         MenuLayout.Children.Add(CreateMenuItem(MediaDataType.Cd));
@@ -79,6 +68,11 @@ public partial class PopupMenuPage
             case MediaDataType.Cd:
                 text = "Add CD";
                 classId = "Cd";
+                imageSource = "icons_cd_50.png";
+                break;
+            case MediaDataType.Series:
+                text = "Add Series";
+                classId = "series";
                 imageSource = "icons_cd_50.png";
                 break;
         }

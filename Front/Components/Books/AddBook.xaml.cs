@@ -1,11 +1,12 @@
 
+using MauiApp1.BackEnd.Controllers.ViewModels;
 using MauiApp1.Controllers;
 using MauiApp1.Controllers.ViewModels;
-using MauiApp1.Front.Components.Shared;
+using MauiApp1.Service.Modals;
 
 namespace MauiApp1.Components.Books;
 
-public partial class AddBook : ContentPage
+public partial class AddBook
 {
 	BookSetupViewModel _viewModel;
     BookController controller;
@@ -15,69 +16,6 @@ public partial class AddBook : ContentPage
         controller = new BookController();
 
         _viewModel = controller.GetBookSetup();
-
-        SetupForm();
-    }
-
-    public void SetupForm()
-    {
-        
-        //Dropdown
-        HorizontalStackLayout seriesLayout = new HorizontalStackLayout();
-        seriesLayout.HorizontalOptions = LayoutOptions.Start;
-        seriesLayout.Add(new Label
-        {
-            Text = "Series",
-            WidthRequest = 50,
-            HorizontalOptions = LayoutOptions.Start,
-            HorizontalTextAlignment = TextAlignment.End
-
-        });
-        seriesLayout.Add(new Picker
-        {
-            ItemDisplayBinding = new Binding("Text"),
-            HorizontalOptions = LayoutOptions.Start,
-            WidthRequest = 250,
-            ItemsSource = _viewModel.ListOfSeries
-        });
-
-        var page = this.Content.FindByName<VerticalStackLayout>("AddBookForm");
-        page.Add(seriesLayout);
-
-        page.Add(new TextField("Title"));
-        page.Add(new TextField("Author"));
-        page.Add(new TextField("Artist", -1,-1, null, "Artist or co-author"));
-        page.Add(new TextField("Volume"));
-        page.Add(new Checkbox());
-
-
-        page.Add(new Button
-        {
-            Text = "Add Book",
-            HorizontalOptions = LayoutOptions.Center,
-            WidthRequest = 200,
-        });
-        //
-        /*
-         
-        </HorizontalStackLayout>
-        <HorizontalStackLayout>
-            <Label Text="Volume" WidthRequest="100" HorizontalOptions="End"/>
-            <Entry
-                Completed="OnEntryCompleted"
-                Keyboard="Numeric"
-                MaxLength="50" />
-        </HorizontalStackLayout>
-        <HorizontalStackLayout>
-            <CheckBox />
-            <Label Text="Completed" WidthRequest="100" HorizontalOptions="End" VerticalOptions="Center"/>
-        </HorizontalStackLayout>
-        <HorizontalStackLayout>
-            <Label Text="Cover Image" />
-        </HorizontalStackLayout>
-        <Button
-            Text="Add Book"></Button>
-         */
     }
 
     private async void OnPickFileButtonClicked(object sender, EventArgs e)
@@ -114,14 +52,38 @@ public partial class AddBook : ContentPage
         catch (Exception ex)
         {
             // Other errors
-            await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
+            //await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
         }
     }
 
-    private async void OnNavigatedTo(object sender, NavigatedToEventArgs args)
+    private async void Button_Clicked(object sender, EventArgs e)
     {
-        // Invoked when the page has been navigated to
-        Page? previousPage = args.PreviousPage;
-        NavigationType navigationType = args.NavigationType;
+        await Shell.Current.GoToAsync("///MainPage");
+    }
+
+    private async void AddButton_Clicked(object sender, EventArgs e)
+    {
+        //Get and save values
+
+        string title = TitleTextField.Value.ToString();
+        if (title.Length > 0)
+        { 
+            //Validate 
+        }
+        string author = AuthorTextField.Value.ToString();
+        if (author.Length > 0)
+        {
+            //Validate 
+        }
+
+        Book book = new Book {
+            Title = title,
+            Author = author,
+            Publisher = (string)publisherTextField.Value,
+            Artist = (string)ArtistTextField.Value,
+            volume = int.Parse((string)VolumeTextField.Value)
+        };
+
+        await Shell.Current.GoToAsync("///MainPage");
     }
 }

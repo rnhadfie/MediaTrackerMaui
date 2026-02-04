@@ -4,12 +4,57 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:MauiApp1.Front.Components.Shared"
-    Title="AddBook">
-    <VerticalStackLayout x:Name="AddBookForm" VerticalOptions="Start" HorizontalOptions="Start">
-        <Label
-         HorizontalOptions="Center"
-         Text="Add Book"
-         VerticalOptions="Center" />
-        <local:TextField ></local:TextField>
-    </VerticalStackLayout>
+    xmlns:maui="clr-namespace:Microsoft.Maui;assembly=Microsoft.Maui">
+    <Grid ColumnDefinitions="*">
+        <VerticalStackLayout
+            x:Name="AddBookForm"
+            HorizontalOptions="Fill"
+            VerticalOptions="Start">
+            <Label
+                HorizontalOptions="Center"
+                Text="Add Book"
+                VerticalOptions="Center" />
+            <local:Combobox x:Name="SeriesCombobox" HorizontalOptions="Fill" />
+            <local:TextField
+                x:Name="TitleTextField"
+                FieldClassId="title"
+                HorizontalOptions="Fill"
+                PlaceholderText="Title" />
+            <local:TextField
+                x:Name="AuthorTextField"
+                FieldClassId="author"
+                HorizontalOptions="Fill"
+                PlaceholderText="Author" />
+            <local:TextField
+                x:Name="ArtistTextField"
+                FieldClassId="artist"
+                HorizontalOptions="Fill"
+                PlaceholderText="Artist" />
+            <local:TextField
+                x:Name="publisherTextField"
+                FieldClassId="publisher"
+                HorizontalOptions="Fill"
+                PlaceholderText="Publisher" />
+            <local:FilePicker />
+            <local:TextField
+                x:Name="VolumeTextField"
+                FieldClassId="volume"
+                HorizontalOptions="Start"
+                InputFieldType="{x:Static maui:Keyboard.Numeric}"
+                PlaceholderText="Volume"
+                TextWidth="150" />
+            <HorizontalStackLayout Padding="4" HorizontalOptions="End">
+                <Button
+                    Margin="4"
+                    Clicked="Button_Clicked"
+                    HorizontalOptions="End"
+                    Text="Cancel" />
+                <Button
+                    Margin="4"
+                    Clicked="AddButton_Clicked"
+                    HorizontalOptions="End"
+                    Text="Add Book" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Grid>
 </ContentPage>

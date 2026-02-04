@@ -1,4 +1,5 @@
 ﻿using MauiApp1.Components.Books;
+using MauiApp1.Front.Components.Series;
 
 namespace MauiApp1
 {
@@ -8,7 +9,9 @@ namespace MauiApp1
         {
             InitializeComponent();
 
+            Routing.RegisterRoute(nameof(MainPage), typeof(MainPage));
             Routing.RegisterRoute(nameof(AddBook), typeof(AddBook));
+            Routing.RegisterRoute(nameof(AddSeries), typeof(AddSeries));
         }
 
 

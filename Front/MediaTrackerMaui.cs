@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using MauiApp1.Components.Books;
+using MauiApp1.Front.Components.Series;
 using Microsoft.Extensions.Logging;
 
 namespace MauiApp1
@@ -19,6 +20,7 @@ namespace MauiApp1
             builder.Services.AddSingleton<MainPage>();
 
             builder.Services.AddTransient<AddBook>();
+            builder.Services.AddTransient<AddSeries>();
 #if DEBUG
             builder.Logging.AddDebug();
 #endif

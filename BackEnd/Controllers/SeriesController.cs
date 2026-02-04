@@ -1,19 +1,18 @@
-﻿using MauiApp1.BackEnd.Database;
+﻿using MauiApp1.BackEnd.Controllers.ViewModels;
 using MauiApp1.BackEnd.Service;
 using MauiApp1.Controllers.ViewModels;
-using MauiApp1.Shared;
-using Microsoft.Maui.Controls;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MauiApp1.Controllers
+namespace MauiApp1.BackEnd.Controllers
 {
-    public class BookController
+    public class SeriesController
     {
         private Lazy<SeriesService> SeriesService;
         private SeriesService _SeriesService;
-        public BookController() {
+        public SeriesController()
+        {
             _SeriesService = new Lazy<SeriesService>(() =>
             {
                 // You can specify any additional
@@ -22,12 +21,15 @@ namespace MauiApp1.Controllers
             }).Value;
         }
 
-        public BookSetupViewModel GetBookSetup() {
-            BookSetupViewModel viewModel
-                = new BookSetupViewModel();
+        public SeiresSetupViewModel GetSeriesSetup()
+        {
+            SeiresSetupViewModel viewModel
+                    = new SeiresSetupViewModel();
             viewModel.ListOfSeries = _SeriesService.GetListOfSeries();
+            viewModel.ListOfSeriesStatus = _SeriesService.GetCollectionStatus();
 
             return viewModel;
         }
     }
 }
+
