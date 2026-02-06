@@ -1,4 +1,5 @@
-﻿using MauiApp1.Repository;
+﻿using MauiApp1.BackEnd.Database;
+using MauiApp1.Repository;
 using MauiApp1.Service.Modals;
 using MauiApp1.Shared;
 using System;
@@ -13,19 +14,19 @@ namespace MauiApp1.BackEnd.Service
         private Lazy<SeriesRepository> SeriesRepository;
         private SeriesRepository _SeriesRepository;
 
-        public SeriesService()
+        public SeriesService(DataContext dataContext)
         {
             _SeriesRepository = new Lazy<SeriesRepository>(() =>
             {
                 // You can specify any additional
                 // initialization steps here.
-                return new SeriesRepository();
+                return new SeriesRepository(dataContext);
             }).Value;
         }
 
-        public List<TextValuePair<int>> GetListOfSeries()
+        public async Task<List<TextValuePair<int>>> GetListOfSeries()
         {
-            List<Series> series = _SeriesRepository.GetSeriessAsync().Result;
+            List<Series> series = await _SeriesRepository.GetSeriessAsync();
             List<TextValuePair<int>> listOfSeries = new List<TextValuePair<int>>();
             listOfSeries.Add(new TextValuePair<int>("None", 0));
             if (series != null || series.Count > 0)
@@ -37,6 +38,11 @@ namespace MauiApp1.BackEnd.Service
             }
 
             return listOfSeries;
+        }
+
+        public bool AddNewSeries(Series series)
+        {
+            return _SeriesRepository.SaveSeriesAsync(series);
         }
 
         public List<TextValuePair<int>> GetCollectionStatus()

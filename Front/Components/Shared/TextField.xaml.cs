@@ -24,7 +24,7 @@ public partial class TextField : ContentView
            BindableProperty.Create(nameof(InputFieldType), typeof(Keyboard), typeof(TextField), Keyboard.Text, BindingMode.TwoWay, null, OnInputTypeChanged);
 
     public static readonly BindableProperty ValueProperty =
-            BindableProperty.Create(nameof(Value), typeof(object), typeof(TextField), "", BindingMode.TwoWay, null, OnValueChanged);
+            BindableProperty.Create(nameof(Value), typeof(string), typeof(TextField), "", BindingMode.TwoWay, null, OnValueChanged);
 
    
     #endregion
@@ -48,9 +48,9 @@ public partial class TextField : ContentView
         set => SetValue(PlaceholderTextProperty, value);
     }
 
-    public object Value
+    public string Value
     {
-        get => GetValue(ValueProperty);
+        get => (string)GetValue(ValueProperty);
         set => SetValue(ValueProperty, value);
     }
 
@@ -143,6 +143,8 @@ public partial class TextField : ContentView
         {
             AnimateLabel(false);
         }
+
+        Value = e.NewTextValue;
     }
 
 

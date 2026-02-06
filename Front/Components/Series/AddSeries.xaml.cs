@@ -1,19 +1,31 @@
+
 using MauiApp1.BackEnd.Controllers;
 using MauiApp1.BackEnd.Controllers.ViewModels;
+using MauiApp1.BackEnd.Database;
+using MauiApp1.Controllers;
+using MauiApp1.Controllers.ViewModels;
 
 namespace MauiApp1.Front.Components.Series;
 
-public partial class AddSeries : ContentView
+public partial class AddSeries
 {
     SeiresSetupViewModel _viewModel;
     SeriesController controller;
-
-    public AddSeries()
+    private readonly DataContext _dbContext;
+    public AddSeries(DataContext dataContext)
 	{
 		InitializeComponent();
+        _dbContext = dataContext;
 
-        controller = new SeriesController();
+        GetSetup();
+    }
+
+    private async void GetSetup()
+    {
+        controller = new SeriesController(_dbContext);
         _viewModel = controller.GetSeriesSetup();
+
+        StatusCombobox.InputList = _viewModel.ListOfSeriesStatus;
     }
 
     private async void Button_Clicked(object sender, EventArgs e)
@@ -24,7 +36,7 @@ public partial class AddSeries : ContentView
     private async void AddButton_Clicked(object sender, EventArgs e)
     {
         //Get and save values
-
+        
         string title = Series_TitleTextField.Value.ToString();
         if (title.Length > 0)
         {
@@ -36,15 +48,25 @@ public partial class AddSeries : ContentView
             //Validate 
         }
 
+        string totalVolumesString = Series_VolumeTextField.Value;
+        int? totalVolumes = null;
+        if (totalVolumesString != null && totalVolumesString.Length != 0 )
+        {
+            totalVolumes = int.Parse(totalVolumesString);
+        }
+
         var s = new MauiApp1.Service.Modals.Series
         {
+            SeriesId = -1,
             Title = title,
             Author = author,
-            Publisher = (string)Series_publisherTextField.Value,
-            Artist = (string)Series_ArtistTextField.Value,
+            Publisher = Series_publisherTextField.Value,
+            Artist = Series_ArtistTextField.Value,
             CollectionStatus = MauiApp1.Shared.Enums.CollectionStatus.Collecting,
-            TotalVolumes = int.Parse((string)Series_VolumeTextField.Value)
+            TotalVolumes = totalVolumes
         };
+
+        controller.SaveNewSeries(s);
 
         await Shell.Current.GoToAsync("///MainPage");
     }

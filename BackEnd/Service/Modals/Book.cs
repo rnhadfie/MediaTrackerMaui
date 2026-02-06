@@ -1,4 +1,4 @@
-﻿using SQLite;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,7 +8,6 @@ namespace MauiApp1.Service.Modals
 {
     public class Book
     {
-        [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
         public string Title { get; set; }
         public byte[] Cover { get; set; }

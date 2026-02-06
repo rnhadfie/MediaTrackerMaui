@@ -1,25 +1,65 @@
 ﻿using MauiApp1.BackEnd.Database;
 using MauiApp1.Service.Modals;
-using SQLite;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace MauiApp1.BackEnd.Repository
 {
     public class BookRepository
     {
-        DatabaseService databaseService;
-        SQLiteAsyncConnection database;
-        public BookRepository()
+        DataContext _dbContext;
+
+        public BookRepository(DataContext dataContext)
         {
-            databaseService = new DatabaseService();
-            database = databaseService.Database;
+            _dbContext = dataContext;
         }
+
+        public async Task<List<Book>> GetBooksAsync()
+        {
+            return new ObservableCollection<Book>(_dbContext.BookTable).ToList();
+        }
+
+        public Book GetSeriesAsync(int id)
+        {
+            using (var context = _dbContext)
+            {
+
+
+                var result = (Book)context.BookTable.Where(x => x.Id == id);
+                return result;
+            }
+        }
+
+        public bool SaveBookAsync(Book item)
+        {
+            using (var context = _dbContext)
+            {
+                if (item.SeriesId != -1)
+                    context.BookTable.Update(item);
+                else
+                {
+                    int maxId = 1;
+                    if (context.BookTable.Any())
+                    {
+                        maxId = context.BookTable.Max(x => x.Id);
+                    }
+                    item.SeriesId = maxId + 1;
+
+                    context.BookTable.Add(item);
+
+                }
+                int result = context.SaveChanges();
+                return result > 0;
+            }
+        }
+
+        /*
         public async Task<List<Book>> GetBooksAsync()
         {
             await databaseService.Init();
-            return await database.Table<Book>().ToListAsync();
+           //eturn await database.Table<Book>().ToListAsync();
         }
 
         public async Task<Book> GetBookAsync(int id)
@@ -41,7 +81,7 @@ namespace MauiApp1.BackEnd.Repository
         {
             await databaseService.Init();
             return await database.DeleteAsync(item);
-        }
+        }*/
 
     }
 }

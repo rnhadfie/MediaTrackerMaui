@@ -1,8 +1,10 @@
 
 using MauiApp1.BackEnd.Controllers.ViewModels;
+using MauiApp1.BackEnd.Database;
 using MauiApp1.Controllers;
 using MauiApp1.Controllers.ViewModels;
 using MauiApp1.Service.Modals;
+using Microsoft.EntityFrameworkCore;
 
 namespace MauiApp1.Components.Books;
 
@@ -10,12 +12,17 @@ public partial class AddBook
 {
 	BookSetupViewModel _viewModel;
     BookController controller;
-    public AddBook()
+    private readonly DataContext _dbContext;
+    public AddBook(DataContext dataContext)
 	{
-		InitializeComponent();
-        controller = new BookController();
+        _dbContext = dataContext;
 
-        _viewModel = controller.GetBookSetup();
+        InitializeComponent();
+        controller = new BookController(_dbContext);
+
+        _viewModel = controller.GetBookSetup().Result;
+
+        SeriesCombobox.InputList = _viewModel.ListOfSeries;
     }
 
     private async void OnPickFileButtonClicked(object sender, EventArgs e)
@@ -83,6 +90,8 @@ public partial class AddBook
             Artist = (string)ArtistTextField.Value,
             volume = int.Parse((string)VolumeTextField.Value)
         };
+
+        controller.AddBook(book);
 
         await Shell.Current.GoToAsync("///MainPage");
     }

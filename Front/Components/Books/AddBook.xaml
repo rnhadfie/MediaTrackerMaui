@@ -14,7 +14,7 @@
                 HorizontalOptions="Center"
                 Text="Add Book"
                 VerticalOptions="Center" />
-            <local:Combobox x:Name="SeriesCombobox" HorizontalOptions="Fill" />
+            <local:Combobox x:Name="SeriesCombobox" HorizontalOptions="Fill" PlaceholderText="Series" />
             <local:TextField
                 x:Name="TitleTextField"
                 FieldClassId="title"

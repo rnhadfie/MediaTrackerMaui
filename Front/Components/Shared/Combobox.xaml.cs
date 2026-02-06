@@ -12,7 +12,8 @@ public partial class Combobox : ContentView
     public static readonly BindableProperty PlaceholderTextProperty =
             BindableProperty.Create(nameof(PlaceholderText), typeof(string), typeof(Combobox), "", BindingMode.TwoWay, null, OnPlaceHolderTextChanged);
 
-
+    public static readonly BindableProperty InputListProperty =
+           BindableProperty.Create(nameof(InputList), typeof(List<TextValuePair<int>>), typeof(Combobox), null, BindingMode.TwoWay, null, OnInputListChanged);
 
     public static readonly BindableProperty ValueProperty =
             BindableProperty.Create(nameof(Value), typeof(object), typeof(Combobox), "", BindingMode.TwoWay, null, OnValueChanged);
@@ -25,6 +26,12 @@ public partial class Combobox : ContentView
     {
         get => (string)GetValue(PlaceholderTextProperty);
         set => SetValue(PlaceholderTextProperty, value);
+    }
+
+    public List<TextValuePair<int>> InputList
+    {
+        get => (List<TextValuePair<int>>)GetValue(InputListProperty);
+        set => SetValue(InputListProperty, value);
     }
 
     public object Value
@@ -43,10 +50,16 @@ public partial class Combobox : ContentView
         control.comboboxLabel.Text = (string)newValue;
     }
 
+    private static void OnInputListChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        var control = (Combobox)bindable;
+        control.SeriesList.ItemsSource = (List<TextValuePair<int>>)newValue;
+    }
+
     private static void OnValueChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (Combobox)bindable;
-        control.SearchEntry.Text = (string)newValue;
+        control.SearchEntry.Text = ((TextValuePair<int>)newValue).Text;
     }
 
     #endregion
@@ -56,17 +69,14 @@ public partial class Combobox : ContentView
     public Combobox()
 	{
 		InitializeComponent();
-
-        controller = new BookController();
-        _viewModel = controller.GetBookSetup();
-        SeriesList.ItemsSource = _viewModel.ListOfSeries;
     }
 
     private void OnTextChanged(object sender, TextChangedEventArgs e)
     {
         // Filter items as the user types
+        var oldList = SeriesList.ItemsSource;
         var filter = e.NewTextValue.ToLower();
-        SeriesList.ItemsSource = _viewModel.ListOfSeries.Where(i => i.Text.ToLower().Contains(filter)).ToList();
+        SeriesList.ItemsSource = InputList.Where(i => i.Text.ToLower().Contains(filter)).ToList();
 
         DropdownBorder.IsVisible = true;
 
@@ -78,6 +88,9 @@ public partial class Combobox : ContentView
         {
             AnimateLabel(false);
         }
+
+        Value = new TextValuePair<int>(e.NewTextValue, -1);
+        
     }
 
     private async void OnEntryFocused(object sender, FocusEventArgs e)
@@ -105,6 +118,8 @@ public partial class Combobox : ContentView
         {
             SearchEntry.Text = selectedItem.Text;
             DropdownBorder.IsVisible = false;
+
+            Value = new TextValuePair<int>(selectedItem.Text, selectedItem.Value);
         }
     }
 

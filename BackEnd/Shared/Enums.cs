@@ -8,7 +8,7 @@ namespace MauiApp1.Shared
     public class Enums
     {
        public enum MediaDataType {
-         Default = 0,
+         All = 0,
          Book = 1,
          Video = 2,
          Cd = 3,

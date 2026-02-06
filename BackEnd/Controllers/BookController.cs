@@ -1,6 +1,7 @@
 ﻿using MauiApp1.BackEnd.Database;
 using MauiApp1.BackEnd.Service;
 using MauiApp1.Controllers.ViewModels;
+using MauiApp1.Service.Modals;
 using MauiApp1.Shared;
 using Microsoft.Maui.Controls;
 using System;
@@ -11,23 +12,36 @@ namespace MauiApp1.Controllers
 {
     public class BookController
     {
+        DataContext _dataContext;
         private Lazy<SeriesService> SeriesService;
         private SeriesService _SeriesService;
-        public BookController() {
+
+        private Lazy<BookService> BookService;
+        private BookService _BookService;
+        public BookController(DataContext dataContext) {
+           _dataContext = dataContext;
             _SeriesService = new Lazy<SeriesService>(() =>
             {
-                // You can specify any additional
-                // initialization steps here.
-                return new SeriesService();
+                return new SeriesService(_dataContext);
+            }).Value;
+
+            _BookService = new Lazy<BookService>(() =>
+            {
+                return new BookService(_dataContext);
             }).Value;
         }
 
-        public BookSetupViewModel GetBookSetup() {
+        public async Task<BookSetupViewModel> GetBookSetup() {
             BookSetupViewModel viewModel
                 = new BookSetupViewModel();
-            viewModel.ListOfSeries = _SeriesService.GetListOfSeries();
+            viewModel.ListOfSeries = await _SeriesService.GetListOfSeries();
 
             return viewModel;
+        }
+
+        public bool AddBook(Book newBook)
+        {
+            return _BookService.AddNewBool(newBook);
         }
     }
 }

@@ -1,59 +1,63 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:maui="clr-namespace:Microsoft.Maui;assembly=Microsoft.Maui"
-             xmlns:local="clr-namespace:MauiApp1.Front.Components.Shared"
-             x:Class="MauiApp1.Front.Components.Series.AddSeries">
+<ContentPage
+    x:Class="MauiApp1.Front.Components.Series.AddSeries"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:MauiApp1.Front.Components.Shared"
+    xmlns:maui="clr-namespace:Microsoft.Maui;assembly=Microsoft.Maui">
     <Grid ColumnDefinitions="*">
         <VerticalStackLayout
-        x:Name="AddSeriesForm"
-        HorizontalOptions="Fill"
-        VerticalOptions="Start">
+            x:Name="AddSeriesForm"
+            HorizontalOptions="Fill"
+            VerticalOptions="Start">
             <Label
-            HorizontalOptions="Center"
-            Text="Add Series"
-            VerticalOptions="Center" />
+                HorizontalOptions="Center"
+                Text="Add Series"
+                VerticalOptions="Center" />
 
             <local:TextField
-            x:Name="Series_TitleTextField"
-            FieldClassId="title"
-            HorizontalOptions="Fill"
-            PlaceholderText="Title" />
+                x:Name="Series_TitleTextField"
+                FieldClassId="title"
+                HorizontalOptions="Fill"
+                PlaceholderText="Title" />
             <local:TextField
-            x:Name="Series_AuthorTextField"
-            FieldClassId="author"
-            HorizontalOptions="Fill"
-            PlaceholderText="Author" />
+                x:Name="Series_AuthorTextField"
+                FieldClassId="author"
+                HorizontalOptions="Fill"
+                PlaceholderText="Author" />
             <local:TextField
-            x:Name="Series_ArtistTextField"
-            FieldClassId="artist"
-            HorizontalOptions="Fill"
-            PlaceholderText="Artist" />
+                x:Name="Series_ArtistTextField"
+                FieldClassId="artist"
+                HorizontalOptions="Fill"
+                PlaceholderText="Artist" />
             <local:TextField
-            x:Name="Series_publisherTextField"
-            FieldClassId="publisher"
-            HorizontalOptions="Fill"
-            PlaceholderText="Publisher" />
-            <!-- <local:Combobox x:Name="StatusCombobox" HorizontalOptions="Fill" />-->
+                x:Name="Series_publisherTextField"
+                FieldClassId="publisher"
+                HorizontalOptions="Fill"
+                PlaceholderText="Publisher" />
+            <local:Combobox
+                x:Name="StatusCombobox"
+                HorizontalOptions="Fill"
+                PlaceholderText="Status" />
             <local:TextField
-            x:Name="Series_VolumeTextField"
-            FieldClassId="totalVolumes"
-            HorizontalOptions="Start"
-            InputFieldType="{x:Static maui:Keyboard.Numeric}"
-            PlaceholderText="Total"
-            TextWidth="150" />
+                x:Name="Series_VolumeTextField"
+                FieldClassId="totalVolumes"
+                HorizontalOptions="Start"
+                InputFieldType="{x:Static maui:Keyboard.Numeric}"
+                PlaceholderText="Total"
+                TextWidth="150" />
             <HorizontalStackLayout Padding="4" HorizontalOptions="End">
                 <Button
-                Margin="4"
-                Clicked="Button_Clicked"
-                HorizontalOptions="End"
-                Text="Cancel" />
+                    Margin="4"
+                    Clicked="Button_Clicked"
+                    HorizontalOptions="End"
+                    Text="Cancel" />
                 <Button
-                Margin="4"
-                Clicked="AddButton_Clicked"
-                HorizontalOptions="End"
-                Text="Add Book" />
+                    Margin="4"
+                    Clicked="AddButton_Clicked"
+                    HorizontalOptions="End"
+                    Text="Add Book" />
             </HorizontalStackLayout>
         </VerticalStackLayout>
     </Grid>
-</ContentView>
+</ContentPage>

@@ -1,4 +1,5 @@
 using CommunityToolkit.Maui.Views;
+using MauiApp1.BackEnd.Database;
 using MauiApp1.Components.Books;
 using MauiApp1.Front.Components.Series;
 using MauiApp1.Shared;
@@ -9,17 +10,19 @@ namespace MauiApp1.Components;
 
 public partial class PopupMenuPage
 {
-	public PopupMenuPage()
+    private readonly DataContext _dbContext;
+
+    public PopupMenuPage(DataContext dbContext)
 	{
 		InitializeComponent();
         AddMenus();
-
+        _dbContext = dbContext;
     }
 
     public async void onMenuSelected(object sender, EventArgs e)
     {
         var currentBtn = (MenuItemButton)sender;
-        MediaDataType mediaDataType = currentBtn != null && currentBtn.Value != null ? (MediaDataType)currentBtn.Value : MediaDataType.Default;
+        MediaDataType mediaDataType = currentBtn != null && currentBtn.Value != null ? (MediaDataType)currentBtn.Value : MediaDataType.All;
 
         if (MediaDataType.Book == mediaDataType) {
             await Shell.Current.GoToAsync(nameof(AddBook));
@@ -27,6 +30,7 @@ public partial class PopupMenuPage
 
         if (MediaDataType.Series == mediaDataType)
         {
+            //await Shell.Current.GoToAsync(nameof(AddBook));
             await Shell.Current.GoToAsync(nameof(AddSeries));
         }
     }

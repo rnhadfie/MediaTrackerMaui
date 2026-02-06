@@ -6,18 +6,17 @@ namespace MauiApp1
 {
     public partial class MainPage : ContentPage
     {
-        DatabaseService _databaseService = new DatabaseService();
-        public MainPage()
+        private readonly DataContext _dbContext;
+        public MainPage(DataContext dataContext)
         {
             InitializeComponent();
-
-            _databaseService.InitTables();
+            _dbContext = dataContext;
         }
 
 
         private void OnOpenMenu(object? sender, EventArgs e)
         {
-            this.ShowPopup(new PopupMenuPage());
+            this.ShowPopup(new PopupMenuPage(_dbContext));
         }
     }
 }
