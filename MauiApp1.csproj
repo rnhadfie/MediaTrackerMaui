@@ -62,15 +62,23 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Maui" Version="13.0.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.30" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="14.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.31" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.2" />
-		<PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.30" />
+		<PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.31" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Compile Update="Front\Components\ScrollDisplay\ScrollViewDisplay.xaml.cs">
 	    <DependentUpon>ScrollViewDisplay.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Front\Components\Shared\Checkbox.xaml.cs">
+	    <DependentUpon>Checkbox.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Front\Components\Shared\FilePickerCom.xaml.cs">
+	    <DependentUpon>FilePickerCom.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
@@ -87,12 +95,25 @@
 	  <MauiXaml Update="Front\Components\ScrollDisplay\ScrollViewItem.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Series\AddSeries.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Front\Components\Shared\Checkbox.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Shared\Combobox.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Shared\FilePickerCom.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Front\Components\Shared\TextField.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="LocalStorage\" />
 	</ItemGroup>
 
 </Project>

@@ -1,56 +1,50 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
-    x:Class="MauiApp1.Components.Books.AddBook"
+    x:Class="MauiApp1.Front.Components.Series.AddSeries"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:MauiApp1.Front.Components.Shared"
     xmlns:maui="clr-namespace:Microsoft.Maui;assembly=Microsoft.Maui">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition  Width="*"/>
-            <ColumnDefinition Width="200" />
-        </Grid.ColumnDefinitions>
+    <Grid ColumnDefinitions="*">
         <VerticalStackLayout
-            x:Name="AddBookForm"
+            x:Name="AddSeriesForm"
             HorizontalOptions="Fill"
-            VerticalOptions="Start"
-            Grid.Column="0">
+            VerticalOptions="Start">
             <Label
                 HorizontalOptions="Center"
-                Text="Add Book"
+                Text="Add Series"
                 VerticalOptions="Center" />
-            <local:Combobox 
-                x:Name="SeriesCombobox" 
-                HorizontalOptions="Fill" 
-                PlaceholderText="Series"
-                SelectionChanged="SeriesCombobox_SelectionChanged"/>
+
             <local:TextField
-                x:Name="TitleTextField"
+                x:Name="Series_TitleTextField"
                 FieldClassId="title"
                 HorizontalOptions="Fill"
                 PlaceholderText="Title" />
             <local:TextField
-                x:Name="AuthorTextField"
+                x:Name="Series_AuthorTextField"
                 FieldClassId="author"
                 HorizontalOptions="Fill"
                 PlaceholderText="Author" />
             <local:TextField
-                x:Name="ArtistTextField"
+                x:Name="Series_ArtistTextField"
                 FieldClassId="artist"
                 HorizontalOptions="Fill"
                 PlaceholderText="Artist" />
             <local:TextField
-                x:Name="publisherTextField"
+                x:Name="Series_publisherTextField"
                 FieldClassId="publisher"
                 HorizontalOptions="Fill"
                 PlaceholderText="Publisher" />
-
+            <local:Combobox
+                x:Name="StatusCombobox"
+                HorizontalOptions="Fill"
+                PlaceholderText="Status" />
             <local:TextField
-                x:Name="VolumeTextField"
-                FieldClassId="volume"
+                x:Name="Series_VolumeTextField"
+                FieldClassId="totalVolumes"
                 HorizontalOptions="Start"
                 InputFieldType="{x:Static maui:Keyboard.Numeric}"
-                PlaceholderText="Volume"
+                PlaceholderText="Total"
                 TextWidth="150" />
             <HorizontalStackLayout Padding="4" HorizontalOptions="End">
                 <Button
@@ -64,9 +58,6 @@
                     HorizontalOptions="End"
                     Text="Add Book" />
             </HorizontalStackLayout>
-        </VerticalStackLayout>
-        <VerticalStackLayout Grid.Column="1">
-            <local:FilePicker x:Name="bookFilePicker" />
         </VerticalStackLayout>
     </Grid>
 </ContentPage>

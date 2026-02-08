@@ -1,83 +1,29 @@
 
+using MauiApp1.BackEnd.Controllers.ViewModels;
+using MauiApp1.BackEnd.Database;
 using MauiApp1.Controllers;
 using MauiApp1.Controllers.ViewModels;
-using MauiApp1.Front.Components.Shared;
+using MauiApp1.Service.Modals;
+using MauiApp1.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace MauiApp1.Components.Books;
 
-public partial class AddBook : ContentPage
+public partial class AddBook
 {
 	BookSetupViewModel _viewModel;
     BookController controller;
-    public AddBook()
+    private readonly DataContext _dbContext;
+    public AddBook(DataContext dataContext)
 	{
-		InitializeComponent();
-        controller = new BookController();
+        _dbContext = dataContext;
+
+        InitializeComponent();
+        controller = new BookController(_dbContext);
 
         _viewModel = controller.GetBookSetup();
 
-        SetupForm();
-    }
-
-    public void SetupForm()
-    {
-        
-        //Dropdown
-        HorizontalStackLayout seriesLayout = new HorizontalStackLayout();
-        seriesLayout.HorizontalOptions = LayoutOptions.Start;
-        seriesLayout.Add(new Label
-        {
-            Text = "Series",
-            WidthRequest = 50,
-            HorizontalOptions = LayoutOptions.Start,
-            HorizontalTextAlignment = TextAlignment.End
-
-        });
-        seriesLayout.Add(new Picker
-        {
-            ItemDisplayBinding = new Binding("Text"),
-            HorizontalOptions = LayoutOptions.Start,
-            WidthRequest = 250,
-            ItemsSource = _viewModel.ListOfSeries
-        });
-
-        var page = this.Content.FindByName<VerticalStackLayout>("AddBookForm");
-        page.Add(seriesLayout);
-
-        page.Add(new TextField("Title"));
-        page.Add(new TextField("Author"));
-        page.Add(new TextField("Artist", -1,-1, null, "Artist or co-author"));
-        page.Add(new TextField("Volume"));
-        page.Add(new Checkbox());
-
-
-        page.Add(new Button
-        {
-            Text = "Add Book",
-            HorizontalOptions = LayoutOptions.Center,
-            WidthRequest = 200,
-        });
-        //
-        /*
-         
-        </HorizontalStackLayout>
-        <HorizontalStackLayout>
-            <Label Text="Volume" WidthRequest="100" HorizontalOptions="End"/>
-            <Entry
-                Completed="OnEntryCompleted"
-                Keyboard="Numeric"
-                MaxLength="50" />
-        </HorizontalStackLayout>
-        <HorizontalStackLayout>
-            <CheckBox />
-            <Label Text="Completed" WidthRequest="100" HorizontalOptions="End" VerticalOptions="Center"/>
-        </HorizontalStackLayout>
-        <HorizontalStackLayout>
-            <Label Text="Cover Image" />
-        </HorizontalStackLayout>
-        <Button
-            Text="Add Book"></Button>
-         */
+        SeriesCombobox.InputList = _viewModel.ListOfSeries;
     }
 
     private async void OnPickFileButtonClicked(object sender, EventArgs e)
@@ -114,14 +60,62 @@ public partial class AddBook : ContentPage
         catch (Exception ex)
         {
             // Other errors
-            await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
+            //await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
         }
     }
 
-    private async void OnNavigatedTo(object sender, NavigatedToEventArgs args)
+    private async void Button_Clicked(object sender, EventArgs e)
     {
-        // Invoked when the page has been navigated to
-        Page? previousPage = args.PreviousPage;
-        NavigationType navigationType = args.NavigationType;
+        await Shell.Current.GoToAsync("///MainPage");
+    }
+
+    private async void AddButton_Clicked(object sender, EventArgs e)
+    {
+        //Get and save values
+
+        string title = TitleTextField.Value.ToString();
+        if (title.Length <= 0)
+        { 
+            //Validate 
+        }
+        string author = AuthorTextField.Value.ToString();
+        if (author.Length <= 0)
+        {
+            //Validate 
+        }
+        int volume = -1;
+        if (VolumeTextField.Value.Length > 0 && !VolumeTextField.Value.IsWhiteSpace())
+        { 
+            int.TryParse(VolumeTextField.Value, out volume);
+        }
+        Book book = new Book {
+            SeriesId = ((TextValuePair<int>)SeriesCombobox.Value).Value,
+            Title = title,
+            Author = author,
+            Publisher = (string)publisherTextField.Value,
+            Artist = (string)ArtistTextField.Value,
+            Cover = bookFilePicker.ImageData,
+            volume = volume
+        };
+
+        controller.AddBook(book);
+
+        await Shell.Current.GoToAsync("///MainPage");
+    }
+
+    private void SeriesCombobox_SelectionChanged(object sender, EventArgs e)
+    {
+        int seriesId = ((TextValuePair<int>)SeriesCombobox.Value).Value;
+        if (seriesId <= 0)
+        {
+            return;
+        }
+
+        Series selectedSeries = controller.GetSeriesInfo(seriesId);
+        
+        this.AuthorTextField.Value = selectedSeries.Author;
+        this.ArtistTextField.Value = selectedSeries.Artist;
+        this.publisherTextField.Value = selectedSeries.Publisher;
+        this.AuthorTextField.Value = selectedSeries.Author;
     }
 }

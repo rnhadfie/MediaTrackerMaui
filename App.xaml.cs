@@ -11,7 +11,7 @@ namespace MauiApp1
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            const int newHeight = 450;
+            const int newHeight = 500;
             const int newWidth = 700;
 
             var newWindow = new Window(new AppShell())

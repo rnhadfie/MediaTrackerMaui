@@ -5,6 +5,5 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:MauiApp1.Shared"
     xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui">
-    <VerticalStackLayout x:Name="MenuLayout">
-    </VerticalStackLayout>
+    <VerticalStackLayout x:Name="MenuLayout" />
 </mct:Popup>

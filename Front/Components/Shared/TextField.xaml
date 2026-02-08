@@ -3,26 +3,34 @@
     x:Class="MauiApp1.Front.Components.Shared.TextField"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
-    <Grid x:Name="ControlGrid" HeightRequest="60" Padding="10,0">
+    <Grid
+        x:Name="ControlGrid"
+        Padding="10,0"
+        HeightRequest="60"
+        HorizontalOptions="Fill">
         <Label
             x:Name="textfieldLabel"
-            Padding="{Binding Padding}"
-            Text="{Binding Text}"
-            FontSize="{Binding FontSize}"
-            HorizontalOptions="{Binding HorizontalOptions}"
-            HorizontalTextAlignment="{Binding HorizontalTextAlignment}"
+            Margin="0,0,30,0"
+            Padding="0,0,45,0"
+            ClassId="{Binding Source={x:Reference this}, Path=FieldClassId}"
+            FontSize="{Binding Source={x:Reference this}, Path=FontSize}"
+            HorizontalOptions="Start"
+            HorizontalTextAlignment="Start"
+            Text="{Binding Source={x:Reference this}, Path=PlaceholderText}"
             TextColor="Gray"
-            VerticalOptions="{Binding VerticalOptions}"
-            WidthRequest="{Binding WidthRequest}" />
+            VerticalOptions="Center" />
         <Entry
             x:Name="textfieldInput"
             Margin="0,15,0,0"
             BackgroundColor="Transparent"
+            ClassId="{Binding Source={x:Reference this}, Path=FieldClassId}"
             Focused="OnEntryFocused"
+            FontSize="{Binding Source={x:Reference this}, Path=FontSize}"
             HorizontalOptions="Fill"
             HorizontalTextAlignment="Start"
+            Keyboard="{Binding Source={x:Reference this}, Path=InputFieldType}"
+            Text="{Binding Source={x:Reference this}, Path=Value}"
             TextChanged="OnEntryTextChanged"
-            Unfocused="OnEntryUnfocused"
-            WidthRequest="260" />
+            Unfocused="OnEntryUnfocused" />
     </Grid>
 </ContentView>

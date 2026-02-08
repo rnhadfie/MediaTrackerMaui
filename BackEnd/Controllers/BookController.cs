@@ -1,5 +1,7 @@
-﻿using MauiApp1.Controllers.ViewModels;
-using MauiApp1.Service;
+﻿using MauiApp1.BackEnd.Database;
+using MauiApp1.BackEnd.Service;
+using MauiApp1.Controllers.ViewModels;
+using MauiApp1.Service.Modals;
 using MauiApp1.Shared;
 using Microsoft.Maui.Controls;
 using System;
@@ -10,23 +12,41 @@ namespace MauiApp1.Controllers
 {
     public class BookController
     {
-        private Lazy<GeneralService> GeneralService;
-        private GeneralService _GeneralService;
-        public BookController() {
-            _GeneralService = new Lazy<GeneralService>(() =>
+        DataContext _dataContext;
+        private Lazy<SeriesService> SeriesService;
+        private SeriesService _SeriesService;
+
+        private Lazy<BookService> BookService;
+        private BookService _BookService;
+        public BookController(DataContext dataContext) {
+           _dataContext = dataContext;
+            _SeriesService = new Lazy<SeriesService>(() =>
             {
-                // You can specify any additional
-                // initialization steps here.
-                return new GeneralService();
+                return new SeriesService(_dataContext);
+            }).Value;
+
+            _BookService = new Lazy<BookService>(() =>
+            {
+                return new BookService(_dataContext);
             }).Value;
         }
 
         public BookSetupViewModel GetBookSetup() {
             BookSetupViewModel viewModel
                 = new BookSetupViewModel();
-            viewModel.ListOfSeries = _GeneralService.GetListOfSeries();
+            viewModel.ListOfSeries = _SeriesService.GetListOfSeries();
 
             return viewModel;
+        }
+
+        public bool AddBook(Book newBook)
+        {
+            return _BookService.AddNewBool(newBook);
+        }
+
+        public Series GetSeriesInfo(int id)
+        {
+            return _SeriesService.GetSeries(id);
         }
     }
 }
