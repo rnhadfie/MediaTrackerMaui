@@ -69,7 +69,7 @@ public partial class FilePicker : ContentView
     private static void OnButtonTextPropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (FilePicker)bindable;
-        control.filePickButton.Text = newValue.ToString();
+        //ntrol.filePickButton.Text = newValue.ToString();
     }
 
     private static void OnShowImagePreviewChanged(BindableObject bindable, object oldValue, object newValue)
@@ -110,18 +110,14 @@ public partial class FilePicker : ContentView
                 string fullPath = result.FullPath;
 
                 ImageFilenameData = fileName;
-
                 fileNameLabel.Text = fileName;
 
-                // To read the file content, use OpenReadAsync
-                using var stream = await result.OpenReadAsync();
-                // ... use the stream to read/process the file ...
-
-                previewImage.Source = ImageSource.FromStream(() => stream);
+                var stream = await result.OpenReadAsync();
                 previewImage.IsVisible = true;
 
-                ImageData = new byte[stream.Length];
-                stream.Read(ImageData, 0, (int)stream.Length);
+                ImageData = StreamToByteArray(stream);
+
+                LoadImageFromStream(ImageData);
 
                 Console.WriteLine($"Selected file: {fileName}");
             }
@@ -141,4 +137,29 @@ public partial class FilePicker : ContentView
             Console.WriteLine($"Error picking file: {ex.Message}");
         }
     }
+
+    private static byte[] StreamToByteArray(Stream sourceStream)
+    {
+        // MemoryStream is IDisposable, so wrap it in a using statement
+        using (var memoryStream = new MemoryStream())
+        {
+            // Copy the entire contents of the source stream to the memory stream
+            sourceStream.CopyTo(memoryStream);
+
+            // Return the byte array representation of the memory stream contents
+            return memoryStream.ToArray();
+        }
+    }
+
+    private void LoadImageFromStream(byte[] imageData)
+    {
+        if (imageData != null && imageData.Length > 0)
+        {
+            
+            // Assign the source using a Func<Stream> to let MAUI manage the stream lifecycle
+            previewImage.Source = ImageSource.FromStream(() => new MemoryStream(imageData));
+        }
+    }
+
+
 }

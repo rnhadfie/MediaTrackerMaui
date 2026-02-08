@@ -23,20 +23,24 @@ namespace MauiApp1.BackEnd.Repository
 
         public Book GetSeriesAsync(int id)
         {
-            using (var context = _dbContext)
+            try
             {
-
-
+                var context = _dbContext;
                 var result = (Book)context.BookTable.Where(x => x.Id == id);
                 return result;
+            }
+            catch (Exception ex)
+            {
+                return new Book();
             }
         }
 
         public bool SaveBookAsync(Book item)
         {
-            using (var context = _dbContext)
+            try
             {
-                if (item.SeriesId != -1)
+                var context = _dbContext;
+                if (item.Id > 0)
                     context.BookTable.Update(item);
                 else
                 {
@@ -52,6 +56,10 @@ namespace MauiApp1.BackEnd.Repository
                 }
                 int result = context.SaveChanges();
                 return result > 0;
+            }
+            catch (Exception ex)
+            {
+                return false;
             }
         }
 

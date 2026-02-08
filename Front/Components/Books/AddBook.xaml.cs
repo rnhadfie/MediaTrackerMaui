@@ -4,6 +4,7 @@ using MauiApp1.BackEnd.Database;
 using MauiApp1.Controllers;
 using MauiApp1.Controllers.ViewModels;
 using MauiApp1.Service.Modals;
+using MauiApp1.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace MauiApp1.Components.Books;
@@ -20,7 +21,7 @@ public partial class AddBook
         InitializeComponent();
         controller = new BookController(_dbContext);
 
-        _viewModel = controller.GetBookSetup().Result;
+        _viewModel = controller.GetBookSetup();
 
         SeriesCombobox.InputList = _viewModel.ListOfSeries;
     }
@@ -73,26 +74,48 @@ public partial class AddBook
         //Get and save values
 
         string title = TitleTextField.Value.ToString();
-        if (title.Length > 0)
+        if (title.Length <= 0)
         { 
             //Validate 
         }
         string author = AuthorTextField.Value.ToString();
-        if (author.Length > 0)
+        if (author.Length <= 0)
         {
             //Validate 
         }
-
+        int volume = -1;
+        if (VolumeTextField.Value.Length > 0 && !VolumeTextField.Value.IsWhiteSpace())
+        { 
+            int.TryParse(VolumeTextField.Value, out volume);
+        }
         Book book = new Book {
+            SeriesId = ((TextValuePair<int>)SeriesCombobox.Value).Value,
             Title = title,
             Author = author,
             Publisher = (string)publisherTextField.Value,
             Artist = (string)ArtistTextField.Value,
-            volume = int.Parse((string)VolumeTextField.Value)
+            Cover = bookFilePicker.ImageData,
+            volume = volume
         };
 
         controller.AddBook(book);
 
         await Shell.Current.GoToAsync("///MainPage");
+    }
+
+    private void SeriesCombobox_SelectionChanged(object sender, EventArgs e)
+    {
+        int seriesId = ((TextValuePair<int>)SeriesCombobox.Value).Value;
+        if (seriesId <= 0)
+        {
+            return;
+        }
+
+        Series selectedSeries = controller.GetSeriesInfo(seriesId);
+        
+        this.AuthorTextField.Value = selectedSeries.Author;
+        this.ArtistTextField.Value = selectedSeries.Artist;
+        this.publisherTextField.Value = selectedSeries.Publisher;
+        this.AuthorTextField.Value = selectedSeries.Author;
     }
 }

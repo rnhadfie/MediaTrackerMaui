@@ -31,10 +31,10 @@ namespace MauiApp1.Controllers
             }).Value;
         }
 
-        public async Task<BookSetupViewModel> GetBookSetup() {
+        public BookSetupViewModel GetBookSetup() {
             BookSetupViewModel viewModel
                 = new BookSetupViewModel();
-            viewModel.ListOfSeries = await _SeriesService.GetListOfSeries();
+            viewModel.ListOfSeries = _SeriesService.GetListOfSeries();
 
             return viewModel;
         }
@@ -42,6 +42,11 @@ namespace MauiApp1.Controllers
         public bool AddBook(Book newBook)
         {
             return _BookService.AddNewBool(newBook);
+        }
+
+        public Series GetSeriesInfo(int id)
+        {
+            return _SeriesService.GetSeries(id);
         }
     }
 }

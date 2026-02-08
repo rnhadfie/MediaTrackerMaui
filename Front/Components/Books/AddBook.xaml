@@ -5,16 +5,25 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:MauiApp1.Front.Components.Shared"
     xmlns:maui="clr-namespace:Microsoft.Maui;assembly=Microsoft.Maui">
-    <Grid ColumnDefinitions="*">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition  Width="*"/>
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
         <VerticalStackLayout
             x:Name="AddBookForm"
             HorizontalOptions="Fill"
-            VerticalOptions="Start">
+            VerticalOptions="Start"
+            Grid.Column="0">
             <Label
                 HorizontalOptions="Center"
                 Text="Add Book"
                 VerticalOptions="Center" />
-            <local:Combobox x:Name="SeriesCombobox" HorizontalOptions="Fill" PlaceholderText="Series" />
+            <local:Combobox 
+                x:Name="SeriesCombobox" 
+                HorizontalOptions="Fill" 
+                PlaceholderText="Series"
+                SelectionChanged="SeriesCombobox_SelectionChanged"/>
             <local:TextField
                 x:Name="TitleTextField"
                 FieldClassId="title"
@@ -35,7 +44,7 @@
                 FieldClassId="publisher"
                 HorizontalOptions="Fill"
                 PlaceholderText="Publisher" />
-            <local:FilePicker />
+
             <local:TextField
                 x:Name="VolumeTextField"
                 FieldClassId="volume"
@@ -55,6 +64,9 @@
                     HorizontalOptions="End"
                     Text="Add Book" />
             </HorizontalStackLayout>
+        </VerticalStackLayout>
+        <VerticalStackLayout Grid.Column="1">
+            <local:FilePicker x:Name="bookFilePicker" />
         </VerticalStackLayout>
     </Grid>
 </ContentPage>

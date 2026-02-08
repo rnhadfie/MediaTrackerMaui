@@ -29,5 +29,19 @@ namespace MauiApp1.Shared
             Collecting = 3,
             Completed = 4,
         }
+
+        public enum VideoFormat
+        {
+            DVD = 1,
+            Bluray = 2,
+            ultraHd = 3
+        }
+
+        public enum VideoType { 
+            Movie = 1,
+            tvShow = 2,
+            Concert = 3,
+            Documentary = 4
+        }
     }
 }

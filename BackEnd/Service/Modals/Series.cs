@@ -14,9 +14,7 @@ namespace MauiApp1.Service.Modals
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public required int SeriesId { get; set; }
         
-
         public required string Title { get; set; }
-
 
         public string? Author { get; set; }
         public string? Artist { get; set; }
@@ -28,5 +26,7 @@ namespace MauiApp1.Service.Modals
         public MediaDataType type { get; set; }
 
         public CollectionStatus? CollectionStatus { get; set; }
+
+        //public bool Complete { get; set; }
     }
 }

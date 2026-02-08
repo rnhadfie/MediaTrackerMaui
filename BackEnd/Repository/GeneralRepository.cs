@@ -19,26 +19,30 @@ namespace MauiApp1.Repository
         {
             _dbContext = dataContext;
         }
-        public async Task<List<Series>> GetSeriessAsync()
+        public List<Series> GetSeriessAsync()
         {
             return new ObservableCollection<Series>(_dbContext.SeriesTable).ToList();
         }
         
         public Series GetSeriesAsync(int id)
         {
-            using (var context = _dbContext)
+            try
             {
-               
-            
-            var result = (Series)context.SeriesTable.Where(x => x.SeriesId == id);
-            return result;
+                var context = _dbContext;
+            var result = context.SeriesTable.Where(x => x.SeriesId == id);
+                return result.FirstOrDefault<Series>();
+            }
+            catch (Exception ex)
+            {
+                return new Series() { Title = "", SeriesId = -1};
             }
         }
 
         public bool SaveSeriesAsync(Series item)
         {
-            using (var context = _dbContext)
+            try
             {
+                var context = _dbContext;
                 if (item.SeriesId != -1)
                     context.SeriesTable.Update(item);
                 else
@@ -51,10 +55,14 @@ namespace MauiApp1.Repository
                     item.SeriesId = maxId + 1;
 
                     context.SeriesTable.Add(item);
-                   
+
                 }
                 int result = context.SaveChanges();
                 return result > 0;
+            }
+            catch (Exception ex)
+            {
+                return false;
             }
         }
         /*

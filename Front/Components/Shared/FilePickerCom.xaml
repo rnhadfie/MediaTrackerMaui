@@ -3,24 +3,31 @@
     x:Class="MauiApp1.Front.Components.Shared.FilePicker"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
-    <VerticalStackLayout>
+    <VerticalStackLayout Padding="8,8,8,8">
         <Image
             x:Name="previewImage"
-            Aspect="AspectFill"
+            Aspect="AspectFit"
+            BackgroundColor="LightGray"
             HeightRequest="150"
-            HorizontalOptions="Center"
-            IsVisible="False"
+            HorizontalOptions="Fill"
+            IsVisible="True"
+            Source="not_applicable.png"
             WidthRequest="100" />
+        <ImageButton
+            x:Name="filePickButton"
+            Margin="75,-25,-5,0"
+            Padding="8,8,8,8"
+            BackgroundColor="White"
+            BorderColor="Black"
+            BorderWidth="2"
+            Clicked="OnPickFileButtonClicked"
+            CornerRadius="32"
+            HeightRequest="24"
+            HorizontalOptions="Center"
+            Source="icons_add_50.png"
+            WidthRequest="24" />
         <HorizontalStackLayout>
-            <Button
-                x:Name="filePickButton"
-                Padding="8,8,8,8"
-                BackgroundColor="White"
-                BorderColor="Black"
-                Clicked="OnPickFileButtonClicked"
-                HorizontalOptions="Start"
-                Text="addCover"
-                TextColor="Black" />
+
             <Label
                 x:Name="fileNameLabel"
                 HorizontalOptions="Fill"

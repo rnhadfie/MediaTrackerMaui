@@ -17,10 +17,12 @@ public partial class Combobox : ContentView
 
     public static readonly BindableProperty ValueProperty =
             BindableProperty.Create(nameof(Value), typeof(object), typeof(Combobox), "", BindingMode.TwoWay, null, OnValueChanged);
+
+    public event EventHandler SelectionChanged;
     #endregion
 
     #region Properties
-    
+
 
     public string PlaceholderText
     {
@@ -120,8 +122,10 @@ public partial class Combobox : ContentView
             DropdownBorder.IsVisible = false;
 
             Value = new TextValuePair<int>(selectedItem.Text, selectedItem.Value);
+            SelectionChanged?.Invoke(this, EventArgs.Empty);
         }
     }
+
 
     private async Task AnimateLabel(bool isFocused)
     {

@@ -22,7 +22,7 @@
                 Clicked="OnOpenMenu"
                 HeightRequest="36"
                 HorizontalOptions="End"
-                Source="dotnet_bot.png"
+                Source="icons_add_50.png"
                 VerticalOptions="End"
                 WidthRequest="36" />
         </VerticalStackLayout>

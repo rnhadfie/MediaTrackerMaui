@@ -24,9 +24,9 @@ namespace MauiApp1.BackEnd.Service
             }).Value;
         }
 
-        public async Task<List<TextValuePair<int>>> GetListOfSeries()
+        public List<TextValuePair<int>> GetListOfSeries()
         {
-            List<Series> series = await _SeriesRepository.GetSeriessAsync();
+            List<Series> series =  _SeriesRepository.GetSeriessAsync();
             List<TextValuePair<int>> listOfSeries = new List<TextValuePair<int>>();
             listOfSeries.Add(new TextValuePair<int>("None", 0));
             if (series != null || series.Count > 0)
@@ -43,6 +43,11 @@ namespace MauiApp1.BackEnd.Service
         public bool AddNewSeries(Series series)
         {
             return _SeriesRepository.SaveSeriesAsync(series);
+        }
+
+        public Series GetSeries(int id)
+        {
+            return _SeriesRepository.GetSeriesAsync(id);
         }
 
         public List<TextValuePair<int>> GetCollectionStatus()
