@@ -5,6 +5,7 @@ using MauiApp1.Front.Components.Series;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using MauiApp1.BackEnd.Service.Modals;
+using MauiApp1.Front.Components.Video;
 
 namespace MauiApp1
 {
@@ -27,6 +28,7 @@ namespace MauiApp1
 
             builder.Services.AddTransient<AddBook>();
             builder.Services.AddTransient<AddSeries>();
+            builder.Services.AddTransient<AddVideo>();
 
             builder.Services.AddDbContext<DataContext>(
                 options =>
@@ -56,15 +58,7 @@ namespace MauiApp1
                    context.SaveChanges();
                 }
 
-                if (!context.CategoryTable.Any())
-                {
-                    context.CategoryTable.AddRange(
-                        [ new Category{Id= 1, Name= "Live Action" }, 
-                        new Category{Id=2, Name="Anime"}, 
-                        new Category{Id=3, Name = "Western Animation"},
-                        new Category{Id=4, Name = "Concert"},
-                        new Category { Id = 5, Name = "Documentary"}]);
-                }
+               
             }
 
             return app;

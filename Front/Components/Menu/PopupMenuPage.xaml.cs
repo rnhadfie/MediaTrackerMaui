@@ -2,6 +2,7 @@ using CommunityToolkit.Maui.Views;
 using MauiApp1.BackEnd.Database;
 using MauiApp1.Components.Books;
 using MauiApp1.Front.Components.Series;
+using MauiApp1.Front.Components.Video;
 using MauiApp1.Shared;
 using System.Threading.Tasks;
 using static MauiApp1.Shared.Enums;
@@ -30,8 +31,12 @@ public partial class PopupMenuPage
 
         if (MediaDataType.Series == mediaDataType)
         {
-            //await Shell.Current.GoToAsync(nameof(AddBook));
             await Shell.Current.GoToAsync(nameof(AddSeries));
+        }
+
+        if (MediaDataType.Video == mediaDataType)
+        {
+            await Shell.Current.GoToAsync(nameof(AddVideo));
         }
     }
 

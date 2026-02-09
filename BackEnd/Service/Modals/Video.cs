@@ -14,15 +14,16 @@ namespace MauiApp1.Service.Modals
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         public int? Category { get; set; }
 
+        [ForeignKey("Series")]
         public int Series { get; set; }
 
-        public VideoFormat format { get; set; }
+        public int format { get; set; }
 
-        public VideoType Type { get; set; }
+        public int Type { get; set; }
 
         public byte[]? Cover { get; set; }
 

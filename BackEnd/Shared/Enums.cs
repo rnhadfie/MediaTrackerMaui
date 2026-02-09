@@ -1,4 +1,5 @@
 ﻿//using Android.Provider;
+using MauiApp1.Service.Modals;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -30,6 +31,36 @@ namespace MauiApp1.Shared
             Completed = 4,
         }
 
+        public enum BookFormat
+        {
+            Paperback = 1,
+            Hardcover = 2,
+            EBook = 3
+        }
+
+        public enum BookGenre
+        {
+            Fiction = 1,
+            NonFiction = 2,
+            Mystery = 3,
+            ScienceFiction = 4,
+            Fantasy = 5,
+            Biography = 6,
+            History = 7,
+            Romance = 8,
+            Thriller = 9,
+            Horror = 10
+        }
+
+        public enum  BookType
+        {
+            Novel = 1,
+            Anthology = 2,
+            GraphicNovel = 3,
+            Manga = 4,
+            LightNovel = 5,
+        }
+
         public enum VideoFormat
         {
             DVD = 1,
@@ -40,8 +71,6 @@ namespace MauiApp1.Shared
         public enum VideoType { 
             Movie = 1,
             tvShow = 2,
-            Concert = 3,
-            Documentary = 4
         }
     }
 }

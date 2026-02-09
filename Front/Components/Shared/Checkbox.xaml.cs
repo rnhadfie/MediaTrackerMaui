@@ -1,12 +1,8 @@
-using MauiApp1.Controllers;
-using MauiApp1.Controllers.ViewModels;
-
 namespace MauiApp1.Front.Components.Shared;
 
 public partial class Checkbox : ContentView
 {
-    BookSetupViewModel _viewModel;
-    BookController controller;
+
     #region Bindable Properties
     public static readonly BindableProperty LabelTextProperty =
             BindableProperty.Create(nameof(LabelText), typeof(string), typeof(Shared.Checkbox), "", BindingMode.TwoWay, null, OnLabelTextChanged);
@@ -66,6 +62,5 @@ public partial class Checkbox : ContentView
     public Checkbox()
 	{
 		InitializeComponent();
-        _viewModel = new BookSetupViewModel();
     }
 }
