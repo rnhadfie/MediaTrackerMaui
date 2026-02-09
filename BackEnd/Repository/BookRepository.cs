@@ -31,7 +31,7 @@ namespace MauiApp1.BackEnd.Repository
             }
             catch (Exception ex)
             {
-                return new Book();
+                return new Book() { Title = "" };
             }
         }
 

@@ -13,8 +13,6 @@ namespace MauiApp1.BackEnd.Database
         public DbSet<Series> SeriesTable { get; set; }
         public DbSet<Book> BookTable { get; set; }
 
-        public DbSet<Category> CategoryTable { get; set; }
-
         public DbSet<Video> VideoTable { get; set; }
     }
 }

@@ -34,14 +34,17 @@ namespace MauiApp1.Controllers
         public BookSetupViewModel GetBookSetup() {
             BookSetupViewModel viewModel
                 = new BookSetupViewModel();
-            viewModel.ListOfSeries = _SeriesService.GetListOfSeries();
+            viewModel.Series = _SeriesService.GetListOfSeries();
+            viewModel.Genre = _BookService.GetGenres();
+            viewModel.Format = _BookService.GetBookFormats();
+            viewModel.Type = _BookService.GetBookTypes();
 
             return viewModel;
         }
 
         public bool AddBook(Book newBook)
         {
-            return _BookService.AddNewBool(newBook);
+            return _BookService.AddNewBook(newBook);
         }
 
         public Series GetSeriesInfo(int id)
