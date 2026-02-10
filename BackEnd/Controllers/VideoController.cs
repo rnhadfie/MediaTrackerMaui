@@ -1,11 +1,13 @@
 ﻿using MauiApp1.BackEnd.Controllers.ViewModels;
 using MauiApp1.BackEnd.Database;
 using MauiApp1.BackEnd.Service;
+using MauiApp1.BackEnd.Service.Modals;
 using MauiApp1.Controllers.ViewModels;
 using MauiApp1.Service.Modals;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using static MauiApp1.Shared.Enums;
 
 namespace MauiApp1.BackEnd.Controllers
 {
@@ -45,6 +47,11 @@ namespace MauiApp1.BackEnd.Controllers
         public bool AddVideo(Video newVideo)
         {
             return _VideoService.AddVideo(newVideo);
+        }
+
+        public Video GetVideoInfo(int id)
+        {
+            return _VideoService.GetVideoInfo(id);
         }
     }
 }

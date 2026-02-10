@@ -19,11 +19,16 @@ namespace MauiApp1.Repository
         {
             _dbContext = dataContext;
         }
-        public List<Series> GetSeriessAsync()
+        public List<Series> GetSeriesList()
         {
             return new ObservableCollection<Series>(_dbContext.SeriesTable).ToList();
         }
-        
+
+        public List<Series> GetSeriesList(int take)
+        {
+            return new ObservableCollection<Series>(_dbContext.SeriesTable.Take(take)).ToList();
+        }
+
         public Series GetSeriesAsync(int id)
         {
             try

@@ -19,15 +19,13 @@ namespace MauiApp1.Service.Modals
         public int? Category { get; set; }
 
         [ForeignKey("Series")]
-        public int Series { get; set; }
+        public int SeriesId { get; set; }
 
-        public int format { get; set; }
+        public int VideoFormat { get; set; }
 
         public int Type { get; set; }
 
         public byte[]? Cover { get; set; }
-
-        public bool IsLimitedEdition { get; set; }
 
     }
 }

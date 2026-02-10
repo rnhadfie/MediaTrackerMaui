@@ -1,5 +1,6 @@
 ﻿using MauiApp1.BackEnd.Database;
 using MauiApp1.BackEnd.Repository;
+using MauiApp1.BackEnd.Service.Modals;
 using MauiApp1.Front.Components.Video;
 using MauiApp1.Service.Modals;
 using MauiApp1.Shared;
@@ -28,8 +29,34 @@ namespace MauiApp1.BackEnd.Service
         public bool AddVideo(Video newVideo)
         {
             byte[] CompressedImageData = newVideo.Cover ?? [];
-            newVideo.Cover = SharedService.CompressImage(CompressedImageData, 100, 60);
+            if (CompressedImageData.Length > 0)
+            {
+                newVideo.Cover = SharedService.CompressImage(CompressedImageData, 100, 60);
+            }
             return _VideoRepository.SaveVideo(newVideo);
+        }
+
+        public Video GetVideoInfo(int id)
+        {
+            return _VideoRepository.GetVideo(id);
+        }
+
+        public List<DisplayViewItem> GetVideos(int take)
+        {
+            List<Video> videoList = _VideoRepository.GetAllVideo();
+            List<DisplayViewItem> videoDisplayList = new List<DisplayViewItem>();
+            videoList.ForEach(x =>
+            {
+                videoDisplayList.Add(new DisplayViewItem()
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Cover = x.Cover,
+                    Type = MediaDataType.Video
+
+                });
+            });
+            return videoDisplayList;
         }
 
         public List<TextValuePair<int>> GetVideoFormat()

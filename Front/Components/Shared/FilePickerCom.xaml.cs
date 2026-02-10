@@ -8,17 +8,8 @@ public partial class FilePicker : ContentView
     public static readonly BindableProperty ButtonTextProperty =
             BindableProperty.Create(nameof(ButtonText), typeof(string), typeof(FilePicker), "", BindingMode.TwoWay, null, OnButtonTextPropertyChanged);
 
-    /*
-    public static readonly BindableProperty ImageDataProperty =
-            BindableProperty.Create(nameof(ImageData), typeof(byte[]), typeof(FilePicker), [], BindingMode.TwoWay, null);
-
-    public static readonly BindableProperty ImageFilenameDataProperty =
-           BindableProperty.Create(nameof(ImageFilenameData), typeof(string), typeof(FilePicker), "", BindingMode.TwoWay, null);
-    */
     public static readonly BindableProperty ImagePreviewProperty =
            BindableProperty.Create(nameof(showImagePreview), typeof(bool), typeof(FilePicker), true, BindingMode.TwoWay, null, OnShowImagePreviewChanged);
-
-    
 
     public static readonly BindableProperty FilenamePreviewProperty =
            BindableProperty.Create(nameof(showFileName), typeof(bool), typeof(FilePicker), true, BindingMode.TwoWay, null, OnShowFileNamePreviewChanged);
@@ -35,20 +26,16 @@ public partial class FilePicker : ContentView
         set => SetValue(ButtonTextProperty, value);
     }
 
-    public byte[] ImageData { get; set; }
-    public string ImageFilenameData { get; set; }
-    /*
+    private byte[] _imageData;
     public byte[] ImageData
     {
-        get => GetValue((byte[])ImageDataProperty);
-        set => SetValue((byte[])ImageDataProperty, value);
+        get=> _imageData;
+        set { 
+            _imageData = value;
+            LoadImageFromStream(value);
+        }
     }
-
-    public string ImageFilenameData
-    {
-        get => GetValue((string)ImageFilenameDataProperty);
-        set => SetValue((string)ImageFilenameDataProperty, value);
-    }*/
+    public string ImageFilenameData { get; set; }
 
     public bool showImagePreview
     {
@@ -69,7 +56,6 @@ public partial class FilePicker : ContentView
     private static void OnButtonTextPropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (FilePicker)bindable;
-        //ntrol.filePickButton.Text = newValue.ToString();
     }
 
     private static void OnShowImagePreviewChanged(BindableObject bindable, object oldValue, object newValue)

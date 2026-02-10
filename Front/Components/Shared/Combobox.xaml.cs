@@ -62,15 +62,19 @@ public partial class Combobox : ContentView
     {
         var control = (Combobox)bindable;
         control.SearchEntry.Text = ((TextValuePair<int>)newValue).Text;
+        control.loading = false;
     }
 
     #endregion
 
     BookSetupViewModel _viewModel;
     BookController controller;
+    private bool loading = true;
+
     public Combobox()
 	{
 		InitializeComponent();
+        loading = true;
     }
 
     private void OnTextChanged(object sender, TextChangedEventArgs e)
@@ -79,9 +83,9 @@ public partial class Combobox : ContentView
         var oldList = SeriesList.ItemsSource;
         var filter = e.NewTextValue.ToLower();
         SeriesList.ItemsSource = InputList.Where(i => i.Text.ToLower().Contains(filter)).ToList();
-
-        DropdownBorder.IsVisible = true;
-
+        if (!loading) { 
+            DropdownBorder.IsVisible = true;
+        }
         if (!string.IsNullOrEmpty(e.NewTextValue) && string.IsNullOrEmpty(e.OldTextValue))
         {
             AnimateLabel(true);
@@ -90,8 +94,9 @@ public partial class Combobox : ContentView
         {
             AnimateLabel(false);
         }
-
-        Value = new TextValuePair<int>(e.NewTextValue, -1);
+            if (!loading) { 
+                Value = new TextValuePair<int>(e.NewTextValue, -1);
+            }
         
     }
 

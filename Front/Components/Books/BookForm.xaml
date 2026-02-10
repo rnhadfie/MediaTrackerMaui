@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
-    x:Class="MauiApp1.Front.Components.Video.AddVideo"
+    x:Class="MauiApp1.Components.Books.BookForm"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:MauiApp1.Front.Components.Shared"
@@ -13,53 +13,64 @@
                     <ColumnDefinition Width="200" />
                 </Grid.ColumnDefinitions>
                 <VerticalStackLayout
-                    x:Name="AddVideoForm"
+                    x:Name="AddBookForm"
                     Grid.Column="0"
                     HorizontalOptions="Fill"
                     VerticalOptions="Start">
                     <Label
                         HorizontalOptions="Center"
-                        Text="Add DVD/BluRay"
+                        Text="Add Book"
                         VerticalOptions="Center" />
                     <local:Combobox
-                        x:Name="Video_SeriesCombobox"
+                        x:Name="Book_SeriesCombobox"
                         HorizontalOptions="Fill"
                         PlaceholderText="Series"
-                        SelectionChanged="Video_SeriesCombobox_SelectionChanged" />
-
+                        SelectionChanged="SeriesCombobox_SelectionChanged" />
                     <local:TextField
-                        x:Name="Video_TitleTextField"
+                        x:Name="Book_TitleTextField"
                         FieldClassId="title"
                         HorizontalOptions="Fill"
                         PlaceholderText="Title" />
-                    <local:RadioButtons
-                        x:Name="Video_FormatRadioButtons"
-                        HorizontalOptions="Start"
-                        LabelText="Format"
-                        Source="{Binding _viewModel.VideoFormat}" />
-                    <local:RadioButtons
-                        x:Name="Video_TypeRadioButtons"
-                        HorizontalOptions="Start"
-                        LabelText="Type"
-                        Source="{Binding _viewModel.VideoType}" />
-                    <local:Combobox
-                        x:Name="Video_CategoryCombobox"
+                    <local:TextField
+                        x:Name="Book_AuthorTextField"
+                        FieldClassId="author"
                         HorizontalOptions="Fill"
-                        PlaceholderText="Category"
-                        SelectionChanged="" />
-
+                        PlaceholderText="Author" />
+                    <local:TextField
+                        x:Name="Book_ArtistTextField"
+                        FieldClassId="artist"
+                        HorizontalOptions="Fill"
+                        PlaceholderText="Artist" />
+                    <local:TextField
+                        x:Name="Book_PublisherTextField"
+                        FieldClassId="publisher"
+                        HorizontalOptions="Fill"
+                        PlaceholderText="Publisher" />
 
                     <local:TextField
-                        x:Name="Video_VolumeTextField"
+                        x:Name="Book_VolumeTextField"
                         FieldClassId="volume"
                         HorizontalOptions="Start"
                         InputFieldType="{x:Static maui:Keyboard.Numeric}"
-                        PlaceholderText="Season/Set"
+                        PlaceholderText="Volume"
                         TextWidth="150" />
 
+                    <local:RadioButtons
+                        x:Name="Book_FormatRadioButtons"
+                        HorizontalOptions="Start"
+                        LabelText="Format" />
+                    <local:RadioButtons
+                        x:Name="Book_TypeRadioButtons"
+                        HorizontalOptions="Start"
+                        LabelText="Format" />
+                    <local:Combobox
+                        x:Name="Book_Genre"
+                        HorizontalOptions="Fill"
+                        PlaceholderText="Genre"
+                        SelectionChanged="" />
                 </VerticalStackLayout>
                 <VerticalStackLayout Grid.Column="1">
-                    <local:FilePicker x:Name="Video_FilePicker" />
+                    <local:FilePicker x:Name="Book_FilePicker" />
                 </VerticalStackLayout>
             </Grid>
             <HorizontalStackLayout Padding="4" HorizontalOptions="End">
@@ -72,9 +83,8 @@
                     Margin="4"
                     Clicked="AddButton_Clicked"
                     HorizontalOptions="End"
-                    Text="Add DVD/BluRay" />
+                    Text="Add Book" />
             </HorizontalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>

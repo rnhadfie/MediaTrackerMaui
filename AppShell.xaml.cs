@@ -11,9 +11,9 @@ namespace MauiApp1
             InitializeComponent();
 
             Routing.RegisterRoute(nameof(MainPage), typeof(MainPage));
-            Routing.RegisterRoute(nameof(AddBook), typeof(AddBook));
-            Routing.RegisterRoute(nameof(AddSeries), typeof(AddSeries));
-            Routing.RegisterRoute(nameof(AddVideo), typeof(AddVideo));
+            Routing.RegisterRoute(nameof(BookForm), typeof(BookForm));
+            Routing.RegisterRoute(nameof(SeriesForm), typeof(SeriesForm));
+            Routing.RegisterRoute(nameof(VideoForm), typeof(VideoForm));
         }
 
 

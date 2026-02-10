@@ -16,18 +16,23 @@ namespace MauiApp1.BackEnd.Repository
             _dbContext = dataContext;
         }
 
-        public async Task<List<Video>> GetBooksAsync()
+        public List<Video> GetAllVideo()
         {
             return new ObservableCollection<Video>(_dbContext.VideoTable).ToList();
         }
 
-        public Video GetSeriesAsync(int id)
+        public List<Video> GetAllVideo(int take)
+        {
+            return new ObservableCollection<Video>(_dbContext.VideoTable.Take(take)).ToList();
+        }
+
+        public Video GetVideo(int id)
         {
             try
             {
                 var context = _dbContext;
-                var result = (Video)context.VideoTable.Where(x => x.Id == id);
-                return result;
+                var result = context.VideoTable.Where(x => x.Id == id);
+                return result.FirstOrDefault<Video>();
             }
             catch (Exception ex)
             {
@@ -49,7 +54,7 @@ namespace MauiApp1.BackEnd.Repository
                     {
                         maxId = context.VideoTable.Max(x => x.Id);
                     }
-                    item.Series = maxId + 1;
+                    item.Id = maxId + 1;
 
                     context.VideoTable.Add(item);
 

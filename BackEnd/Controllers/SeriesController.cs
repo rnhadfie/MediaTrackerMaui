@@ -32,6 +32,11 @@ namespace MauiApp1.BackEnd.Controllers
             return viewModel;
         }
 
+        public Series GetSeriesInfo(int id)
+        {
+            return _SeriesService.GetSeries(id);
+        }
+
         public bool SaveNewSeries(Series newSeries)
         {
             _SeriesService.AddNewSeries(newSeries);

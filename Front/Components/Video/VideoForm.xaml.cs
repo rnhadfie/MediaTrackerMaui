@@ -11,13 +11,16 @@ using static MauiApp1.Shared.Enums;
 
 namespace MauiApp1.Front.Components.Video;
 
-public partial class AddVideo : ContentPage
+[QueryProperty(nameof(Add), nameof(Add))]
+[QueryProperty(nameof(VideoId), "VideoId")]
+public partial class VideoForm : ContentPage
 {
     //Vide _viewModel;
     VideoController controller;
     VideoSetupViewModel _viewModel;
+    private MauiApp1.Service.Modals.Video _Video;
     private readonly DataContext _dbContext;
-    public AddVideo(DataContext dataContext)
+    public VideoForm(DataContext dataContext)
 	{
         _dbContext = dataContext;
         controller = new VideoController(_dbContext);
@@ -29,6 +32,59 @@ public partial class AddVideo : ContentPage
         Video_CategoryCombobox.InputList = _viewModel.Category;
         Video_FormatRadioButtons.AddData(_viewModel.VideoFormat);
         Video_TypeRadioButtons.AddData(_viewModel.VideoType);
+
+        _Video = new MauiApp1.Service.Modals.Video()
+        {
+            Id = -1,
+            Name = "",
+        };
+    }
+
+    private bool add;
+
+    public bool Add
+    {
+        get => add;
+        set
+        {
+            OnPropertyChanged();
+            add = value;
+            OnPropertyChanged2();
+        }
+    }
+
+    private int videoId;
+    public int VideoId
+    {
+        get => videoId; set
+        {
+            OnPropertyChanged();
+            videoId = value;
+            OnPropertyChanged2();
+        }
+    }
+
+    private void OnPropertyChanged2()
+    {
+        if (!add && videoId > 0)
+        {
+            _Video = controller.GetVideoInfo(videoId);
+            if (_Video != null && _Video.SeriesId > 0)
+            {
+                Video_TitleTextField.Value = _Video.Name;
+                Video_SeriesCombobox.Value = _viewModel.Series.FirstOrDefault(x => x.Value == _Video.SeriesId);
+                Video_FormatRadioButtons.Value = _Video.VideoFormat;
+                Video_TypeRadioButtons.Value = _Video.Type;
+            }
+            else
+            {
+                _Video = new MauiApp1.Service.Modals.Video()
+                {
+                    Id = -1,
+                    Name = "",
+                };
+            }
+        }
     }
 
     private async void Button_Clicked(object sender, EventArgs e)
@@ -92,10 +148,10 @@ public partial class AddVideo : ContentPage
         MauiApp1.Service.Modals.Video newVideo = new MauiApp1.Service.Modals.Video
         {
            Id = -1,
-           Series = ((TextValuePair<int>)Video_SeriesCombobox.Value).Value,
+           SeriesId = ((TextValuePair<int>)Video_SeriesCombobox.Value).Value,
             Name = Video_TitleTextField.Value,
            Category = ((TextValuePair<int>)Video_CategoryCombobox.Value).Value,
-           format = Video_FormatRadioButtons.Value,
+           VideoFormat = Video_FormatRadioButtons.Value,
            Type = Video_TypeRadioButtons.Value,
            Cover = Video_FilePicker.ImageData
         };

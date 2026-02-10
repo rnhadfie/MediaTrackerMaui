@@ -47,6 +47,12 @@ namespace MauiApp1.Controllers
             return _BookService.AddNewBook(newBook);
         }
 
+
+        public Book GetBookInfo(int id)
+        {
+            return _BookService.GetBookInfo(id);
+        }
+
         public Series GetSeriesInfo(int id)
         {
             return _SeriesService.GetSeries(id);

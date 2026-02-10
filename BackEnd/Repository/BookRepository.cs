@@ -16,18 +16,23 @@ namespace MauiApp1.BackEnd.Repository
             _dbContext = dataContext;
         }
 
-        public async Task<List<Book>> GetBooksAsync()
+        public List<Book> GetAllBooks()
         {
             return new ObservableCollection<Book>(_dbContext.BookTable).ToList();
         }
 
-        public Book GetSeriesAsync(int id)
+        public List<Book> GetAllBooks(int take)
+        {
+            return new ObservableCollection<Book>(_dbContext.BookTable.Take(take)).ToList();
+        }
+
+        public Book GetBook(int id)
         {
             try
             {
                 var context = _dbContext;
-                var result = (Book)context.BookTable.Where(x => x.Id == id);
-                return result;
+                var result = context.BookTable.Where(x => x.Id == id);
+                return result.FirstOrDefault<Book>();
             }
             catch (Exception ex)
             {

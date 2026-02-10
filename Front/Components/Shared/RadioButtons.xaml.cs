@@ -71,6 +71,15 @@ public partial class RadioButtons : ContentView
     private static void OnValueChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (Shared.RadioButtons)bindable;
+        control.Value = (int)newValue;
+        foreach (RadioButton item in control.RadioButtonGroup.Children)
+        {
+            if (item.ClassId == $"RadioButton_{control.Value}")
+            {
+                item.IsChecked = true;
+                break;
+            }
+        } 
     }
 
     private static void OnClassIdChanged(BindableObject bindable, object oldValue, object newValue)
@@ -94,6 +103,7 @@ public partial class RadioButtons : ContentView
                 label.Padding = new Thickness(2, 0, 16, 0);
                 var radioButton = new RadioButton
                 {
+                    ClassId = $"RadioButton_{item.Value}",
                     Content = label,
                     Value = item.Value,
                     GroupName = this.GroupName,

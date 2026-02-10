@@ -25,7 +25,7 @@ namespace MauiApp1.BackEnd.Service
                 return null;
             }
             MemoryStream compressedStream = new MemoryStream();
-            newImage.AsStream(ImageFormat.Jpeg, quality).CopyTo(compressedStream);
+            newImage.AsStream(ImageFormat.Jpeg, 0.6f).CopyTo(compressedStream);
 
             return compressedStream.ToArray();
         }

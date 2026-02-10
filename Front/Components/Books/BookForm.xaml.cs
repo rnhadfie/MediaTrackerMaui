@@ -9,24 +9,97 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MauiApp1.Components.Books;
 
-public partial class AddBook
+[QueryProperty(nameof(Add), nameof(Add))]
+[QueryProperty(nameof(BookId), "BookId")]
+public partial class BookForm: ContentPage
 {
 	BookSetupViewModel _viewModel;
+    Book _book;
     BookController controller;
     private readonly DataContext _dbContext;
-    public AddBook(DataContext dataContext)
+
+    public BookForm(DataContext dataContext)
 	{
+        
         _dbContext = dataContext;
 
         InitializeComponent();
+        BindingContext = this;
         controller = new BookController(_dbContext);
 
+
+        #region Setup 
+        
         _viewModel = controller.GetBookSetup();
 
         Book_SeriesCombobox.InputList = _viewModel.Series;
         Book_Genre.InputList = _viewModel.Genre;
         Book_FormatRadioButtons.AddData(_viewModel.Format);
         Book_TypeRadioButtons.AddData(_viewModel.Type);
+
+        #endregion
+
+        _book = new Book()
+        {
+            Id = -1,
+            Title = "",
+        };
+    }
+
+    private bool add;
+
+    public bool Add
+    {
+        get => add;
+        set
+        {
+            OnPropertyChanged();
+            add = value;
+            OnPropertyChanged2();
+        }
+    }
+
+    private int bookId;
+    public int BookId
+    {
+        get => bookId; set
+        {
+            OnPropertyChanged();
+            bookId = value;
+            OnPropertyChanged2();
+        }
+    }
+
+    private void OnPropertyChanged2()
+    {
+        if (!add && bookId > 0)
+        {
+            _book = controller.GetBookInfo(bookId);
+            if (_book != null && _book.Id > 0)
+            {
+                Book_TitleTextField.Value = _book.Title;
+                Book_AuthorTextField.Value = _book.Author;
+                Book_ArtistTextField.Value = _book.Artist;
+                Book_PublisherTextField.Value = _book.Publisher;
+                Book_VolumeTextField.Value = _book.Volume.ToString();
+                Book_SeriesCombobox.Value = _viewModel.Series.FirstOrDefault(x => x.Value == _book.SeriesId);
+                Book_Genre.Value = _viewModel.Genre.FirstOrDefault(x => x.Value == _book.Genre);
+                Book_FormatRadioButtons.Value = _book.Format;
+                Book_TypeRadioButtons.Value = _book.Type;
+                if (_book.Cover != null && _book.Cover.Length > 0)
+                {
+                    Book_FilePicker.ImageData = _book.Cover;
+                }
+            }
+            else
+            {
+                _book = new Book()
+                {
+                    Id = -1,
+                    Title = "",
+                };
+            }
+        }
     }
 
     private async void OnPickFileButtonClicked(object sender, EventArgs e)
@@ -91,17 +164,18 @@ public partial class AddBook
         { 
             int.TryParse(Book_VolumeTextField.Value, out volume);
         }
-        Book book = new Book {
-            SeriesId = ((TextValuePair<int>)Book_SeriesCombobox.Value).Value,
-            Title = title,
-            Author = author,
-            Publisher = (string)Book_PublisherTextField.Value,
-            Artist = (string)Book_ArtistTextField.Value,
-            Cover = Book_FilePicker.ImageData,
-            Volume = volume
-        };
+        _book.SeriesId = ((TextValuePair<int>)Book_SeriesCombobox.Value).Value;
+        _book.Title = title;
+        _book.Author = author;
+        _book.Publisher = (string)Book_PublisherTextField.Value;
+        _book.Artist = (string)Book_ArtistTextField.Value;
+        _book.Cover = Book_FilePicker.ImageData ?? [];
+        _book.Genre = ((TextValuePair<int>)Book_Genre.Value).Value;
+        _book.Format = Book_FormatRadioButtons.Value;
+        _book.Type = Book_TypeRadioButtons.Value;
+        _book.Volume = volume;
 
-        controller.AddBook(book);
+        controller.AddBook(_book);
 
         await Shell.Current.GoToAsync("///MainPage");
     }
@@ -116,9 +190,8 @@ public partial class AddBook
 
         Series selectedSeries = controller.GetSeriesInfo(seriesId);
         
-        this.Book_AuthorTextField.Value = selectedSeries.Author;
-        this.Book_ArtistTextField.Value = selectedSeries.Artist;
-        this.Book_PublisherTextField.Value = selectedSeries.Publisher;
-        this.Book_AuthorTextField.Value = selectedSeries.Author;
+        this.Book_AuthorTextField.Value = selectedSeries.Author ?? "";
+        this.Book_ArtistTextField.Value = selectedSeries.Artist ?? "";
+        this.Book_PublisherTextField.Value = selectedSeries.Publisher ?? "";
     }
 }

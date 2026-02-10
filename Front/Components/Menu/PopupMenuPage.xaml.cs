@@ -26,17 +26,17 @@ public partial class PopupMenuPage
         MediaDataType mediaDataType = currentBtn != null && currentBtn.Value != null ? (MediaDataType)currentBtn.Value : MediaDataType.All;
 
         if (MediaDataType.Book == mediaDataType) {
-            await Shell.Current.GoToAsync(nameof(AddBook));
+            await Shell.Current.GoToAsync($"{nameof(BookForm)}?Add={true}&BookId={-1}");
         }
 
         if (MediaDataType.Series == mediaDataType)
         {
-            await Shell.Current.GoToAsync(nameof(AddSeries));
+            await Shell.Current.GoToAsync($"{nameof(SeriesForm)}?Add={true}&SeriesId={-1}");
         }
 
         if (MediaDataType.Video == mediaDataType)
         {
-            await Shell.Current.GoToAsync(nameof(AddVideo));
+            await Shell.Current.GoToAsync($"{nameof(VideoForm)}?Add={true}&VideoId={-1}");
         }
     }
 

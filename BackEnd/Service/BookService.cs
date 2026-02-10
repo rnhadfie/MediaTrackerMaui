@@ -1,11 +1,13 @@
 ﻿using MauiApp1.BackEnd.Database;
 using MauiApp1.BackEnd.Repository;
+using MauiApp1.BackEnd.Service.Modals;
 using MauiApp1.Repository;
 using MauiApp1.Service.Modals;
 using MauiApp1.Shared;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using static MauiApp1.Shared.Enums;
 
 namespace MauiApp1.BackEnd.Service
 {
@@ -26,8 +28,35 @@ namespace MauiApp1.BackEnd.Service
         public bool AddNewBook(Book book)
         {
             byte[] CompressedImageData = book.Cover ?? [];
-            book.Cover = SharedService.CompressImage(CompressedImageData, 100, 60);
+            if (CompressedImageData.Length > 0)
+            {
+                book.Cover = SharedService.CompressImage(CompressedImageData, 100, 60);
+            }
             return _BookRepository.SaveBookAsync(book);
+        }
+
+
+        public List<DisplayViewItem> GetAllBooks(int take)
+        {
+            List<Book> bookList = _BookRepository.GetAllBooks(take);
+            List<DisplayViewItem> bookDisplayList = new List<DisplayViewItem>();
+            bookList.ForEach(x =>
+            {
+                bookDisplayList.Add(new DisplayViewItem()
+                {
+                    Id = x.Id,
+                    Name = x.Title,
+                    Cover = x.Cover,
+                    Type = MediaDataType.Book
+
+                });
+            });
+            return bookDisplayList;
+        }
+
+        public Book GetBookInfo(int id)
+        {
+            return _BookRepository.GetBook(id);
         }
 
         public List<TextValuePair<int>> GetGenres()
@@ -38,7 +67,7 @@ namespace MauiApp1.BackEnd.Service
                 new TextValuePair<int>("Non-Fiction", 2),
                 new TextValuePair<int>("Science Fiction",  3 ),
                 new TextValuePair<int>("Fantasy", 4 ),
-                new TextValuePair<int>( "Biography",  5 ),
+                new TextValuePair<int>("Biography",  5 ),
                 new TextValuePair<int>("History",  6 ),
                 new TextValuePair<int>("Mystery", 7 ),
                 new TextValuePair<int>("Romance", 8 ),

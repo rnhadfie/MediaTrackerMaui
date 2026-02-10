@@ -63,6 +63,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="14.0.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.31" />
@@ -71,8 +72,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Front\Components\Books\BookForm.xaml.cs">
+	    <DependentUpon>BookForm.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Front\Components\ScrollDisplay\ScrollViewDisplay.xaml.cs">
 	    <DependentUpon>ScrollViewDisplay.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Front\Components\Series\SeriesForm.xaml.cs">
+	    <DependentUpon>SeriesForm.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Front\Components\Shared\Checkbox.xaml.cs">
 	    <DependentUpon>Checkbox.xaml</DependentUpon>
@@ -80,10 +87,13 @@
 	  <Compile Update="Front\Components\Shared\FilePickerCom.xaml.cs">
 	    <DependentUpon>FilePickerCom.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Front\Components\Video\VideoForm.xaml.cs">
+	    <DependentUpon>VideoForm.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Front\Components\Books\AddBook.xaml">
+	  <MauiXaml Update="Front\Components\Books\BookForm.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Front\Components\ListItem.xaml">
@@ -95,7 +105,7 @@
 	  <MauiXaml Update="Front\Components\ScrollDisplay\ScrollViewItem.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Series\AddSeries.xaml">
+	  <MauiXaml Update="Front\Components\Series\SeriesForm.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Front\Components\Shared\Checkbox.xaml">
@@ -113,7 +123,7 @@
 	  <MauiXaml Update="Front\Components\Shared\TextField.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Video\AddVideo.xaml">
+	  <MauiXaml Update="Front\Components\Video\VideoForm.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

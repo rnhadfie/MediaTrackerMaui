@@ -1,4 +1,5 @@
 ﻿using MauiApp1.BackEnd.Database;
+using MauiApp1.BackEnd.Service.Modals;
 using MauiApp1.Repository;
 using MauiApp1.Service.Modals;
 using MauiApp1.Shared;
@@ -26,7 +27,7 @@ namespace MauiApp1.BackEnd.Service
 
         public List<TextValuePair<int>> GetListOfSeries()
         {
-            List<Series> series =  _SeriesRepository.GetSeriessAsync();
+            List<Series> series =  _SeriesRepository.GetSeriesList();
             List<TextValuePair<int>> listOfSeries = new List<TextValuePair<int>>();
             listOfSeries.Add(new TextValuePair<int>("None", 0));
             if (series != null || series.Count > 0)
@@ -48,6 +49,24 @@ namespace MauiApp1.BackEnd.Service
         public Series GetSeries(int id)
         {
             return _SeriesRepository.GetSeriesAsync(id);
+        }
+
+        public List<DisplayViewItem> GetSeriesList(int take)
+        {
+            List<Series> seriesList =  _SeriesRepository.GetSeriesList(take);
+            List<DisplayViewItem> seriesDisplayList = new List<DisplayViewItem>();
+            seriesList.ForEach(x =>
+            {
+                seriesDisplayList.Add(new DisplayViewItem()
+                {
+                    Id = x.SeriesId,
+                    Name = x.Title,
+                    Cover = [],
+                    Type = MediaDataType.Series
+
+                });
+            });
+            return seriesDisplayList;
         }
 
         public List<TextValuePair<int>> GetCollectionStatus()

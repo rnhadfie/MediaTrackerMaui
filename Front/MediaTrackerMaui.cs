@@ -26,9 +26,9 @@ namespace MauiApp1
                 });
             builder.Services.AddSingleton<MainPage>();
 
-            builder.Services.AddTransient<AddBook>();
-            builder.Services.AddTransient<AddSeries>();
-            builder.Services.AddTransient<AddVideo>();
+            builder.Services.AddTransient<BookForm>();
+            builder.Services.AddTransient<SeriesForm>();
+            builder.Services.AddTransient<VideoForm>();
 
             builder.Services.AddDbContext<DataContext>(
                 options =>
@@ -48,7 +48,7 @@ namespace MauiApp1
                 {
                    context.SeriesTable.Add(new Service.Modals.Series {
                        SeriesId = 1, 
-                       Title = "Nor part of a Series",
+                       Title = "Not part of a Series",
                        Author = "",
                        Artist = "",
                        Publisher = "",
@@ -57,8 +57,6 @@ namespace MauiApp1
                        type = Shared.Enums.MediaDataType.All });
                    context.SaveChanges();
                 }
-
-               
             }
 
             return app;
