@@ -69,15 +69,44 @@ namespace MauiApp1.BackEnd.Service
             return seriesDisplayList;
         }
 
+        public List<DisplayViewItem> GetSeriesList()
+        {
+            List<Series> seriesList = _SeriesRepository.GetSeriesList();
+            List<DisplayViewItem> seriesDisplayList = new List<DisplayViewItem>();
+            seriesList.ForEach(x =>
+            {
+                seriesDisplayList.Add(new DisplayViewItem()
+                {
+                    Id = x.SeriesId,
+                    Name = x.Title,
+                    Cover = [],
+                    Type = MediaDataType.Series
+
+                });
+            });
+            return seriesDisplayList;
+        }
+
         public List<TextValuePair<int>> GetCollectionStatus()
         {
             List<TextValuePair<int>> collectionStatusList = new List<TextValuePair<int>>(){
+                new TextValuePair<int>("All", (int)CollectionStatus.All),
                 new TextValuePair<int>("Not collecting",(int)CollectionStatus.NotCompleting),
                 new TextValuePair<int>("Collecting", (int)CollectionStatus.Collecting),
                 new TextValuePair<int>("Completed", (int)CollectionStatus.Completed),
                 new TextValuePair<int>("On hold", (int)CollectionStatus.OnHold),
             };
             return collectionStatusList;
+        }
+
+        public List<TextValuePair<int>> GetMediaTypesStatus()
+        {
+            List<TextValuePair<int>> list = new List<TextValuePair<int>>(){
+                new TextValuePair<int>("All",(int)MediaDataType.All),
+                new TextValuePair<int>("Book", (int)MediaDataType.Book),
+                new TextValuePair<int>("Video", (int)MediaDataType.Video),
+            };
+            return list;
         }
     }
 }

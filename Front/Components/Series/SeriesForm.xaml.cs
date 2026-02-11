@@ -61,7 +61,8 @@ public partial class SeriesForm
         controller = new SeriesController(_dbContext);
         _viewModel = controller.GetSeriesSetup();
 
-        StatusCombobox.InputList = _viewModel.ListOfSeriesStatus;
+        Series_Status.Source = _viewModel.ListOfSeriesStatus;
+        Series_Type.Source = _viewModel.ListOfMediaTypes;
     }
 
     private void OnPropertyChanged2()
@@ -119,8 +120,9 @@ public partial class SeriesForm
              _Series.Author = author;
              _Series.Publisher = Series_publisherTextField.Value;
              _Series.Artist = Series_ArtistTextField.Value;
-             _Series.CollectionStatus = MauiApp1.Shared.Enums.CollectionStatus.Collecting;
-             _Series.TotalVolumes = totalVolumes;
+             _Series.CollectionStatus = (CollectionStatus)Series_Status.Value;
+            _Series.type = (MediaDataType)Series_Type.Value;
+            _Series.TotalVolumes = totalVolumes;
 
         controller.SaveNewSeries(_Series);
 

@@ -7,6 +7,7 @@
     Title="MauiApp1"
     MaximumHeightRequest="500"
     MaximumWidthRequest="400"
+    Shell.FlyoutBehavior="Flyout"
     WidthRequest="350">
 
     <ShellContent

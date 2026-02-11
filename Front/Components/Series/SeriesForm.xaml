@@ -35,10 +35,8 @@
                 FieldClassId="publisher"
                 HorizontalOptions="Fill"
                 PlaceholderText="Publisher" />
-            <local:Combobox
-                x:Name="StatusCombobox"
-                HorizontalOptions="Fill"
-                PlaceholderText="Status" />
+            <local:RadioButtons x:Name="Series_Status" LabelText="Status" />
+            <local:RadioButtons x:Name="Series_Type" LabelText="Type" />
             <local:TextField
                 x:Name="Series_VolumeTextField"
                 FieldClassId="totalVolumes"

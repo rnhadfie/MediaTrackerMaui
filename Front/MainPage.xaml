@@ -14,9 +14,18 @@
                 SemanticProperties.HeadingLevel="Level1"
                 Style="{StaticResource Headline}"
                 Text="Hello" />
-            <local:ScrollViewDisplay x:Name="SeriesScrollView"   MediaType="Series" LabelText="Series"/>
-            <local:ScrollViewDisplay x:Name="VideoScrollView"  MediaType="Video" LabelText="Movies and Tv Shows"/>
-            <local:ScrollViewDisplay x:Name="BookScrollView"  MediaType="Book" LabelText="Books"/>
+            <local:ScrollViewDisplay
+                x:Name="SeriesScrollView"
+                LabelText="Series"
+                MediaType="Series" />
+            <local:ScrollViewDisplay
+                x:Name="VideoScrollView"
+                LabelText="Movies and Tv Shows"
+                MediaType="Video" />
+            <local:ScrollViewDisplay
+                x:Name="BookScrollView"
+                LabelText="Books"
+                MediaType="Book" />
             <ImageButton
                 x:Name="AddItem"
                 AnchorX="24"

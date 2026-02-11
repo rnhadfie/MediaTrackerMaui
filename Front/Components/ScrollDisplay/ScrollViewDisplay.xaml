@@ -12,9 +12,24 @@
             Style="{StaticResource SubHeadline}"
             Text="{Binding Source={x:Reference root}, Path=LabelText}" />
         <ScrollView Orientation="Horizontal">
-            <StackLayout x:Name="ScrollView_Scroll"  Orientation="Horizontal">
-                <Label x:Name ="EmptyList" HorizontalOptions="Center" FontSize="16" TextColor="Black"/>
-            </StackLayout>
+            <HorizontalStackLayout>
+                <StackLayout x:Name="ScrollView_Scroll" Orientation="Horizontal">
+                    <Label
+                        x:Name="EmptyList"
+                        FontSize="16"
+                        HorizontalOptions="Center"
+                        TextColor="Black" />
+                </StackLayout>
+                <ImageButton
+                    x:Name="ScrollView_Arrow"
+                    BackgroundColor="Transparent"
+                    Clicked="onMenuSelected"
+                    HeightRequest="30"
+                    HorizontalOptions="End"
+                    Source="icons_next_50.png"
+                    VerticalOptions="Center"
+                    WidthRequest="30" />
+            </HorizontalStackLayout>
         </ScrollView>
     </VerticalStackLayout>
 </ContentView>

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using MauiApp1.BackEnd.Service.Modals;
 using MauiApp1.Front.Components.Video;
+using MauiApp1.Front.Components.Books;
 
 namespace MauiApp1
 {
@@ -24,11 +25,18 @@ namespace MauiApp1
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
+
+
             builder.Services.AddSingleton<MainPage>();
+
+            builder.Services.AddTransient<VideoView>();
+            builder.Services.AddTransient<SeriesView>();
+            builder.Services.AddTransient<BookView>();
 
             builder.Services.AddTransient<BookForm>();
             builder.Services.AddTransient<SeriesForm>();
             builder.Services.AddTransient<VideoForm>();
+
 
             builder.Services.AddDbContext<DataContext>(
                 options =>

@@ -3,6 +3,7 @@ using MauiApp1.BackEnd.Controllers;
 using MauiApp1.BackEnd.Database;
 using MauiApp1.BackEnd.Service.Modals;
 using MauiApp1.Components.Books;
+using MauiApp1.Front.Components.Books;
 using MauiApp1.Front.Components.Series;
 using MauiApp1.Front.Components.Video;
 using MauiApp1.Service.Modals;
@@ -82,13 +83,15 @@ public partial class ScrollViewDisplay : ContentView
        var list = control.Source;
         if (list == null || list.Count == 0)
         {
+            control.ScrollView_Arrow.IsVisible = false;
             control.EmptyList.Text = "No items found";
             control.EmptyList.IsVisible = true;
             control.EmptyList.HeightRequest = 100;
             return;
         }
 
-        control.EmptyList.IsVisible = false; 
+        control.EmptyList.IsVisible = false;
+        
         foreach (var item in list)
         {
             var scrollViewItem = new ScrollViewItem
@@ -109,12 +112,13 @@ public partial class ScrollViewDisplay : ContentView
         switch (type)
         {
             case MediaDataType.Series:
+                await Shell.Current.GoToAsync(nameof(SeriesView));
                 break;
             case MediaDataType.Video:
-
+                await Shell.Current.GoToAsync(nameof(VideoView));
                 break;
             case MediaDataType.Book:
-                await Shell.Current.GoToAsync($"{nameof(BookForm)}?id={1}&isAdding={false}");
+                await Shell.Current.GoToAsync(nameof(BookView));
                 break;
             default:
                 break;
@@ -130,14 +134,5 @@ public partial class ScrollViewDisplay : ContentView
     {
 
         InitializeComponent();
-
-
-        ImageButton button = new ImageButton();
-        button.Source = "icons_next_50.png";
-        button.HeightRequest = 180;
-        button.Clicked += onMenuSelected;
-
-       ScrollView_Scroll.Add(button);
-
     }
 }

@@ -25,6 +25,7 @@ namespace MauiApp1.Shared
         }
 
         public enum CollectionStatus { 
+            All = 0,
             NotCompleting = 1,
             OnHold = 2,
             Collecting = 3,

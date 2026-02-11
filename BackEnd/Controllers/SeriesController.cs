@@ -1,6 +1,7 @@
 ﻿using MauiApp1.BackEnd.Controllers.ViewModels;
 using MauiApp1.BackEnd.Database;
 using MauiApp1.BackEnd.Service;
+using MauiApp1.BackEnd.Service.Modals;
 using MauiApp1.Controllers.ViewModels;
 using MauiApp1.Service.Modals;
 using System;
@@ -28,8 +29,14 @@ namespace MauiApp1.BackEnd.Controllers
             SeiresSetupViewModel viewModel
                     = new SeiresSetupViewModel();
             viewModel.ListOfSeriesStatus = _SeriesService.GetCollectionStatus();
+            viewModel.ListOfMediaTypes = _SeriesService.GetMediaTypesStatus();
 
             return viewModel;
+        }
+
+        public List<DisplayViewItem> GetSeriesList()
+        {
+            return _SeriesService.GetSeriesList();
         }
 
         public Series GetSeriesInfo(int id)
@@ -42,6 +49,7 @@ namespace MauiApp1.BackEnd.Controllers
             _SeriesService.AddNewSeries(newSeries);
             return false;
         }
+
     }
 }
 

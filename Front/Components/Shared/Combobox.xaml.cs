@@ -16,7 +16,7 @@ public partial class Combobox : ContentView
            BindableProperty.Create(nameof(InputList), typeof(List<TextValuePair<int>>), typeof(Combobox), null, BindingMode.TwoWay, null, OnInputListChanged);
 
     public static readonly BindableProperty ValueProperty =
-            BindableProperty.Create(nameof(Value), typeof(object), typeof(Combobox), "", BindingMode.TwoWay, null, OnValueChanged);
+            BindableProperty.Create(nameof(Value), typeof(object), typeof(Combobox), null, BindingMode.TwoWay, null, OnValueChanged);
 
     public event EventHandler SelectionChanged;
     #endregion
