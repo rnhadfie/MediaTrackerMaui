@@ -39,7 +39,7 @@ namespace MauiApp1.Shared
             EBook = 3
         }
 
-        public enum BookGenre
+        public enum Genre
         {
             Fiction = 1,
             NonFiction = 2,
@@ -72,6 +72,15 @@ namespace MauiApp1.Shared
         public enum VideoType { 
             Movie = 1,
             tvShow = 2,
+        }
+
+        public enum VideoGroup
+        {
+            LiveAction = 1,
+            Anime = 2,
+            WesternAnimation =3,
+            Concert = 4,
+            Documentary = 5
         }
     }
 }

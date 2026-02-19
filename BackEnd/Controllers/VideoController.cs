@@ -53,5 +53,10 @@ namespace MauiApp1.BackEnd.Controllers
         {
             return _VideoService.GetVideoInfo(id);
         }
+
+        public List<Video> GetAllVideos(VideoFitler filter)
+        {
+            return _VideoService.GetAllVideos(filter);
+        }
     }
 }

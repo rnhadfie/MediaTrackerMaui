@@ -34,9 +34,14 @@ namespace MauiApp1.BackEnd.Controllers
             }).Value;
         }
 
+        public List<DisplayViewItem> GetSeriesList()
+        {
+            return _SeriesService.GetDisplaySeriesList();
+        }
+
         public List<DisplayViewItem> GetSeriesList(int take)
         {
-            return _SeriesService.GetSeriesList(take);
+            return _SeriesService.GetDisplaySeriesList(take);
         }
 
         public List<DisplayViewItem> GetBookList(int take)

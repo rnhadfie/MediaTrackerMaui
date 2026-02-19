@@ -4,8 +4,9 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:MauiApp1.Front.Components.Shared"
-    Title="List of Series">
-    <VerticalStackLayout x:Name="SeriesLayout">
+    Title="SeriesView">
+    <ScrollView Orientation="Both" x:Name="SeriesLayout">
+    <VerticalStackLayout>
         <Label
                 HorizontalOptions="Center"
                 Text="Series"
@@ -14,7 +15,7 @@
         <ImageButton
                 Clicked="ImageButton_Clicked"
                 HorizontalOptions="End"
-                Source="icons_add_50.png"
+                Source="sort.png"
                 WidthRequest="25" />
         <Grid >
             <Grid.ColumnDefinitions>
@@ -23,15 +24,9 @@
             </Grid.ColumnDefinitions>
 
             <VerticalStackLayout Grid.Column="0">
-                <ScrollView>
-                    <Grid
-                        x:Name="SeriesGridView"
-                        ColumnSpacing="5"
-                        RowSpacing="5"
-                        SizeChanged="OnGridSizeChanged" />
-                </ScrollView>
-            </VerticalStackLayout>
-            <local:Drawer Grid.Column="1" x:Name="FilterDrawer" IsVisible="Hidden">
+                    <local:ItemGrid HorizontalOptions="Fill" VerticalOptions="Fill" x:Name="SeriesGridView"/>
+                </VerticalStackLayout>
+            <local:Drawer Grid.Column="1" x:Name="FilterDrawer" IsVisible="Hidden" Padding="0,16">
                 <VerticalStackLayout>
                     <HorizontalStackLayout Background="MediumPurple">
                         <Label
@@ -56,7 +51,7 @@
                         PlaceholderText="Media Status"
                         VerticalOptions="Fill" />
                     <HorizontalStackLayout>
-                        <Button Text="Cancel" Clicked="ImageButton_Clicked" Padding="8,8,8,8" HorizontalOptions="End"></Button>
+                        <Button Text="Cancel" Clicked="ImageButton_Clicked" Padding="8,8,8,8" HorizontalOptions="Start"></Button>
                         <Button Text="Filter" Clicked="FilterButton_Clicked" Padding="8,8,8,8" HorizontalOptions="End"></Button>
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
@@ -64,4 +59,5 @@
 
         </Grid>
     </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

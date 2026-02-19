@@ -17,13 +17,15 @@ namespace MauiApp1
             Routing.RegisterRoute(nameof(MainPage), typeof(MainPage));
             Routing.RegisterRoute(nameof(BookForm), typeof(BookForm));
             Routing.RegisterRoute(nameof(SeriesForm), typeof(SeriesForm));
+            Routing.RegisterRoute(nameof(SeriesDetailView), typeof(SeriesDetailView));
             Routing.RegisterRoute(nameof(VideoForm), typeof(VideoForm));
             Routing.RegisterRoute(nameof(VideoView), typeof(VideoView));
+            Routing.RegisterRoute(nameof(VideoDetailView), typeof(VideoDetailView));
             Routing.RegisterRoute(nameof(SeriesView), typeof(SeriesView));
             Routing.RegisterRoute(nameof(BookView), typeof(BookView));
+            Routing.RegisterRoute(nameof(BookDetailView), typeof(BookDetailView));
 
 
-            
 
 
         }

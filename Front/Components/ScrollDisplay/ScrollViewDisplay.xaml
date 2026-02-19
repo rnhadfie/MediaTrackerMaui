@@ -23,7 +23,7 @@
                 <ImageButton
                     x:Name="ScrollView_Arrow"
                     BackgroundColor="Transparent"
-                    Clicked="onMenuSelected"
+                    Clicked="onButtonSelected"
                     HeightRequest="30"
                     HorizontalOptions="End"
                     Source="icons_next_50.png"

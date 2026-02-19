@@ -1,5 +1,6 @@
 ﻿
 using MauiApp1.BackEnd.Database;
+using MauiApp1.BackEnd.Service.Modals;
 using MauiApp1.Service.Modals;
 using MauiApp1.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -70,6 +71,17 @@ namespace MauiApp1.Repository
                 return false;
             }
         }
+
+        public List<Book> GetBooksInSeries(int seriesId)
+        {
+            return new ObservableCollection<Book>(_dbContext.BookTable.Where(x=>x.SeriesId == seriesId)).ToList();
+        }
+
+        public List<Video> GetVideosInSeries(int seriesId)
+        {
+            return new ObservableCollection<Video>(_dbContext.VideoTable.Where(x => x.SeriesId == seriesId)).ToList();
+        }
+
         /*
         public async Task<int> DeleteSeriesAsync(Series item)
         {

@@ -29,13 +29,19 @@ namespace MauiApp1
 
             builder.Services.AddSingleton<MainPage>();
 
-            builder.Services.AddTransient<VideoView>();
-            builder.Services.AddTransient<SeriesView>();
-            builder.Services.AddTransient<BookView>();
-
-            builder.Services.AddTransient<BookForm>();
+            
             builder.Services.AddTransient<SeriesForm>();
+            builder.Services.AddTransient<SeriesView>();
+            builder.Services.AddTransient<SeriesDetailView>();
+
+            builder.Services.AddTransient<BookView>();
+            builder.Services.AddTransient<BookDetailView>();
+            builder.Services.AddTransient<BookForm>();
+
+          
             builder.Services.AddTransient<VideoForm>();
+            builder.Services.AddTransient<VideoView>();
+            builder.Services.AddTransient<VideoDetailView>();
 
 
             builder.Services.AddDbContext<DataContext>(

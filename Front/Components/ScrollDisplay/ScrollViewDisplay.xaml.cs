@@ -21,6 +21,9 @@ public partial class ScrollViewDisplay : ContentView
     public static readonly BindableProperty LabelTextProperty =
         BindableProperty.Create(nameof(LabelText), typeof(string), typeof(ScrollViewDisplay), "", BindingMode.TwoWay, null, OnLabelTextChanged);
 
+    public static readonly BindableProperty LocationProperty =
+        BindableProperty.Create(nameof(LocationText), typeof(string), typeof(ScrollViewDisplay), "", BindingMode.TwoWay, null, OnLocationChanged);
+
     public static readonly BindableProperty MediaTypeProperty =
         BindableProperty.Create(nameof(MediaType), typeof(MediaDataType), typeof(ScrollViewDisplay), MediaDataType.All, BindingMode.TwoWay, null, OnMediaChanged);
 
@@ -35,6 +38,12 @@ public partial class ScrollViewDisplay : ContentView
     {
         get => (string)GetValue(LabelTextProperty);
         set => SetValue(LabelTextProperty, value);
+    }
+
+    public string LocationText
+    {
+        get => (string)GetValue(LocationProperty);
+        set => SetValue(LocationProperty, value);
     }
 
     public MediaDataType MediaType
@@ -69,6 +78,11 @@ public partial class ScrollViewDisplay : ContentView
         control.ScrollView_Label.Text = (string)newValue;
     }
 
+    private static void OnLocationChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        var control = (ScrollViewDisplay)bindable;
+    }
+
     private static void OnMediaChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (ScrollViewDisplay)bindable;
@@ -91,14 +105,15 @@ public partial class ScrollViewDisplay : ContentView
         }
 
         control.EmptyList.IsVisible = false;
-        
+        control.ScrollView_Scroll.Clear();
         foreach (var item in list)
         {
             var scrollViewItem = new ScrollViewItem
             {
                 MediaType = item.Type,
-                Source = item,
+                Source = item.Cover ?? [],
                 LabelText = item.Name,
+                ItemId = item.Id,
             };
             control.ScrollView_Scroll.Add(scrollViewItem);
         }
@@ -106,23 +121,13 @@ public partial class ScrollViewDisplay : ContentView
 
     }
 
-    public async void onMenuSelected(object sender, EventArgs e)
+    public async void onButtonSelected(object sender, EventArgs e)
     {
-        var type = MediaType;
-        switch (type)
+        if (!string.IsNullOrWhiteSpace(LocationText))
         {
-            case MediaDataType.Series:
-                await Shell.Current.GoToAsync(nameof(SeriesView));
-                break;
-            case MediaDataType.Video:
-                await Shell.Current.GoToAsync(nameof(VideoView));
-                break;
-            case MediaDataType.Book:
-                await Shell.Current.GoToAsync(nameof(BookView));
-                break;
-            default:
-                break;
+            await Shell.Current.GoToAsync(LocationText);
         }
+        
     }
 
     #endregion

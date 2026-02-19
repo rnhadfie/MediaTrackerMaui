@@ -1,4 +1,5 @@
-﻿using MauiApp1.BackEnd.Database;
+﻿using MauiApp1.BackEnd.Controllers.ViewModels;
+using MauiApp1.BackEnd.Database;
 using MauiApp1.Service.Modals;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,37 @@ namespace MauiApp1.BackEnd.Repository
         public List<Video> GetAllVideo(int take)
         {
             return new ObservableCollection<Video>(_dbContext.VideoTable.Take(take)).ToList();
+        }
+
+        public List<Video> GetAllVideo(VideoFitler filter)
+        {
+            var table = _dbContext.VideoTable;
+            IQueryable<Video> fitleredTable = null;
+            if (filter.Type > 0)
+            {
+                fitleredTable = table.Where(x => x.Type == filter.Type);
+            }
+            /*if (filter.Genre != null)
+            {
+                fitleredTable = table.Where(x => x.Genre == filter.Genre);
+            }*/
+            if (filter.Series != null)
+            {
+                fitleredTable = table.Where(x => x.SeriesId == filter.Series);
+            }
+            if (filter.Group != null)
+            {
+                fitleredTable = table.Where(x => x.Category == filter.Group);
+            }
+            if (filter.Take != null)
+            {
+                fitleredTable = table.Take(filter.Take.Value);
+            }
+            if (fitleredTable != null)
+            {
+                return new ObservableCollection<Video>(fitleredTable).ToList();
+            }
+            return new ObservableCollection<Video>(table).ToList();
         }
 
         public Video GetVideo(int id)
@@ -57,6 +89,7 @@ namespace MauiApp1.BackEnd.Repository
                     item.Id = maxId + 1;
 
                     context.VideoTable.Add(item);
+
 
                 }
                 int result = context.SaveChanges();

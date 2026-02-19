@@ -4,15 +4,42 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:MauiApp1"
+    xmlns:Book="clr-namespace:MauiApp1.Front.Components.Books"
+    xmlns:Series="clr-namespace:MauiApp1.Front.Components.Series"
+    xmlns:Video="clr-namespace:MauiApp1.Front.Components.Video"
     Title="MauiApp1"
     MaximumHeightRequest="500"
     MaximumWidthRequest="400"
-    Shell.FlyoutBehavior="Flyout"
-    WidthRequest="350">
+    WidthRequest="350"
+    FlyoutBehavior="Flyout">
 
     <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
+
+    <FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
+
+        <ShellContent
+            Title="Books"
+            Icon="icons_book_32.png"
+            IsVisible="true" 
+            ContentTemplate="{DataTemplate Book:BookView}"
+            />
+        <ShellContent
+            Title="Series"
+            Icon="icons_book_32.png"
+            IsVisible="true" 
+            ContentTemplate="{DataTemplate Series:SeriesView}"
+             />
+        <ShellContent
+            Title="Video"
+            Icon="icons_dvd_32.png"
+            IsVisible="true"
+            ContentTemplate="{DataTemplate Video:VideoView}"/>
+
+
+    </FlyoutItem>
+
 
 </Shell>

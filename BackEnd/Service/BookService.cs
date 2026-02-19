@@ -1,4 +1,5 @@
-﻿using MauiApp1.BackEnd.Database;
+﻿using MauiApp1.BackEnd.Controllers.ViewModels;
+using MauiApp1.BackEnd.Database;
 using MauiApp1.BackEnd.Repository;
 using MauiApp1.BackEnd.Service.Modals;
 using MauiApp1.Repository;
@@ -52,6 +53,11 @@ namespace MauiApp1.BackEnd.Service
                 });
             });
             return bookDisplayList;
+        }
+
+        public List<Book> GetBookList(BookFilter filter)
+        {
+           return _BookRepository.GetAllBooks(filter);
         }
 
         public Book GetBookInfo(int id)

@@ -1,4 +1,5 @@
-﻿using MauiApp1.BackEnd.Database;
+﻿using MauiApp1.BackEnd.Controllers.ViewModels;
+using MauiApp1.BackEnd.Database;
 using MauiApp1.BackEnd.Service;
 using MauiApp1.Controllers.ViewModels;
 using MauiApp1.Service.Modals;
@@ -56,6 +57,11 @@ namespace MauiApp1.Controllers
         public Series GetSeriesInfo(int id)
         {
             return _SeriesService.GetSeries(id);
+        }
+
+        public List<Book> GetAllBooks(BookFilter filter)
+        {
+             return _BookService.GetBookList(filter);
         }
     }
 }

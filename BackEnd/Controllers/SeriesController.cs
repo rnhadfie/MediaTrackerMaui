@@ -34,7 +34,12 @@ namespace MauiApp1.BackEnd.Controllers
             return viewModel;
         }
 
-        public List<DisplayViewItem> GetSeriesList()
+        public List<DisplayViewItem> GetSeriesDisplayViewList()
+        {
+            return _SeriesService.GetDisplaySeriesList();
+        }
+
+        public List<Series> GetSeriesList()
         {
             return _SeriesService.GetSeriesList();
         }
@@ -50,6 +55,11 @@ namespace MauiApp1.BackEnd.Controllers
             return false;
         }
 
+
+        public List<DisplayViewItem> GetSeriesItems(int seriesId)
+        {
+            return _SeriesService.GetSeriesItems(seriesId);
+        }
     }
 }
 

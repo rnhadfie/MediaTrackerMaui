@@ -1,4 +1,5 @@
-﻿using MauiApp1.BackEnd.Database;
+﻿using MauiApp1.BackEnd.Controllers.ViewModels;
+using MauiApp1.BackEnd.Database;
 using MauiApp1.Service.Modals;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,37 @@ namespace MauiApp1.BackEnd.Repository
         public List<Book> GetAllBooks()
         {
             return new ObservableCollection<Book>(_dbContext.BookTable).ToList();
+        }
+
+        public List<Book> GetAllBooks(BookFilter filter)
+        {
+            var table = _dbContext.BookTable;
+            IQueryable<Book> fitleredTable = null;
+            if (filter.Type > 0)
+            {
+                fitleredTable = table.Where(x=>x.Type == filter.Type);
+            }
+            if (filter.Genre != null)
+            {
+                fitleredTable = table.Where(x => x.Genre == filter.Genre);
+            }
+            if (filter.Series != null)
+            {
+                fitleredTable = table.Where(x => x.SeriesId == filter.Series);
+            }
+            if (filter.Format != null)
+            {
+                fitleredTable = table.Where(x => x.Format == filter.Format);
+            }
+            if (filter.Take != null)
+            {
+                fitleredTable = table.Take(filter.Take.Value);
+            }
+            if (fitleredTable != null)
+            {
+                return new ObservableCollection<Book>(fitleredTable).ToList();
+            }
+            return new ObservableCollection<Book>(table).ToList();
         }
 
         public List<Book> GetAllBooks(int take)

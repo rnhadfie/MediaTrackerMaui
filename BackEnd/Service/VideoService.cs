@@ -1,4 +1,5 @@
-﻿using MauiApp1.BackEnd.Database;
+﻿using MauiApp1.BackEnd.Controllers.ViewModels;
+using MauiApp1.BackEnd.Database;
 using MauiApp1.BackEnd.Repository;
 using MauiApp1.BackEnd.Service.Modals;
 using MauiApp1.Front.Components.Video;
@@ -34,6 +35,11 @@ namespace MauiApp1.BackEnd.Service
                 newVideo.Cover = SharedService.CompressImage(CompressedImageData, 100, 60);
             }
             return _VideoRepository.SaveVideo(newVideo);
+        }
+
+        public List<Video> GetAllVideos(VideoFitler fitler)
+        {
+            return _VideoRepository.GetAllVideo(fitler);
         }
 
         public Video GetVideoInfo(int id)
@@ -86,9 +92,11 @@ namespace MauiApp1.BackEnd.Service
         {
 
             List<TextValuePair<int>> groups = [
-                new TextValuePair<int>("Live Action", 1),
-                new TextValuePair<int>("Anime", 2),
-                 new TextValuePair<int>("Concert", 1),
+                new TextValuePair<int>("Live Action", (int)VideoGroup.LiveAction),
+                new TextValuePair<int>("Anime", (int)VideoGroup.Anime),
+                new TextValuePair<int>("Western Animation", (int)VideoGroup.WesternAnimation),
+                new TextValuePair<int>("Concert", (int)VideoGroup.Concert),
+                new TextValuePair<int>("Documentary", (int)VideoGroup.Documentary),
                 ];
             return groups;
         }

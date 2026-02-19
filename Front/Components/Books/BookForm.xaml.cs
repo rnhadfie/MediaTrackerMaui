@@ -78,9 +78,9 @@ public partial class BookForm: ContentPage
             if (_book != null && _book.Id > 0)
             {
                 Book_TitleTextField.Value = _book.Title;
-                Book_AuthorTextField.Value = _book.Author;
-                Book_ArtistTextField.Value = _book.Artist;
-                Book_PublisherTextField.Value = _book.Publisher;
+                Book_AuthorTextField.Value = _book.Author ?? "";
+                Book_ArtistTextField.Value = _book.Artist ?? "";
+                Book_PublisherTextField.Value = _book.Publisher ?? "";
                 Book_VolumeTextField.Value = _book.Volume.ToString();
                 Book_SeriesCombobox.Value = _viewModel.Series.FirstOrDefault(x => x.Value == _book.SeriesId);
                 Book_Genre.Value = _viewModel.Genre.FirstOrDefault(x => x.Value == _book.Genre);
@@ -177,7 +177,7 @@ public partial class BookForm: ContentPage
 
         controller.AddBook(_book);
 
-        await Shell.Current.GoToAsync("///MainPage");
+        await Shell.Current.GoToAsync(".");
     }
 
     private void SeriesCombobox_SelectionChanged(object sender, EventArgs e)
