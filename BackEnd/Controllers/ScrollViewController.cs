@@ -1,10 +1,6 @@
 ﻿using MauiApp1.BackEnd.Database;
+using MauiApp1.BackEnd.Modals;
 using MauiApp1.BackEnd.Service;
-using MauiApp1.BackEnd.Service.Modals;
-using MauiApp1.Service.Modals;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MauiApp1.BackEnd.Controllers
 {

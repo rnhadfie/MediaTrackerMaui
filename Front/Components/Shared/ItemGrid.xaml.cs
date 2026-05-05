@@ -1,7 +1,5 @@
-using MauiApp1.BackEnd.Service.Modals;
+using MauiApp1.BackEnd.Modals;
 using MauiApp1.Components.ScrollDisplay;
-using MauiApp1.Shared;
-using Microsoft.Maui.Controls;
 
 namespace MauiApp1.Front.Components.Shared;
 

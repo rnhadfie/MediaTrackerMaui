@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+  <!-- Root container -->
+  <xs:element name="Library">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Books" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Book" type="BookType" maxOccurs="unbounded"/>
+            </xs:sequence>
+
+            <!-- unique Ids for books -->
+            <xs:unique name="UniqueBookIds">
+              <xs:selector xpath="Book"/>
+              <xs:field xpath="Id"/>
+            </xs:unique>
+          </xs:complexType>
+        </xs:element>
+
+        <!-- Music (represents Cd objects; items are named 'music' per request) -->
+        <xs:element name="Music" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="music" type="MusicType" maxOccurs="unbounded"/>
+            </xs:sequence>
+
+            <xs:unique name="UniqueMusicIds">
+              <xs:selector xpath="music"/>
+              <xs:field xpath="Id"/>
+            </xs:unique>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="Videos" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Video" type="VideoType" maxOccurs="unbounded"/>
+            </xs:sequence>
+
+            <xs:unique name="UniqueVideoIds">
+              <xs:selector xpath="Video"/>
+              <xs:field xpath="Id"/>
+            </xs:unique>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="Others" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Other" type="OtherType" maxOccurs="unbounded"/>
+            </xs:sequence>
+
+            <xs:unique name="UniqueOtherIds">
+              <xs:selector xpath="Other"/>
+              <xs:field xpath="Id"/>
+            </xs:unique>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="Collections" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Collection" type="CollectionType" maxOccurs="unbounded"/>
+            </xs:sequence>
+
+            <xs:unique name="UniqueCollectionIds">
+              <xs:selector xpath="Collection"/>
+              <xs:field xpath="SeriesId"/>
+            </xs:unique>
+          </xs:complexType>
+        </xs:element>
+
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Types -->
+
+  <xs:complexType name="BookType">
+    <xs:sequence>
+      <xs:element name="Id" type="xs:int"/>
+      <xs:element name="Title" type="xs:string"/>
+      <xs:element name="Cover" type="xs:base64Binary" minOccurs="0"/>
+      <xs:element name="Author" type="xs:string" minOccurs="0"/>
+      <xs:element name="Artist" type="xs:string" minOccurs="0"/>
+      <xs:element name="Publisher" type="xs:string" minOccurs="0"/>
+      <xs:element name="Genre" type="xs:int"/>
+      <xs:element name="Format" type="xs:int"/>
+      <xs:element name="Type" type="xs:int"/>
+      <xs:element name="Volume" type="xs:int"/>
+      <xs:element name="SeriesId" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="MusicType">
+    <xs:sequence>
+      <xs:element name="Id" type="xs:int"/>
+      <xs:element name="Name" type="xs:string"/>
+      <xs:element name="Artist" type="xs:string" minOccurs="0"/>
+      <xs:element name="Cover" type="xs:base64Binary" minOccurs="0"/>
+      <xs:element name="Language" type="xs:int" minOccurs="0"/>
+      <xs:element name="MusicGenre" type="xs:int" minOccurs="0"/>
+      <xs:element name="Collection" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="VideoType">
+    <xs:sequence>
+      <xs:element name="Id" type="xs:int"/>
+      <xs:element name="Name" type="xs:string"/>
+      <xs:element name="Category" type="xs:int" minOccurs="0"/>
+      <xs:element name="SeriesId" type="xs:int"/>
+      <xs:element name="VideoFormat" type="xs:int"/>
+      <xs:element name="Type" type="xs:int"/>
+      <xs:element name="Cover" type="xs:base64Binary" minOccurs="0"/>
+      <xs:element name="Genre" type="xs:int" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="OtherType">
+    <xs:sequence>
+      <xs:element name="Id" type="xs:int"/>
+      <xs:element name="Name" type="xs:string"/>
+      <xs:element name="Image" type="xs:base64Binary" minOccurs="0"/>
+      <xs:element name="Collection" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CollectionType">
+    <xs:sequence>
+      <xs:element name="SeriesId" type="xs:int"/>
+      <xs:element name="Title" type="xs:string"/>
+      <xs:element name="Author" type="xs:string" minOccurs="0"/>
+      <xs:element name="Artist" type="xs:string" minOccurs="0"/>
+      <xs:element name="Publisher" type="xs:string" minOccurs="0"/>
+      <xs:element name="TotalVolumes" type="xs:int" minOccurs="0"/>
+      <xs:element name="type" type="xs:int" minOccurs="0"/>
+      <xs:element name="CollectionStatus" type="xs:int" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

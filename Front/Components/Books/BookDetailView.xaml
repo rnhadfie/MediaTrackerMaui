@@ -25,9 +25,7 @@
 
                 <VerticalStackLayout Grid.Column="0">
                     <ScrollView>
-                        <local:ItemGrid
-                            x:Name="BookGridView"
-                            SizeChanged="OnGridSizeChanged" />
+                        <local:ItemGrid x:Name="BookGridView" SizeChanged="OnGridSizeChanged" />
                     </ScrollView>
                 </VerticalStackLayout>
                 <local:Drawer

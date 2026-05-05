@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiApp1.Front.Components.Other.OtherForm"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:MauiApp1.Front.Components.Shared"
+    xmlns:maui="clr-namespace:Microsoft.Maui;assembly=Microsoft.Maui">
+    <ScrollView>
+        <VerticalStackLayout>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
+                <VerticalStackLayout
+                    x:Name="AddOtherForm"
+                    Grid.Column="0"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Start">
+                    <Label
+                        HorizontalOptions="Center"
+                        Text="Add Item"
+                        VerticalOptions="Center" />
+                    <local:Combobox
+                        x:Name="Other_SeriesCombobox"
+                        HorizontalOptions="Fill"
+                        PlaceholderText="Series"
+                        SelectionChanged="SeriesCombobox_SelectionChanged" />
+                    <local:TextField
+                        x:Name="Other_TitleTextField"
+                        FieldClassId="title"
+                        HorizontalOptions="Fill"
+                        PlaceholderText="Item" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1">
+                    <local:FilePicker x:Name="Other_FilePicker" />
+                </VerticalStackLayout>
+            </Grid>
+            <HorizontalStackLayout Padding="4" HorizontalOptions="End">
+                <Button
+                    Margin="4"
+                    Clicked="Button_Clicked"
+                    HorizontalOptions="End"
+                    Text="Cancel" />
+                <Button
+                    Margin="4"
+                    Clicked="AddButton_Clicked"
+                    HorizontalOptions="End"
+                    Text="Add Book" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,13 +1,14 @@
 using CommunityToolkit.Maui.Views;
 using MauiApp1.BackEnd.Database;
-using MauiApp1.Components.Books;
-using MauiApp1.Front.Components.Series;
+using MauiApp1.Front.Components.Books;
+using MauiApp1.Front.Components.Music;
+using MauiApp1.Front.Components.Other;
+using MauiApp1.Front.Components.Collections;
 using MauiApp1.Front.Components.Video;
 using MauiApp1.Shared;
-using System.Threading.Tasks;
-using static MauiApp1.Shared.Enums;
+using static MauiApp1.BackEnd.Shared.Enums;
 
-namespace MauiApp1.Components;
+namespace MauiApp1.Components.Menu;
 
 public partial class PopupMenuPage
 {
@@ -29,14 +30,24 @@ public partial class PopupMenuPage
             await Shell.Current.GoToAsync($"{nameof(BookForm)}?Add={true}&BookId={-1}");
         }
 
-        if (MediaDataType.Series == mediaDataType)
+        if (MediaDataType.Collection == mediaDataType)
         {
-            await Shell.Current.GoToAsync($"{nameof(SeriesForm)}?Add={true}&SeriesId={-1}");
+            await Shell.Current.GoToAsync($"{nameof(CollectionForm)}?Add={true}&SeriesId={-1}");
         }
 
         if (MediaDataType.Video == mediaDataType)
         {
             await Shell.Current.GoToAsync($"{nameof(VideoForm)}?Add={true}&VideoId={-1}");
+        }
+
+        if (MediaDataType.Cd == mediaDataType)
+        {
+            await Shell.Current.GoToAsync($"{nameof(MusicForm)}?Add={true}&Id={-1}");
+        }
+
+        if (MediaDataType.Other == mediaDataType)
+        {
+            await Shell.Current.GoToAsync($"{nameof(OtherForm)}?Add={true}&Id={-1}");
         }
     }
 
@@ -49,10 +60,11 @@ public partial class PopupMenuPage
     public void AddMenus()
     {
         MenuLayout.Children.Clear();
-        MenuLayout.Children.Add(CreateMenuItem(MediaDataType.Series));
+        MenuLayout.Children.Add(CreateMenuItem(MediaDataType.Collection));
         MenuLayout.Children.Add(CreateMenuItem(MediaDataType.Book));
         MenuLayout.Children.Add(CreateMenuItem(MediaDataType.Video));
         MenuLayout.Children.Add(CreateMenuItem(MediaDataType.Cd));
+        MenuLayout.Children.Add(CreateMenuItem(MediaDataType.Other));
 
     }
 
@@ -79,7 +91,12 @@ public partial class PopupMenuPage
                 classId = "Cd";
                 imageSource = "icons_cd_50.png";
                 break;
-            case MediaDataType.Series:
+            case MediaDataType.Other:
+                text = "Add Other Items";
+                classId = "Other";
+                imageSource = "icons_cd_50.png";
+                break;
+            case MediaDataType.Collection:
                 text = "Add Series";
                 classId = "series";
                 imageSource = "icons_cd_50.png";
@@ -94,8 +111,9 @@ public partial class PopupMenuPage
             TextColor = Color.FromArgb("#000000"),
             BorderColor = Color.FromArgb("#000000"),
             BorderWidth = 1,
-            HorizontalOptions=LayoutOptions.Fill,
-            ImageSource = imageSource
+            HorizontalOptions = LayoutOptions.Fill,
+            ImageSource = imageSource,
+            Margin = new Thickness(8,8,8,8)
 
         };
         button.Clicked += onMenuSelected;

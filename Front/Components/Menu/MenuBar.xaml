@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiApp1.Components.Menu.MenuBar"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    <ContentPage.MenuBarItems>
+        <MenuBarItem Text="File">
+            <MenuFlyoutItem Command="{Binding ExitCommand}" Text="Exit" />
+        </MenuBarItem>
+        <MenuBarItem Text="Locations">
+            <MenuFlyoutSubItem Text="Pages">
+                <MenuFlyoutItem Text="Books" />
+                <MenuFlyoutItem Text="Series" />
+                <MenuFlyoutItem Text="Videos" />
+                <MenuFlyoutItem Text="Cds" />
+                <MenuFlyoutItem Text="Other items" />
+            </MenuFlyoutSubItem>
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem Text="Add Books" />
+            <MenuFlyoutItem Text="Add Videos" />
+            <MenuFlyoutItem Text="Add Series" />
+            <MenuFlyoutItem Text="Add Cds" />
+            <MenuFlyoutItem Text="Add Other items" />
+        </MenuBarItem>
+        <MenuBarItem Text="View">
+            <MenuFlyoutItem Text="Refresh" />
+        </MenuBarItem>
+        <MenuBarItem Text="Data">
+            <MenuFlyoutItem Text="Import Data" />
+            <MenuFlyoutItem Text="Export Data" />
+        </MenuBarItem>
+    </ContentPage.MenuBarItems>
+</ContentPage>

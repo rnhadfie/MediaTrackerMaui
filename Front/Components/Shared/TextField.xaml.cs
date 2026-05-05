@@ -77,20 +77,26 @@ public partial class TextField : ContentView
     private static void OnPlaceHolderTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (TextField)bindable;
-        control.textfieldLabel.Text = newValue.ToString();
+        if (control.textfieldLabel != null) control.textfieldLabel.Text = newValue?.ToString();
     }
 
     private static void OnValueChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (TextField)bindable;
-        control.textfieldInput.Text = newValue.ToString();
+        if (control.textfieldInput != null) control.textfieldInput.Text = newValue?.ToString();
     }
 
     private static void OnClassIdChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (TextField)bindable;
-        control.textfieldInput.ClassId = newValue.ToString() + "_label";
-        control.textfieldInput.ClassId = newValue.ToString() + "_input";
+        if (control.textfieldInput != null)
+        {
+            control.textfieldInput.ClassId = newValue.ToString() + "_input";
+        }
+        if (control.textfieldLabel != null)
+        {
+            control.textfieldLabel.ClassId = newValue.ToString() + "_label";
+        }
     }
 
     private static void OnTextWidthChanged(BindableObject bindable, object oldValue, object newValue)

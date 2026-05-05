@@ -1,14 +1,10 @@
 ﻿using MauiApp1.BackEnd.Controllers.ViewModels;
 using MauiApp1.BackEnd.Database;
+using MauiApp1.BackEnd.Modals;
 using MauiApp1.BackEnd.Repository;
-using MauiApp1.BackEnd.Service.Modals;
-using MauiApp1.Repository;
-using MauiApp1.Service.Modals;
+using MauiApp1.Modals;
 using MauiApp1.Shared;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using static MauiApp1.Shared.Enums;
+using static MauiApp1.BackEnd.Shared.Enums;
 
 namespace MauiApp1.BackEnd.Service
 {
@@ -33,7 +29,7 @@ namespace MauiApp1.BackEnd.Service
             {
                 book.Cover = SharedService.CompressImage(CompressedImageData, 100, 60);
             }
-            return _BookRepository.SaveBookAsync(book);
+            return _BookRepository.SaveBook(book);
         }
 
 
@@ -57,11 +53,36 @@ namespace MauiApp1.BackEnd.Service
 
         public List<Book> GetBookList(BookFilter filter)
         {
-           return _BookRepository.GetAllBooks(filter);
+           List<Book> books = _BookRepository.GetAllBooks();
+            books.FindAll(x =>
+            {
+                bool matches = true;
+                if (filter.Genre.HasValue)
+                {
+                    matches &= x.Genre == filter.Genre.Value;
+                }
+                if (filter.Format.HasValue)
+                {
+                    matches &= x.Format == filter.Format.Value;
+                }
+                if (filter.Type.HasValue)
+                {
+                    matches &= x.Type == filter.Type.Value;
+                }
+                if (filter.Series.HasValue)
+                {
+                    matches &= x.SeriesId == filter.Series.Value;
+                }
+                return matches;
+            });
+
+            books.GetRange(filter.Take ?? 0, books.Count - (filter.Take ?? 0));
+            return books;
         }
 
         public Book GetBookInfo(int id)
         {
+            List<Book> books = _BookRepository.GetAllBooks();
             return _BookRepository.GetBook(id);
         }
 

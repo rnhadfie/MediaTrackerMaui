@@ -46,8 +46,12 @@
                         x:Name="Video_CategoryCombobox"
                         HorizontalOptions="Fill"
                         PlaceholderText="Category"
-                        SelectionChanged="" />
-
+                         />
+                    <local:Combobox
+                        x:Name="Video_Genre"
+                        HorizontalOptions="Fill"
+                        PlaceholderText="Genre"
+                         />
 
                     <local:TextField
                         x:Name="Video_VolumeTextField"

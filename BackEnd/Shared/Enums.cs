@@ -1,10 +1,5 @@
-﻿//using Android.Provider;
-using MauiApp1.Service.Modals;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MauiApp1.Shared
+﻿
+namespace MauiApp1.BackEnd.Shared
 {
     public class Enums
     {
@@ -13,8 +8,8 @@ namespace MauiApp1.Shared
          Book = 1,
          Video = 2,
          Cd = 3,
-         Games = 4,
-         Series = 5,
+         Other = 4,
+         Collection = 5,
         }
 
         public enum DisplayOptions { 

@@ -62,9 +62,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="ClosedXML" Version="0.105.0" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="14.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="DrawnUi.Maui" Version="1.9.0.1" />
+		<PackageReference Include="MEGraph.MAUI" Version="2.2.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.3" />
@@ -81,11 +83,32 @@
 	  <Compile Update="Front\Components\Books\BookDetailView.xaml.cs">
 	    <DependentUpon>BookDetailView.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Front\Components\Collections\CollectionForm.xaml.cs">
+	    <DependentUpon>CollectionForm.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Front\Components\Collections\CollectionView.xaml.cs">
+	    <DependentUpon>CollectionView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Front\Components\Music\MusicDetailView.xaml.cs">
+	    <DependentUpon>MusicDetailView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Front\Components\Music\MusicForm.xaml.cs">
+	    <DependentUpon>MusicForm.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Front\Components\Music\MusicView.xaml.cs">
+	    <DependentUpon>MusicView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Front\Components\Other\OtherDetailView.xaml.cs">
+	    <DependentUpon>OtherDetailView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Front\Components\Other\OtherForm.xaml.cs">
+	    <DependentUpon>OtherForm.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Front\Components\Other\OtherView.xaml.cs">
+	    <DependentUpon>OtherView.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Front\Components\ScrollDisplay\ScrollViewDisplay.xaml.cs">
 	    <DependentUpon>ScrollViewDisplay.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Series\SeriesForm.xaml.cs">
-	    <DependentUpon>SeriesForm.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Front\Components\Shared\Checkbox.xaml.cs">
 	    <DependentUpon>Checkbox.xaml</DependentUpon>
@@ -99,6 +122,27 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Front\Components\Menu\MenuBar.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Other\OtherDetailView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Other\OtherForm.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Other\OtherView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Music\MusicDetailView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Music\MusicForm.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Music\MusicView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Front\Components\Books\BookForm.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -106,6 +150,12 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Front\Components\Books\BookView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Collections\CollectionDetailView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Collections\CollectionForm.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Front\Components\ListItem.xaml">
@@ -117,13 +167,7 @@
 	  <MauiXaml Update="Front\Components\ScrollDisplay\ScrollViewItem.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Series\SeriesDetailView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Series\SeriesForm.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Series\SeriesView.xaml">
+	  <MauiXaml Update="Front\Components\Collections\CollectionView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Front\Components\Shared\Checkbox.xaml">

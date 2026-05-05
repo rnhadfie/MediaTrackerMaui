@@ -1,12 +1,14 @@
 ﻿using CommunityToolkit.Maui;
 using MauiApp1.BackEnd.Database;
-using MauiApp1.Components.Books;
-using MauiApp1.Front.Components.Series;
-using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
-using MauiApp1.BackEnd.Service.Modals;
-using MauiApp1.Front.Components.Video;
 using MauiApp1.Front.Components.Books;
+using MauiApp1.Front.Components.Music;
+using MauiApp1.Front.Components.Other;
+using MauiApp1.Front.Components.Collections;
+using MauiApp1.Front.Components.Video;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using CollectionView = MauiApp1.Front.Components.Collections.CollectionView;
+using static MauiApp1.BackEnd.Shared.Enums;
 
 namespace MauiApp1
 {
@@ -19,7 +21,9 @@ namespace MauiApp1
 
             var builder = MauiApp.CreateBuilder();
             builder
-                .UseMauiApp<App>().UseMauiCommunityToolkit()
+                .UseMauiApp<App>()
+                .UseMauiCommunityToolkit(options =>
+                    options.SetShouldEnableSnackbarOnWindows(true))
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -27,12 +31,15 @@ namespace MauiApp1
                 });
 
 
-            builder.Services.AddSingleton<MainPage>();
+            // Do not register MainPage as a singleton because it consumes a scoped DbContext.
+            // Use transient so each activation receives a fresh scoped DbContext and to avoid
+            // capturing a scoped service in a singleton which causes tracking/disposal issues.
+            builder.Services.AddTransient<MainPage>();
 
             
-            builder.Services.AddTransient<SeriesForm>();
-            builder.Services.AddTransient<SeriesView>();
-            builder.Services.AddTransient<SeriesDetailView>();
+            builder.Services.AddTransient<CollectionForm>();
+            builder.Services.AddTransient<CollectionView>();
+            builder.Services.AddTransient<CollectionDetailView>();
 
             builder.Services.AddTransient<BookView>();
             builder.Services.AddTransient<BookDetailView>();
@@ -42,6 +49,14 @@ namespace MauiApp1
             builder.Services.AddTransient<VideoForm>();
             builder.Services.AddTransient<VideoView>();
             builder.Services.AddTransient<VideoDetailView>();
+
+            builder.Services.AddTransient<MusicForm>();
+            builder.Services.AddTransient<MusicView>();
+            builder.Services.AddTransient<MusicDetailView>();
+
+            builder.Services.AddTransient<OtherForm>();
+            builder.Services.AddTransient<OtherView>();
+            builder.Services.AddTransient<OtherDetailView>();
 
 
             builder.Services.AddDbContext<DataContext>(
@@ -60,15 +75,15 @@ namespace MauiApp1
                 context.Database.EnsureCreated();
                 if(!context.SeriesTable.Any())
                 {
-                   context.SeriesTable.Add(new Service.Modals.Series {
+                   context.SeriesTable.Add(new Modals.Collection {
                        SeriesId = 1, 
                        Title = "Not part of a Series",
                        Author = "",
                        Artist = "",
                        Publisher = "",
                        TotalVolumes = 0,
-                       CollectionStatus = Shared.Enums.CollectionStatus.NotCompleting,
-                       type = Shared.Enums.MediaDataType.All });
+                       CollectionStatus = CollectionStatus.NotCompleting,
+                       type = MediaDataType.All });
                    context.SaveChanges();
                 }
             }

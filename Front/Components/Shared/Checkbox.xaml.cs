@@ -41,7 +41,7 @@ public partial class Checkbox : ContentView
     private static void OnLabelTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (Shared.Checkbox)bindable;
-        control.label.Text = newValue.ToString();
+        if (control.label != null) control.label.Text = newValue?.ToString();
     }
 
     private static void OnValueChanged(BindableObject bindable, object oldValue, object newValue)

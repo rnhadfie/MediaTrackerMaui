@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiApp1.Front.Components.Music.MusicDetailView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:MauiApp1.Front.Components.Shared"
+    Title="">
+    <ScrollView x:Name="MusicLayout" Orientation="Both">
+        <VerticalStackLayout>
+            <Label
+                HorizontalOptions="Center"
+                Style="{StaticResource Headline}"
+                Text="Books"
+                VerticalOptions="Center" />
+            <ImageButton
+                Clicked="ImageButton_Clicked"
+                HorizontalOptions="End"
+                Source="icons_add_50.png"
+                WidthRequest="25" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
+
+                <VerticalStackLayout Grid.Column="0">
+                    <ScrollView>
+                        <local:ItemGrid
+                            x:Name="MusicGridView"
+                            SizeChanged="OnGridSizeChanged" />
+                    </ScrollView>
+                </VerticalStackLayout>
+                <local:Drawer
+                    x:Name="Cd_FilterDrawer"
+                    Grid.Column="1"
+                    Padding="0,16"
+                    IsVisible="Hidden">
+                    <VerticalStackLayout>
+                        <HorizontalStackLayout Background="MediumPurple">
+                            <Label
+                                HorizontalOptions="Center"
+                                Text="Filter"
+                                VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <local:TextField
+                            x:Name="MusicDetailView_Search"
+                            Padding="8,8,8,8"
+                            HorizontalOptions="End"
+                            PlaceholderText="Search"
+                            WidthRequest="200" />
+                        <local:Combobox
+                            x:Name="MusicDetailView_Langauge"
+                            Padding="8,8,8,8"
+                            PlaceholderText="Format"
+                            VerticalOptions="Fill" />
+                        <local:Combobox
+                            x:Name="MusicDetailView_Genre"
+                            Padding="8,8,8,8"
+                            PlaceholderText="Genre"
+                            VerticalOptions="Fill" />
+                        <HorizontalStackLayout>
+                            <Button
+                                Padding="8,8,8,8"
+                                Clicked="ImageButton_Clicked"
+                                HorizontalOptions="Start"
+                                Text="Cancel" />
+                            <Button
+                                Padding="8,8,8,8"
+                                Clicked="FilterButton_Clicked"
+                                HorizontalOptions="End"
+                                Text="Filter" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </local:Drawer>
+
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

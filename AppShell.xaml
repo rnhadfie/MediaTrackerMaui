@@ -3,43 +3,51 @@
     x:Class="MauiApp1.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:MauiApp1"
     xmlns:Book="clr-namespace:MauiApp1.Front.Components.Books"
-    xmlns:Series="clr-namespace:MauiApp1.Front.Components.Series"
+    xmlns:Music="clr-namespace:MauiApp1.Front.Components.Music"
+    xmlns:Other="clr-namespace:MauiApp1.Front.Components.Other"
+    xmlns:Series="clr-namespace:MauiApp1.Front.Components.Collections"
     xmlns:Video="clr-namespace:MauiApp1.Front.Components.Video"
+    xmlns:local="clr-namespace:MauiApp1"
     Title="MauiApp1"
+    FlyoutBehavior="Flyout"
     MaximumHeightRequest="500"
     MaximumWidthRequest="400"
-    WidthRequest="350"
-    FlyoutBehavior="Flyout">
+    WidthRequest="350">
 
     <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
+    <MenuItem Clicked="OnImportDataClicked" Text="Import Data" />
+
+    <MenuItem Clicked="OnExportDataClicked" Text="Export Data" />
 
     <FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
-
         <ShellContent
             Title="Books"
-            Icon="icons_book_32.png"
-            IsVisible="true" 
             ContentTemplate="{DataTemplate Book:BookView}"
-            />
+            Icon="icons_book_32.png"
+            IsVisible="true" />
         <ShellContent
             Title="Series"
+            ContentTemplate="{DataTemplate Series:CollectionView}"
             Icon="icons_book_32.png"
-            IsVisible="true" 
-            ContentTemplate="{DataTemplate Series:SeriesView}"
-             />
+            IsVisible="true" />
         <ShellContent
             Title="Video"
+            ContentTemplate="{DataTemplate Video:VideoView}"
             Icon="icons_dvd_32.png"
-            IsVisible="true"
-            ContentTemplate="{DataTemplate Video:VideoView}"/>
-
-
+            IsVisible="true" />
+        <ShellContent
+            Title="Music"
+            ContentTemplate="{DataTemplate Music:MusicView}"
+            Icon="icons_cd_50.png"
+            IsVisible="true" />
+        <ShellContent
+            Title="Video"
+            ContentTemplate="{DataTemplate Other:OtherView}"
+            Icon="icons_dvd_32.png"
+            IsVisible="true" />
     </FlyoutItem>
-
-
 </Shell>

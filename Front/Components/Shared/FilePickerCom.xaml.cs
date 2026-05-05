@@ -61,7 +61,7 @@ public partial class FilePicker : ContentView
     private static void OnShowImagePreviewChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (FilePicker)bindable;
-        control.previewImage.IsVisible = (bool)newValue;
+        if (control.previewImage != null) control.previewImage.IsVisible = (bool)newValue;
     }
 
     private static void OnShowFileNamePreviewChanged(BindableObject bindable, object oldValue, object newValue)

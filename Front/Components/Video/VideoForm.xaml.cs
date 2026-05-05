@@ -1,13 +1,8 @@
 using MauiApp1.BackEnd.Controllers;
 using MauiApp1.BackEnd.Controllers.ViewModels;
 using MauiApp1.BackEnd.Database;
-using MauiApp1.Controllers;
-using MauiApp1.Controllers.ViewModels;
-using MauiApp1.Service.Modals;
 using MauiApp1.Shared;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Maui.Hosting;
-using static MauiApp1.Shared.Enums;
 
 namespace MauiApp1.Front.Components.Video;
 
@@ -18,7 +13,7 @@ public partial class VideoForm : ContentPage
     //Vide _viewModel;
     VideoController controller;
     VideoSetupViewModel _viewModel;
-    private MauiApp1.Service.Modals.Video _Video;
+    private MauiApp1.Modals.Video _Video;
     private readonly DataContext _dbContext;
     public VideoForm(DataContext dataContext)
 	{
@@ -30,10 +25,11 @@ public partial class VideoForm : ContentPage
 
         Video_SeriesCombobox.InputList = _viewModel.Series;
         Video_CategoryCombobox.InputList = _viewModel.Category;
+        Video_Genre.InputList = _viewModel.Genre;
         Video_FormatRadioButtons.AddData(_viewModel.VideoFormat);
         Video_TypeRadioButtons.AddData(_viewModel.VideoType);
 
-        _Video = new MauiApp1.Service.Modals.Video()
+        _Video = new MauiApp1.Modals.Video()
         {
             Id = -1,
             Name = "",
@@ -64,6 +60,59 @@ public partial class VideoForm : ContentPage
         }
     }
 
+    // Loading overlay
+    Grid _loadingOverlay;
+    ActivityIndicator _loadingIndicator;
+
+    void EnsureLoadingOverlay()
+    {
+        if (_loadingOverlay != null)
+            return;
+
+        var original = Content as View;
+        var root = new Grid();
+        if (original != null)
+            root.Children.Add(original);
+
+        var overlay = new Grid
+        {
+            BackgroundColor = Colors.Black.WithAlpha(0.4f),
+            IsVisible = false,
+            InputTransparent = false
+        };
+
+        var indicator = new ActivityIndicator
+        {
+            IsRunning = true,
+            IsVisible = true,
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            Color = Colors.White
+        };
+
+        overlay.Children.Add(indicator);
+        root.Children.Add(overlay);
+
+        Content = root;
+
+        _loadingOverlay = overlay;
+        _loadingIndicator = indicator;
+    }
+
+    void ShowLoading()
+    {
+        EnsureLoadingOverlay();
+        _loadingOverlay.IsVisible = true;
+        _loadingIndicator.IsRunning = true;
+    }
+
+    void HideLoading()
+    {
+        if (_loadingOverlay == null) return;
+        _loadingOverlay.IsVisible = false;
+        _loadingIndicator.IsRunning = false;
+    }
+
     private void OnPropertyChanged2()
     {
         if (!add && videoId > 0)
@@ -75,10 +124,12 @@ public partial class VideoForm : ContentPage
                 Video_SeriesCombobox.Value = _viewModel.Series.FirstOrDefault(x => x.Value == _Video.SeriesId);
                 Video_FormatRadioButtons.Value = _Video.VideoFormat;
                 Video_TypeRadioButtons.Value = _Video.Type;
+                Video_Genre.Value = _viewModel.Genre.FirstOrDefault(x => x.Value == _Video.Genre);
+                Video_CategoryCombobox.Value = _viewModel.Category.FirstOrDefault(x => x.Value == _Video.Type);
             }
             else
             {
-                _Video = new MauiApp1.Service.Modals.Video()
+                _Video = new MauiApp1.Modals.Video()
                 {
                     Id = -1,
                     Name = "",
@@ -89,7 +140,7 @@ public partial class VideoForm : ContentPage
 
     private async void Button_Clicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("///MainPage");
+        await Shell.Current.GoToAsync("..");
     }
 
     private async void OnPickFileButtonClicked(object sender, EventArgs e)
@@ -145,21 +196,22 @@ public partial class VideoForm : ContentPage
         {
             int.TryParse(Video_VolumeTextField.Value, out volume);
         }
-        MauiApp1.Service.Modals.Video newVideo = new MauiApp1.Service.Modals.Video
+        MauiApp1.Modals.Video newVideo = new MauiApp1.Modals.Video
         {
            Id = -1,
            SeriesId = ((TextValuePair<int>)Video_SeriesCombobox.Value).Value,
             Name = Video_TitleTextField.Value,
            Category = ((TextValuePair<int>)Video_CategoryCombobox.Value).Value,
            VideoFormat = Video_FormatRadioButtons.Value,
-           Type = Video_TypeRadioButtons.Value,
+           Genre = ((TextValuePair<int>)Video_Genre.Value).Value,
+            Type = Video_TypeRadioButtons.Value,
            Cover = Video_FilePicker.ImageData
         };
 
 
         controller.AddVideo(newVideo);
 
-        await Shell.Current.GoToAsync("///MainPage");
+        await Shell.Current.GoToAsync("..");
     }
 
     private void Video_CategoryCombobox_SelectionChanged(object sender, EventArgs e)

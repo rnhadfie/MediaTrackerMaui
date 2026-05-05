@@ -1,17 +1,5 @@
-using CommunityToolkit.Maui.Core.Extensions;
-using MauiApp1.BackEnd.Controllers;
-using MauiApp1.BackEnd.Database;
-using MauiApp1.BackEnd.Service.Modals;
-using MauiApp1.Components.Books;
-using MauiApp1.Front.Components.Books;
-using MauiApp1.Front.Components.Series;
-using MauiApp1.Front.Components.Video;
-using MauiApp1.Service.Modals;
-using MauiApp1.Shared;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Maui.Controls;
-using System.Collections.Generic;
-using static MauiApp1.Shared.Enums;
+using MauiApp1.BackEnd.Modals;
+using static MauiApp1.BackEnd.Shared.Enums;
 
 namespace MauiApp1.Components.ScrollDisplay;
 
@@ -94,31 +82,26 @@ public partial class ScrollViewDisplay : ContentView
         var control = (ScrollViewDisplay)bindable;
         control.Source = (List<DisplayViewItem>)newValue;
 
-       var list = control.Source;
+        var list = control.Source;
+
+        // No items: clear ItemsSource to let CollectionView show its EmptyView
         if (list == null || list.Count == 0)
         {
             control.ScrollView_Arrow.IsVisible = false;
-            control.EmptyList.Text = "No items found";
-            control.EmptyList.IsVisible = true;
-            control.EmptyList.HeightRequest = 100;
+            control.ItemsCollectionView.ItemsSource = null;
             return;
         }
 
-        control.EmptyList.IsVisible = false;
-        control.ScrollView_Scroll.Clear();
-        foreach (var item in list)
+        control.ScrollView_Arrow.IsVisible = true;
+
+        // Assign the list directly; CollectionView will virtualize rendering.
+        control.ItemsCollectionView.ItemsSource = list.Select(i => new DisplayViewItem
         {
-            var scrollViewItem = new ScrollViewItem
-            {
-                MediaType = item.Type,
-                Source = item.Cover ?? [],
-                LabelText = item.Name,
-                ItemId = item.Id,
-            };
-            control.ScrollView_Scroll.Add(scrollViewItem);
-        }
-
-
+            Id = i.Id,
+            Name = i.Name,
+            Cover = i.Cover,
+            Type = i.Type
+        }).ToList();
     }
 
     public async void onButtonSelected(object sender, EventArgs e)
@@ -128,6 +111,31 @@ public partial class ScrollViewDisplay : ContentView
             await Shell.Current.GoToAsync(LocationText);
         }
         
+    }
+
+    private async void ItemsCollectionView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection == null || e.CurrentSelection.Count == 0) return;
+
+        if (e.CurrentSelection.FirstOrDefault() is DisplayViewItem selected)
+        {
+            // Navigate to detail page based on MediaType
+            switch (selected.Type)
+            {
+                case MediaDataType.Book:
+                    await Shell.Current.GoToAsync($"{nameof(Front.Components.Books.BookForm)}?Add=false&BookId={selected.Id}");
+                    break;
+                case MediaDataType.Video:
+                    await Shell.Current.GoToAsync($"{nameof(MauiApp1.Front.Components.Video.VideoForm)}?Add=false&VideoId={selected.Id}");
+                    break;
+                default:
+                    await Shell.Current.GoToAsync($"{nameof(MauiApp1.Front.Components.Collections.CollectionDetailView)}?SeriesId={selected.Id}");
+                    break;
+            }
+        }
+
+        // Clear selection to allow reselecting same item later
+        ItemsCollectionView.SelectedItem = null;
     }
 
     #endregion

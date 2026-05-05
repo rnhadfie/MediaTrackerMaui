@@ -1,13 +1,7 @@
 ﻿using MauiApp1.BackEnd.Controllers.ViewModels;
 using MauiApp1.BackEnd.Database;
 using MauiApp1.BackEnd.Service;
-using MauiApp1.BackEnd.Service.Modals;
-using MauiApp1.Controllers.ViewModels;
-using MauiApp1.Service.Modals;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using static MauiApp1.Shared.Enums;
+using MauiApp1.Modals;
 
 namespace MauiApp1.BackEnd.Controllers
 {
@@ -39,6 +33,7 @@ namespace MauiApp1.BackEnd.Controllers
             viewModel.Category = _VideoService.GetVideoGroups();
             viewModel.VideoFormat = _VideoService.GetVideoFormat();
             viewModel.VideoType = _VideoService.GetVideoType();
+            viewModel.Genre = _VideoService.GetGenres();
 
 
             return viewModel;

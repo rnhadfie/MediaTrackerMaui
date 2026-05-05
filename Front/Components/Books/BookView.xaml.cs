@@ -2,17 +2,11 @@
 using MauiApp1.BackEnd.Controllers;
 using MauiApp1.BackEnd.Controllers.ViewModels;
 using MauiApp1.BackEnd.Database;
-using MauiApp1.BackEnd.Service.Modals;
-using MauiApp1.Components;
-using MauiApp1.Components.Books;
+using MauiApp1.BackEnd.Modals;
 using MauiApp1.Controllers;
 using MauiApp1.Controllers.ViewModels;
-using MauiApp1.Front.Components.Series;
-using MauiApp1.Service.Modals;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Maui.Controls;
-using System.Linq;
-using static MauiApp1.Shared.Enums;
+using MauiApp1.Modals;
+using static MauiApp1.BackEnd.Shared.Enums;
 
 namespace MauiApp1.Front.Components.Books;
 
@@ -87,7 +81,68 @@ public partial class BookView : ContentPage
 
     private async void OnOpenMenu(object? sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync($"{nameof(BookForm)}?Add={true}&BookId={-1}");
+        ShowLoading();
+        try
+        {
+            await Shell.Current.GoToAsync($"{nameof(BookForm)}?Add={true}&BookId={-1}");
+        }
+        finally
+        {
+            HideLoading();
+        }
+    }
+
+    // Loading overlay
+    Grid _loadingOverlay;
+    ActivityIndicator _loadingIndicator;
+
+    void EnsureLoadingOverlay()
+    {
+        if (_loadingOverlay != null)
+            return;
+
+        var original = Content as View;
+        var root = new Grid();
+        if (original != null)
+            root.Children.Add(original);
+
+        var overlay = new Grid
+        {
+            BackgroundColor = Colors.Black.WithAlpha(0.4f),
+            IsVisible = false,
+            InputTransparent = false
+        };
+
+        var indicator = new ActivityIndicator
+        {
+            IsRunning = true,
+            IsVisible = true,
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            Color = Colors.White
+        };
+
+        overlay.Children.Add(indicator);
+        root.Children.Add(overlay);
+
+        Content = root;
+
+        _loadingOverlay = overlay;
+        _loadingIndicator = indicator;
+    }
+
+    void ShowLoading()
+    {
+        EnsureLoadingOverlay();
+        _loadingOverlay.IsVisible = true;
+        _loadingIndicator.IsRunning = true;
+    }
+
+    void HideLoading()
+    {
+        if (_loadingOverlay == null) return;
+        _loadingOverlay.IsVisible = false;
+        _loadingIndicator.IsRunning = false;
     }
 
 

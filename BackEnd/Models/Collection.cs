@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
-using static MauiApp1.Shared.Enums;
+using static MauiApp1.BackEnd.Shared.Enums;
 
-namespace MauiApp1.Service.Modals
+namespace MauiApp1.Modals
 {
-    public class Series
+    public class Collection
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

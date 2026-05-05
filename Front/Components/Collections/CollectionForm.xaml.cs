@@ -2,30 +2,27 @@
 using MauiApp1.BackEnd.Controllers;
 using MauiApp1.BackEnd.Controllers.ViewModels;
 using MauiApp1.BackEnd.Database;
-using MauiApp1.Controllers;
-using MauiApp1.Controllers.ViewModels;
-using MauiApp1.Service.Modals;
-using static MauiApp1.Shared.Enums;
+using static MauiApp1.BackEnd.Shared.Enums;
 
-namespace MauiApp1.Front.Components.Series;
+namespace MauiApp1.Front.Components.Collections;
 
 [QueryProperty(nameof(Add), nameof(Add))]
 [QueryProperty(nameof(SeriesId), "SeriesId")]
-public partial class SeriesForm
+public partial class CollectionForm
 {
     SeiresSetupViewModel _viewModel;
-    SeriesController controller;
+    CollectionController controller;
     private readonly DataContext _dbContext;
-    private MauiApp1.Service.Modals.Series _Series;
+    private MauiApp1.Modals.Collection _Series;
 
-    public SeriesForm(DataContext dataContext)
+    public CollectionForm(DataContext dataContext)
 	{
 		InitializeComponent();
         _dbContext = dataContext;
 
         GetSetup();
 
-        _Series = new MauiApp1.Service.Modals.Series()
+        _Series = new MauiApp1.Modals.Collection()
         {
             SeriesId = -1,
             Title = "",
@@ -58,11 +55,11 @@ public partial class SeriesForm
 
     private async void GetSetup()
     {
-        controller = new SeriesController(_dbContext);
+        controller = new CollectionController(_dbContext);
         _viewModel = controller.GetSeriesSetup();
 
-        Series_Status.Source = _viewModel.ListOfSeriesStatus;
-        Series_Type.Source = _viewModel.ListOfMediaTypes;
+        Series_Status.AddData(_viewModel.ListOfSeriesStatus);
+        Series_Type.AddData(_viewModel.ListOfMediaTypes);
     }
 
     private void OnPropertyChanged2()
@@ -76,11 +73,13 @@ public partial class SeriesForm
                 Series_AuthorTextField.Value = _Series.Author;
                 Series_ArtistTextField.Value = _Series.Artist;
                 Series_publisherTextField.Value = _Series.Publisher;
+                Series_Status.Value = (int)_Series.CollectionStatus.GetValueOrDefault();
+                Series_Type.Value = (int)_Series.type;
                 Series_VolumeTextField.Value = _Series.TotalVolumes.ToString();
             }
             else
             {
-                _Series =new MauiApp1.Service.Modals.Series()
+                _Series =new MauiApp1.Modals.Collection()
                 {
                     SeriesId = -1,
                     Title = "",
@@ -91,7 +90,7 @@ public partial class SeriesForm
 
     private async void Button_Clicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("///MainPage");
+        await Shell.Current.GoToAsync("..");
     }
 
     private async void AddButton_Clicked(object sender, EventArgs e)
@@ -126,6 +125,6 @@ public partial class SeriesForm
 
         controller.SaveNewSeries(_Series);
 
-        await Shell.Current.GoToAsync("///MainPage");
+        await Shell.Current.GoToAsync("..");
     }
 }

@@ -11,26 +11,38 @@
             HorizontalOptions="Start"
             Style="{StaticResource SubHeadline}"
             Text="{Binding Source={x:Reference root}, Path=LabelText}" />
-        <ScrollView Orientation="Horizontal">
-            <HorizontalStackLayout>
-                <StackLayout x:Name="ScrollView_Scroll" Orientation="Horizontal">
-                    <Label
-                        x:Name="EmptyList"
-                        FontSize="16"
-                        HorizontalOptions="Center"
-                        TextColor="Black" />
-                </StackLayout>
-                <ImageButton
-                    x:Name="ScrollView_Arrow"
-                    BackgroundColor="Transparent"
-                    Clicked="onButtonSelected"
-                    HeightRequest="30"
-                    HorizontalOptions="End"
-                    Source="icons_next_50.png"
-                    VerticalOptions="Center"
-                    WidthRequest="30" />
-            </HorizontalStackLayout>
-        </ScrollView>
+
+        <!-- CollectionView provides virtualization and better performance on Android -->
+        <CollectionView x:Name="ItemsCollectionView"
+                        SelectionMode="Single"
+                        SelectionChanged="ItemsCollectionView_SelectionChanged"
+                        ItemsLayout="HorizontalList"
+                        ItemsUpdatingScrollMode="KeepScrollOffset"
+                        HeightRequest="220">
+            <CollectionView.EmptyView>
+                <Label x:Name="EmptyList" FontSize="16" HorizontalOptions="Center" TextColor="Black" Text="No items found" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <local:ScrollViewItem
+                        LabelText="{Binding Name}"
+                        Source="{Binding Cover}"
+                        ItemId="{Binding Id}"
+                        MediaType="{Binding Type}" />
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <ImageButton
+            x:Name="ScrollView_Arrow"
+            BackgroundColor="Transparent"
+            Clicked="onButtonSelected"
+            HeightRequest="30"
+            HorizontalOptions="End"
+            Source="icons_next_50.png"
+            VerticalOptions="Center"
+            WidthRequest="30" />
     </VerticalStackLayout>
 </ContentView>
 

@@ -16,7 +16,13 @@ public partial class Combobox : ContentView
            BindableProperty.Create(nameof(InputList), typeof(List<TextValuePair<int>>), typeof(Combobox), null, BindingMode.TwoWay, null, OnInputListChanged);
 
     public static readonly BindableProperty ValueProperty =
-            BindableProperty.Create(nameof(Value), typeof(object), typeof(Combobox), null, BindingMode.TwoWay, null, OnValueChanged);
+            BindableProperty.Create(
+                nameof(Value),
+                typeof(TextValuePair<int>),
+                typeof(Combobox),
+                default(TextValuePair<int>),
+                BindingMode.TwoWay,
+                propertyChanged: OnValueChanged);
 
     public event EventHandler SelectionChanged;
     #endregion
@@ -36,9 +42,9 @@ public partial class Combobox : ContentView
         set => SetValue(InputListProperty, value);
     }
 
-    public object Value
+    public TextValuePair<int> Value
     {
-        get => GetValue(ValueProperty);
+        get => (TextValuePair<int>)GetValue(ValueProperty);
         set => SetValue(ValueProperty, value);
     }
 
@@ -49,19 +55,25 @@ public partial class Combobox : ContentView
     private static void OnPlaceHolderTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (Combobox)bindable;
-        control.comboboxLabel.Text = (string)newValue;
+        if (control.comboboxLabel != null) control.comboboxLabel.Text = (string)newValue;
     }
 
     private static void OnInputListChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (Combobox)bindable;
-        control.SeriesList.ItemsSource = (List<TextValuePair<int>>)newValue;
+        if (control.SeriesList != null) control.SeriesList.ItemsSource = (List<TextValuePair<int>>)newValue;
     }
 
     private static void OnValueChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (Combobox)bindable;
-        control.SearchEntry.Text = ((TextValuePair<int>)newValue).Text;
+        if (control.SearchEntry == null) return;
+
+        if (newValue is TextValuePair<int> tvp)
+            control.SearchEntry.Text = tvp.Text;
+        else
+            control.SearchEntry.Text = newValue?.ToString() ?? string.Empty;
+
         control.loading = false;
     }
 

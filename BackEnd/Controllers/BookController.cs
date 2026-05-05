@@ -2,12 +2,9 @@
 using MauiApp1.BackEnd.Database;
 using MauiApp1.BackEnd.Service;
 using MauiApp1.Controllers.ViewModels;
-using MauiApp1.Service.Modals;
+using MauiApp1.Modals;
 using MauiApp1.Shared;
-using Microsoft.Maui.Controls;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using static MauiApp1.BackEnd.Shared.Enums;
 
 namespace MauiApp1.Controllers
 {
@@ -35,7 +32,7 @@ namespace MauiApp1.Controllers
         public BookSetupViewModel GetBookSetup() {
             BookSetupViewModel viewModel
                 = new BookSetupViewModel();
-            viewModel.Series = _SeriesService.GetListOfSeries();
+            viewModel.Series = _SeriesService.GetListOfSeries(MediaDataType.Book);
             viewModel.Genre = _BookService.GetGenres();
             viewModel.Format = _BookService.GetBookFormats();
             viewModel.Type = _BookService.GetBookTypes();
@@ -54,7 +51,7 @@ namespace MauiApp1.Controllers
             return _BookService.GetBookInfo(id);
         }
 
-        public Series GetSeriesInfo(int id)
+        public Collection GetSeriesInfo(int id)
         {
             return _SeriesService.GetSeries(id);
         }

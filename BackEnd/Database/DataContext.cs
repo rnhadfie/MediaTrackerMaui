@@ -1,8 +1,6 @@
-﻿using MauiApp1.BackEnd.Service.Modals;
-using MauiApp1.Service.Modals;
+﻿
+using MauiApp1.Modals;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 
 namespace MauiApp1.BackEnd.Database
 {
@@ -10,9 +8,12 @@ namespace MauiApp1.BackEnd.Database
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-        public DbSet<Series> SeriesTable { get; set; }
+        public DbSet<Collection> SeriesTable { get; set; }
         public DbSet<Book> BookTable { get; set; }
-
         public DbSet<Video> VideoTable { get; set; }
+
+        public DbSet<Cd> MusicTable { get; set; }
+        public DbSet<BackEnd.Modals.Other> OtherTable { get; set; }
     }
+
 }

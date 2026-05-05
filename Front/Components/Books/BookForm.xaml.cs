@@ -1,13 +1,12 @@
 
-using MauiApp1.BackEnd.Controllers.ViewModels;
 using MauiApp1.BackEnd.Database;
 using MauiApp1.Controllers;
 using MauiApp1.Controllers.ViewModels;
-using MauiApp1.Service.Modals;
+using MauiApp1.Modals;
 using MauiApp1.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace MauiApp1.Components.Books;
+namespace MauiApp1.Front.Components.Books;
 
 [QueryProperty(nameof(Add), nameof(Add))]
 [QueryProperty(nameof(BookId), "BookId")]
@@ -57,6 +56,59 @@ public partial class BookForm: ContentPage
             add = value;
             OnPropertyChanged2();
         }
+    }
+
+    // Loading overlay
+    Grid _loadingOverlay;
+    ActivityIndicator _loadingIndicator;
+
+    void EnsureLoadingOverlay()
+    {
+        if (_loadingOverlay != null)
+            return;
+
+        var original = Content as View;
+        var root = new Grid();
+        if (original != null)
+            root.Children.Add(original);
+
+        var overlay = new Grid
+        {
+            BackgroundColor = Colors.Black.WithAlpha(0.4f),
+            IsVisible = false,
+            InputTransparent = false
+        };
+
+        var indicator = new ActivityIndicator
+        {
+            IsRunning = true,
+            IsVisible = true,
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            Color = Colors.White
+        };
+
+        overlay.Children.Add(indicator);
+        root.Children.Add(overlay);
+
+        Content = root;
+
+        _loadingOverlay = overlay;
+        _loadingIndicator = indicator;
+    }
+
+    void ShowLoading()
+    {
+        EnsureLoadingOverlay();
+        _loadingOverlay.IsVisible = true;
+        _loadingIndicator.IsRunning = true;
+    }
+
+    void HideLoading()
+    {
+        if (_loadingOverlay == null) return;
+        _loadingOverlay.IsVisible = false;
+        _loadingIndicator.IsRunning = false;
     }
 
     private int bookId;
@@ -142,7 +194,29 @@ public partial class BookForm: ContentPage
 
     private async void Button_Clicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("///MainPage");
+        ShowLoading();
+        try
+        {
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (ArgumentException ex) when (ex.ParamName == "uri" || (ex.Message?.Contains("Ambiguous routes") ?? false))
+        {
+            // Fallback: prefer popping the navigation stack if possible
+            var navigation = Shell.Current?.Navigation;
+            if (navigation != null && navigation.NavigationStack.Count > 1)
+            {
+                await navigation.PopAsync();
+            }
+            else
+            {
+                // Last resort: navigate to a known absolute route / root
+                await Shell.Current.GoToAsync("//MainPage");
+            }
+        }
+        finally
+        {
+            HideLoading();
+        }
     }
 
     private async void AddButton_Clicked(object sender, EventArgs e)
@@ -175,9 +249,30 @@ public partial class BookForm: ContentPage
         _book.Type = Book_TypeRadioButtons.Value;
         _book.Volume = volume;
 
-        controller.AddBook(_book);
-
-        await Shell.Current.GoToAsync(".");
+        ShowLoading();
+        try
+        {
+            controller.AddBook(_book);
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (ArgumentException ex) when (ex.ParamName == "uri" || (ex.Message?.Contains("Ambiguous routes") ?? false))
+        {
+            // Fallback: prefer popping the navigation stack if possible
+            var navigation = Shell.Current?.Navigation;
+            if (navigation != null && navigation.NavigationStack.Count > 1)
+            {
+                await navigation.PopAsync();
+            }
+            else
+            {
+                // Last resort: navigate to a known absolute route / root
+                await Shell.Current.GoToAsync("//MainPage");
+            }
+        }
+        finally
+        {
+            HideLoading();
+        }
     }
 
     private void SeriesCombobox_SelectionChanged(object sender, EventArgs e)
@@ -188,7 +283,7 @@ public partial class BookForm: ContentPage
             return;
         }
 
-        Series selectedSeries = controller.GetSeriesInfo(seriesId);
+        Collection selectedSeries = controller.GetSeriesInfo(seriesId);
         
         this.Book_AuthorTextField.Value = selectedSeries.Author ?? "";
         this.Book_ArtistTextField.Value = selectedSeries.Artist ?? "";

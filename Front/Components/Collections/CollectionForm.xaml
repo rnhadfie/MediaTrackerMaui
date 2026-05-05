@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
-    x:Class="MauiApp1.Front.Components.Series.SeriesForm"
+    x:Class="MauiApp1.Front.Components.Collections.CollectionForm"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:MauiApp1.Front.Components.Shared"
     xmlns:maui="clr-namespace:Microsoft.Maui;assembly=Microsoft.Maui">
     <Grid ColumnDefinitions="*">
         <VerticalStackLayout
-            x:Name="AddSeriesForm"
+            x:Name="AddCollectionForm"
             HorizontalOptions="Fill"
             VerticalOptions="Start">
             <Label
                 HorizontalOptions="Center"
-                Text="Add Series"
+                Text="Add Collection"
                 VerticalOptions="Center" />
 
             <local:TextField
@@ -35,8 +35,16 @@
                 FieldClassId="publisher"
                 HorizontalOptions="Fill"
                 PlaceholderText="Publisher" />
-            <local:RadioButtons x:Name="Series_Status" LabelText="Status" />
-            <local:RadioButtons x:Name="Series_Type" LabelText="Type" />
+            <local:RadioButtons
+               x:Name="Series_Status"
+               HorizontalOptions="Start"
+               LabelText="Status"
+               Source="{Binding _viewModel.ListOfSeriesStatus}" />
+            <local:RadioButtons
+               x:Name="Series_Type"
+               HorizontalOptions="Start"
+               LabelText="Category"
+               Source="{Binding _viewModel.ListOfMediaTypes}" />
             <local:TextField
                 x:Name="Series_VolumeTextField"
                 FieldClassId="totalVolumes"

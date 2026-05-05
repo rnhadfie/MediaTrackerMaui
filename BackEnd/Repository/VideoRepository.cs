@@ -1,10 +1,8 @@
 ﻿using MauiApp1.BackEnd.Controllers.ViewModels;
 using MauiApp1.BackEnd.Database;
-using MauiApp1.Service.Modals;
-using System;
-using System.Collections.Generic;
+using MauiApp1.BackEnd.Shared;
+using MauiApp1.Modals;
 using System.Collections.ObjectModel;
-using System.Text;
 
 namespace MauiApp1.BackEnd.Repository
 {
@@ -19,12 +17,12 @@ namespace MauiApp1.BackEnd.Repository
 
         public List<Video> GetAllVideo()
         {
-            return new ObservableCollection<Video>(_dbContext.VideoTable).ToList();
+            return CacheManager.GetOrAdd("videos:all", () => new ObservableCollection<Video>(_dbContext.VideoTable).ToList());
         }
 
         public List<Video> GetAllVideo(int take)
         {
-            return new ObservableCollection<Video>(_dbContext.VideoTable.Take(take)).ToList();
+            return CacheManager.GetOrAdd($"videos:all:take:{take}", () => new ObservableCollection<Video>(_dbContext.VideoTable.Take(take)).ToList());
         }
 
         public List<Video> GetAllVideo(VideoFitler filter)
@@ -53,18 +51,24 @@ namespace MauiApp1.BackEnd.Repository
             }
             if (fitleredTable != null)
             {
-                return new ObservableCollection<Video>(fitleredTable).ToList();
+                var key = $"videos:filter:{filter.Type}:{filter.Series}:{filter.Group}:{filter.Take}";
+                return CacheManager.GetOrAdd(key, () => new ObservableCollection<Video>(fitleredTable).ToList());
             }
-            return new ObservableCollection<Video>(table).ToList();
+
+            return CacheManager.GetOrAdd("videos:all", () => new ObservableCollection<Video>(table).ToList());
         }
 
         public Video GetVideo(int id)
         {
             try
             {
-                var context = _dbContext;
-                var result = context.VideoTable.Where(x => x.Id == id);
-                return result.FirstOrDefault<Video>();
+                var key = $"videos:id:{id}";
+                return CacheManager.GetOrAdd(key, () =>
+                {
+                    var context = _dbContext;
+                    var result = context.VideoTable.Where(x => x.Id == id);
+                    return result.FirstOrDefault<Video>();
+                });
             }
             catch (Exception ex)
             {
@@ -93,7 +97,22 @@ namespace MauiApp1.BackEnd.Repository
 
                 }
                 int result = context.SaveChanges();
+                CacheManager.RemovePrefix("videos:");
                 return result > 0;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public bool DeleteVideo(Video item)
+        {
+            try
+            {
+                _dbContext.VideoTable.Remove(item);
+                CacheManager.RemovePrefix("videos:");
+                return true;
             }
             catch (Exception ex)
             {

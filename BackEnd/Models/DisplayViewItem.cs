@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using static MauiApp1.Shared.Enums;
+using static MauiApp1.BackEnd.Shared.Enums;
 
-namespace MauiApp1.BackEnd.Service.Modals
+namespace MauiApp1.BackEnd.Modals
 {
     public class DisplayViewItem: ObservableObject
     {

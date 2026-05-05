@@ -11,6 +11,7 @@ namespace MauiApp1.BackEnd.Controllers.ViewModels
         public List<TextValuePair<int>> Series { get; set; }
         public List<TextValuePair<int>> VideoFormat { get; set; }
         public List<TextValuePair<int>> VideoType { get; set; }
+        public List<TextValuePair<int>> Genre { get; set; }
 
     }
 }

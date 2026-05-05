@@ -1,5 +1,6 @@
 using MauiApp1.Shared;
 using System.Collections.Generic;
+using Microsoft.Maui.Controls;
 
 namespace MauiApp1.Front.Components.Shared;
 
@@ -13,7 +14,7 @@ public partial class RadioButtons : ContentView
             BindableProperty.Create(nameof(GroupName), typeof(string), typeof(Shared.RadioButtons), "", BindingMode.TwoWay, null, OnGroupNameChanged);
 
     public static readonly BindableProperty SourceProperty =
-           BindableProperty.Create(nameof(Source), typeof(TextValuePair<int>), typeof(Shared.RadioButtons), null, BindingMode.TwoWay, null, OnSoruceChanged);
+           BindableProperty.Create(nameof(Source), typeof(List<TextValuePair<int>>), typeof(Shared.RadioButtons), null, BindingMode.TwoWay, null, OnSourceChanged);
 
     public static readonly BindableProperty FieldClassIdProperty =
            BindableProperty.Create(nameof(FieldClassId), typeof(string), typeof(Shared.RadioButtons), "", BindingMode.TwoWay, null, OnClassIdChanged);
@@ -42,9 +43,9 @@ public partial class RadioButtons : ContentView
         set => SetValue(ValueProperty, value);
     }
 
-    public object Source
+    public List<TextValuePair<int>> Source
     {
-        get => GetValue(SourceProperty);
+        get => (List<TextValuePair<int>>)GetValue(SourceProperty);
         set => SetValue(SourceProperty, value);
     }
 
@@ -60,7 +61,7 @@ public partial class RadioButtons : ContentView
     private static void OnLabelTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (Shared.RadioButtons)bindable;
-        control.radio_label.Text = newValue.ToString();
+        if (control.radio_label != null) control.radio_label.Text = newValue?.ToString();
     }
 
     private static void OnGroupNameChanged(BindableObject bindable, object oldValue, object newValue)
@@ -71,47 +72,55 @@ public partial class RadioButtons : ContentView
     private static void OnValueChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (Shared.RadioButtons)bindable;
-        control.Value = (int)newValue;
-        foreach (RadioButton item in control.RadioButtonGroup.Children)
+        if (control == null) return;
+
+        // Update radio buttons to reflect the new value without re-setting the BindableProperty (avoids recursion)
+        var newInt = Convert.ToInt32(newValue);
+        foreach (var child in control.RadioButtonGroup.Children)
         {
-            if (item.ClassId == $"RadioButton_{control.Value}")
+            if (child is RadioButton rb)
             {
-                item.IsChecked = true;
-                break;
+                rb.IsChecked = rb.ClassId == $"RadioButton_{newInt}";
             }
-        } 
+        }
     }
 
     private static void OnClassIdChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        var control = (Shared.RadioButtons)bindable;
+        // no-op, reserved for future use
     }
 
-    private static void OnSoruceChanged(BindableObject bindable, object oldValue, object newValue)
+    private static void OnSourceChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (Shared.RadioButtons)bindable;
+        if (control == null) return;
+
+        var list = newValue as List<TextValuePair<int>>;
+        control.AddData(list);
     }
 
     public void AddData(List<TextValuePair<int>> Buttonsource)
     {
-        if (Buttonsource != null)
+        // Clear existing children first
+        RadioButtonGroup.Children.Clear();
+
+        if (Buttonsource == null || Buttonsource.Count == 0) return;
+
+        foreach (var item in Buttonsource)
         {
-            foreach (var item in Buttonsource)
+            // Use plain string Content so platform renderers display text consistently
+            var radioButton = new RadioButton
             {
-                Label label = new Label();
-                label.Text = item.Text;
-                label.Padding = new Thickness(2, 0, 16, 0);
-                var radioButton = new RadioButton
-                {
-                    ClassId = $"RadioButton_{item.Value}",
-                    Content = label,
-                    Value = item.Value,
-                    GroupName = this.GroupName,
-                    IsChecked = (int)Value == item.Value,
-                };
-                radioButton.CheckedChanged += OnRadioButtonCheckedChanged;
-                RadioButtonGroup.Add(radioButton);
-            }
+                ClassId = $"RadioButton_{item.Value}",
+                Content = item.Text,
+                Value = item.Value,
+                GroupName = this.GroupName,
+                IsChecked = this.Value == item.Value,
+                Margin = new Thickness(2, 0, 16, 0)
+            };
+
+            radioButton.CheckedChanged += OnRadioButtonCheckedChanged;
+            RadioButtonGroup.Add(radioButton);
         }
     }
 
@@ -130,5 +139,39 @@ public partial class RadioButtons : ContentView
     public RadioButtons()
 	{
 		InitializeComponent();
+    }
+
+    protected override void OnParentSet()
+    {
+        base.OnParentSet();
+
+        // Subscribe to size changes so we can switch layout orientation on small screens
+        this.SizeChanged -= RadioButtons_SizeChanged;
+        this.SizeChanged += RadioButtons_SizeChanged;
+
+        // Apply initial orientation
+        UpdateOrientation(this.Width);
+    }
+
+    private void RadioButtons_SizeChanged(object? sender, EventArgs e)
+    {
+        UpdateOrientation(this.Width);
+    }
+
+    private void UpdateOrientation(double width)
+    {
+        // Threshold in device-independent units. If width is small, stack vertically.
+        const double smallWidthThreshold = 480; // adjust as needed
+
+        if (RadioButtonGroup == null) return;
+
+        if (width > 0 && width <= smallWidthThreshold)
+        {
+            RadioButtonGroup.Orientation = StackOrientation.Vertical;
+        }
+        else
+        {
+            RadioButtonGroup.Orientation = StackOrientation.Horizontal;
+        }
     }
 }

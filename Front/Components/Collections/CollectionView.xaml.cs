@@ -1,33 +1,30 @@
 using MauiApp1.BackEnd.Controllers;
 using MauiApp1.BackEnd.Database;
-using MauiApp1.BackEnd.Service.Modals;
-using MauiApp1.Components.ScrollDisplay;
-using MauiApp1.Service.Modals;
+using MauiApp1.BackEnd.Modals;
 using MauiApp1.Shared;
-using Microsoft.EntityFrameworkCore;
-using static MauiApp1.Shared.Enums;
+using static MauiApp1.BackEnd.Shared.Enums;
 
-namespace MauiApp1.Front.Components.Series;
+namespace MauiApp1.Front.Components.Collections;
 
 
-public partial class SeriesView : ContentPage
+public partial class CollectionView : ContentPage
 {
 
-    private SeriesController _seriesViewController;
+    private CollectionController _seriesViewController;
     private readonly DataContext _dbContext;
-    private List<MauiApp1.Service.Modals.Series> _TotalSeriesList;
+    private List<Modals.Collection> _TotalSeriesList;
     private List<DisplayViewItem> _SeriesList;
     private const double CellSize = 160;
     private string _TextFilter = "";
     private MediaDataType _TypeFilter = MediaDataType.All;
     private CollectionStatus _StatusFilter = CollectionStatus.All;
 
-    public SeriesView(DataContext dataContext)
+    public CollectionView(DataContext dataContext)
 	{
 		InitializeComponent();
         _dbContext = dataContext;
 
-        _seriesViewController = new SeriesController(dataContext);
+        _seriesViewController = new CollectionController(dataContext);
         _TotalSeriesList = _seriesViewController.GetSeriesList();
 
         _SeriesList = GetDisplayList();
@@ -43,12 +40,12 @@ public partial class SeriesView : ContentPage
     private List<DisplayViewItem> GetDisplayList()
     {
         _TotalSeriesList = _seriesViewController.GetSeriesList();
-        _TotalSeriesList.RemoveAt(0);
+        //_TotalSeriesList.RemoveAt(0);
 
         var list = _TotalSeriesList.FindAll(x =>
         {
             bool textMatch = string.IsNullOrEmpty(_TextFilter) || x.Title.Contains(_TextFilter, StringComparison.OrdinalIgnoreCase);
-            bool typeMatch = x.type == MediaDataType.All || x.type == MediaDataType.Series || x.type == _TypeFilter;
+            bool typeMatch = x.type == MediaDataType.All || x.type == MediaDataType.Collection || x.type == _TypeFilter;
             bool statusMatch = _StatusFilter == CollectionStatus.All || x.CollectionStatus == _StatusFilter;
             return textMatch && typeMatch && statusMatch;
         });
@@ -65,6 +62,72 @@ public partial class SeriesView : ContentPage
     private void OnGridSizeChanged(object sender, EventArgs e)
     {
         UpdateGrid();
+    }
+
+    private async void OnOpenMenu(object? sender, EventArgs e)
+    {
+        ShowLoading();
+        try
+        {
+            await Shell.Current.GoToAsync($"{nameof(CollectionForm)}?Add={true}&SeriesId={-1}");
+        }
+        finally
+        {
+            HideLoading();
+        }
+    }
+
+    // Loading overlay
+    Grid _loadingOverlay;
+    ActivityIndicator _loadingIndicator;
+
+    void EnsureLoadingOverlay()
+    {
+        if (_loadingOverlay != null)
+            return;
+
+        var original = Content as View;
+        var root = new Grid();
+        if (original != null)
+            root.Children.Add(original);
+
+        var overlay = new Grid
+        {
+            BackgroundColor = Colors.Black.WithAlpha(0.4f),
+            IsVisible = false,
+            InputTransparent = false
+        };
+
+        var indicator = new ActivityIndicator
+        {
+            IsRunning = true,
+            IsVisible = true,
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+            Color = Colors.White
+        };
+
+        overlay.Children.Add(indicator);
+        root.Children.Add(overlay);
+
+        Content = root;
+
+        _loadingOverlay = overlay;
+        _loadingIndicator = indicator;
+    }
+
+    void ShowLoading()
+    {
+        EnsureLoadingOverlay();
+        _loadingOverlay.IsVisible = true;
+        _loadingIndicator.IsRunning = true;
+    }
+
+    void HideLoading()
+    {
+        if (_loadingOverlay == null) return;
+        _loadingOverlay.IsVisible = false;
+        _loadingIndicator.IsRunning = false;
     }
    
     private void UpdateGrid()

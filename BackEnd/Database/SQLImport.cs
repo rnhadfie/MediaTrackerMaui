@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MauiApp1.Service.Modals
+namespace MauiApp1.BackEnd.Database
 {
-    internal class Cd
+    internal class SQLImport
     {
     }
 }
