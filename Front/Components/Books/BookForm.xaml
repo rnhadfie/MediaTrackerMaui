@@ -3,87 +3,93 @@
     x:Class="MauiApp1.Front.Components.Books.BookForm"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:MauiApp1.Front.Components.Shared"
-    xmlns:maui="clr-namespace:Microsoft.Maui;assembly=Microsoft.Maui">
-    <ScrollView>
-        <VerticalStackLayout>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="200" />
-                </Grid.ColumnDefinitions>
-                <VerticalStackLayout
-                    x:Name="AddBookForm"
-                    Grid.Column="0"
-                    HorizontalOptions="Fill"
-                    VerticalOptions="Start">
-                    <Label
-                        HorizontalOptions="Center"
-                        Text="Add Book"
-                        VerticalOptions="Center" />
-                    <local:Combobox
-                        x:Name="Book_SeriesCombobox"
-                        HorizontalOptions="Fill"
-                        PlaceholderText="Series"
-                        SelectionChanged="SeriesCombobox_SelectionChanged" />
-                    <local:TextField
-                        x:Name="Book_TitleTextField"
-                        FieldClassId="title"
-                        HorizontalOptions="Fill"
-                        PlaceholderText="Title" />
-                    <local:TextField
-                        x:Name="Book_AuthorTextField"
-                        FieldClassId="author"
-                        HorizontalOptions="Fill"
-                        PlaceholderText="Author" />
-                    <local:TextField
-                        x:Name="Book_ArtistTextField"
-                        FieldClassId="artist"
-                        HorizontalOptions="Fill"
-                        PlaceholderText="Artist" />
-                    <local:TextField
-                        x:Name="Book_PublisherTextField"
-                        FieldClassId="publisher"
-                        HorizontalOptions="Fill"
-                        PlaceholderText="Publisher" />
+    xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+    xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+    xmlns:viewModels="clr-namespace:MauiApp1.Front.Components.Books.ViewModels"
+    Title="Book Form">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            Clicked="OnBackClick"
+            Order="Primary"
+            Priority="0"
+            Text="Back" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.BindingContext>
+        <viewModels:BookFormViewModel />
+    </ContentPage.BindingContext>
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-                    <local:TextField
-                        x:Name="Book_VolumeTextField"
-                        FieldClassId="volume"
-                        HorizontalOptions="Start"
-                        InputFieldType="{x:Static maui:Keyboard.Numeric}"
-                        PlaceholderText="Volume"
-                        TextWidth="150" />
+        <!--  Scrollable content so dialog height constraints don't hide inputs  -->
+        <ScrollView Grid.Row="0">
+            <StackLayout>
+                <material:TextField
+                    x:Name="BookTitle"
+                    Title="Title"
+                    Padding="8"
+                    Text="{Binding Title, Mode=TwoWay}" />
+                <material:TextField
+                    x:Name="BookAuthor"
+                    Title="Author"
+                    Padding="8"
+                    Text="{Binding Author, Mode=TwoWay}" />
+                <material:PickerField
+                    x:Name="BookSeriesPicker"
+                    Title="Pick an option"
+                    Padding="8"
+                    ItemsSource="{Binding BookSeriesList, Mode=TwoWay}"
+                    SelectedItem="{Binding BookSeries, Mode=TwoWay}" />
+                <material:TextField
+                    x:Name="NewBookSeries"
+                    Title="New Book Series"
+                    Padding="8"
+                    Text="{Binding NewBookSeriesName, Mode=TwoWay}" />
 
-                    <local:RadioButtons
-                        x:Name="Book_FormatRadioButtons"
-                        HorizontalOptions="Start"
-                        LabelText="Format" />
-                    <local:RadioButtons
-                        x:Name="Book_TypeRadioButtons"
-                        HorizontalOptions="Start"
-                        LabelText="Format" />
-                    <local:Combobox
-                        x:Name="Book_Genre"
-                        HorizontalOptions="Fill"
-                        PlaceholderText="Genre" />
-                </VerticalStackLayout>
-                <VerticalStackLayout Grid.Column="1">
-                    <local:FilePicker x:Name="Book_FilePicker" />
-                </VerticalStackLayout>
-            </Grid>
-            <HorizontalStackLayout Padding="4" HorizontalOptions="End">
-                <Button
-                    Margin="4"
-                    Clicked="Button_Clicked"
-                    HorizontalOptions="End"
-                    Text="Cancel" />
-                <Button
-                    Margin="4"
-                    Clicked="AddButton_Clicked"
-                    HorizontalOptions="End"
-                    Text="Add Book" />
-            </HorizontalStackLayout>
-        </VerticalStackLayout>
-    </ScrollView>
+                <material:MultiplePickerField
+                    x:Name="BookGenrePicker"
+                    Title="Genre"
+                    Padding="8"
+                    ItemsSource="{Binding GenreOptions, Mode=TwoWay}"
+                    SelectedItems="{Binding Genre, Mode=TwoWay}" />
+                <StackLayout Padding="8">
+
+                    <Label x:Name="BookFormatLabel" Text="Format:" />
+                    <material:RadioButtonGroupView x:Name="BookFormatGroup" SelectedItem="{Binding Format, Mode=TwoWay}" />
+
+                </StackLayout>
+                <material:TextField
+                    x:Name="BookVolumes"
+                    Title="Volumes"
+                    Padding="8"
+                    Text="{Binding Volume, Mode=TwoWay}" />
+                <material:CheckBox
+                    Padding="8"
+                    IsChecked="{Binding Read, Mode=TwoWay}"
+                    Text="Read" />
+                <StackLayout Padding="8">
+                    <Label x:Name="BookLanguageLabel" Text="Language:" />
+                    <material:RadioButtonGroupView x:Name="BookLanguageGroup" SelectedItem="{Binding Language, Mode=TwoWay}" />
+                </StackLayout>
+            </StackLayout>
+        </ScrollView>
+
+        <!--  Footer row pinned to bottom so buttons remain visible  -->
+        <FlexLayout
+            Grid.Row="1"
+            Margin="10"
+            Direction="Row"
+            JustifyContent="End">
+            <Button
+                x:Name="CancelButton"
+                Clicked="OnBackClicked"
+                Text="Back" />
+            <Button
+                x:Name="SubmitButton"
+                Clicked="OnSubmitClicked"
+                Text="Save" />
+        </FlexLayout>
+    </Grid>
 </ContentPage>

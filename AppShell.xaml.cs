@@ -1,13 +1,6 @@
 ﻿using CommunityToolkit.Maui.Storage;
-using MauiApp1.BackEnd.Database;
+using MauiApp1.BackEnd.Controllers;
 using MauiApp1.Front.Components.Books;
-using MauiApp1.Front.Components.Collections;
-using MauiApp1.Front.Components.Music;
-using MauiApp1.Front.Components.Other;
-using MauiApp1.Front.Components.Video;
-using Microsoft.EntityFrameworkCore;
-using CollectionView = MauiApp1.Front.Components.Collections.CollectionView;
-using VideoView = MauiApp1.Front.Components.Video.VideoView;
 
 namespace MauiApp1
 {
@@ -19,7 +12,7 @@ namespace MauiApp1
 
 
             ShellRouting.RegisterRouteSafe(nameof(MainPage), typeof(MainPage));
-            
+            /*
             ShellRouting.RegisterRouteSafe(nameof(CollectionForm), typeof(CollectionForm));
             ShellRouting.RegisterRouteSafe(nameof(CollectionDetailView), typeof(CollectionDetailView));
             ShellRouting.RegisterRouteSafe(nameof(CollectionView), typeof(CollectionView));
@@ -38,29 +31,35 @@ namespace MauiApp1
 
             ShellRouting.RegisterRouteSafe(nameof(BookForm), typeof(BookForm));
             ShellRouting.RegisterRouteSafe(nameof(BookView), typeof(BookView));
-            ShellRouting.RegisterRouteSafe(nameof(BookDetailView), typeof(BookDetailView));
+            ShellRouting.RegisterRouteSafe(nameof(BookDetailView), typeof(BookDetailView));*/
 
-
-
-
-
+            // Register named routes for BookHome and Home so they can be navigated to by route name
+            Routing.RegisterRoute("bookhome", typeof(BookHome));
+            Routing.RegisterRoute("home", typeof(MainPage));
+            Routing.RegisterRoute(nameof(BookForm), typeof(BookForm));
+            // Ensure BookForm route is registered
+            ShellRouting.RegisterRouteSafe(nameof(BookForm), typeof(BookForm));
         }
-
+        
         private async void OnImportDataClicked(object sender, EventArgs e)
         {
             string path = Path.GetFullPath("downloads");
             try
             {
+                var message = $"Import succeeded";
                 var result = await FilePicker.PickAsync(default);
                 if (result != null)
                 {
                     using var stream = await result.OpenReadAsync();
                     using (var workbook = new ClosedXML.Excel.XLWorkbook(stream))
                     {
-                        //SQLExport.Import(_dbContext, workbook);
+                        bool importResult = await ExcelController.ImportExcelData(workbook);
+                        if (!importResult) {
+                            message = $"Import failed";
+                        }
                     }
                 }
-                var message = $"Import succeeded";
+                
 
                 await Shell.Current.DisplayAlert("Import", message ?? "", "OK");
             }
@@ -73,7 +72,7 @@ namespace MauiApp1
                 await Shell.Current.DisplayAlert("Import", message ?? "", "OK");
             }
         }
-
+        /*
         private async void OnExportDataClicked(object sender, EventArgs e)
         {
             string path = Path.GetFullPath("downloads");
@@ -99,6 +98,17 @@ namespace MauiApp1
 
                 await Shell.Current.DisplayAlert("Export", message ?? "", "OK");
             }
+        }
+        */
+
+        private async void OnMenuBooksClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("//bookhome");
+        }
+
+        private async void OnMenuHomeClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("//home");
         }
     }
 

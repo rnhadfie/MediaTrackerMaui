@@ -58,15 +58,23 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\MediaDatabase.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Resources\MediaDatabase.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Include="MediaTrackerMaui.slnx" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="ClosedXML" Version="0.105.0" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="14.0.0" />
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-		<PackageReference Include="DrawnUi.Maui" Version="1.9.0.1" />
-		<PackageReference Include="MEGraph.MAUI" Version="2.2.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="LiveChartsCore.SkiaSharpView.Maui" Version="2.0.4" />
+		<PackageReference Include="Microcharts.Maui" Version="1.0.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.3" />
@@ -74,136 +82,43 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.2" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.31" />
 		<PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.31" />
+		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+		<PackageReference Include="UraniumUI" Version="2.15.0" />
+		<PackageReference Include="UraniumUI.Dialogs.CommunityToolkit" Version="2.15.0" />
+		<PackageReference Include="UraniumUI.Icons.FontAwesome" Version="2.15.0" />
+		<PackageReference Include="UraniumUI.Icons.MaterialIcons" Version="2.15.0" />
+		<PackageReference Include="UraniumUI.Material" Version="2.15.0" />
+		<PackageReference Include="UraniumUI.WebComponents" Version="2.15.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Front\Components\Books\BookForm.xaml.cs">
-	    <DependentUpon>BookForm.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Books\BookDetailView.xaml.cs">
-	    <DependentUpon>BookDetailView.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Collections\CollectionForm.xaml.cs">
-	    <DependentUpon>CollectionForm.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Collections\CollectionView.xaml.cs">
-	    <DependentUpon>CollectionView.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Music\MusicDetailView.xaml.cs">
-	    <DependentUpon>MusicDetailView.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Music\MusicForm.xaml.cs">
-	    <DependentUpon>MusicForm.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Music\MusicView.xaml.cs">
-	    <DependentUpon>MusicView.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Other\OtherDetailView.xaml.cs">
-	    <DependentUpon>OtherDetailView.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Other\OtherForm.xaml.cs">
-	    <DependentUpon>OtherForm.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Other\OtherView.xaml.cs">
-	    <DependentUpon>OtherView.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\ScrollDisplay\ScrollViewDisplay.xaml.cs">
-	    <DependentUpon>ScrollViewDisplay.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Shared\Checkbox.xaml.cs">
-	    <DependentUpon>Checkbox.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Shared\FilePickerCom.xaml.cs">
-	    <DependentUpon>FilePickerCom.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Video\VideoForm.xaml.cs">
-	    <DependentUpon>VideoForm.xaml</DependentUpon>
-	  </Compile>
+	  <Folder Include="BackEnd\Interface\" />
+	  <Folder Include="BackEnd\Repository\" />
+	  <Folder Include="Front\Components\Collections\" />
+	  <Folder Include="Front\Components\Menu\" />
+	  <Folder Include="Front\Components\Music\" />
+	  <Folder Include="Front\Components\Other\" />
+	  <Folder Include="Front\Components\ScrollDisplay\" />
+	  <Folder Include="Front\Components\Video\" />
+	  <Folder Include="LocalStorage\" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Front\Components\Menu\MenuBar.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Other\OtherDetailView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Other\OtherForm.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Other\OtherView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Music\MusicDetailView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Music\MusicForm.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Music\MusicView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
 	  <MauiXaml Update="Front\Components\Books\BookForm.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Books\BookDetailView.xaml">
+	  <MauiXaml Update="Front\Components\Books\BookHome.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Books\BookView.xaml">
+	  <MauiXaml Update="Front\Components\Books\BookList.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Collections\CollectionDetailView.xaml">
+	  <MauiXaml Update="Front\Components\Books\BookVisualization.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Collections\CollectionForm.xaml">
+	  <MauiXaml Update="Front\Components\Shared\ListDisplay.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\ListItem.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\ScrollDisplay\ScrollViewDisplay.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\ScrollDisplay\ScrollViewItem.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Collections\CollectionView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Shared\Checkbox.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Shared\Combobox.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Shared\Drawer.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Shared\FilePickerCom.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Shared\ItemGrid.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Shared\RadioButtons.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Shared\TextField.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Video\VideoDetailView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Video\VideoForm.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Video\VideoView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="LocalStorage\" />
 	</ItemGroup>
 
 </Project>

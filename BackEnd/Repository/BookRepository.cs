@@ -4,99 +4,128 @@ using MauiApp1.BackEnd.Shared;
 using MauiApp1.BackEnd.Interface;
 using MauiApp1.Modals;
 using System.Collections.ObjectModel;
+using MauiApp1.BackEnd.Models;
 
 namespace MauiApp1.BackEnd.Repository
 {
     public class BookRepository: IBookRepository
     {
-        DataContext _dbContext;
-
-        public BookRepository(DataContext dataContext)
-        {
-            _dbContext = dataContext;
-        }
-
-        public List<Book> GetAllBooks()
-        {
-            return CacheManager.GetOrAdd("books:all", () => XmlDatabase.ReadTable<Book>("BookTable"));
-        }
-
-       
-        public List<Book> GetAllBooks(BookFilter filter)
-        {
-            var table = _dbContext.BookTable;
-            IQueryable<Book> fitleredTable = null;
-            if (filter.Type > 0)
-            {
-                fitleredTable = table.Where(x=>x.Type == filter.Type);
-            }
-            if (filter.Genre != null)
-            {
-                fitleredTable = table.Where(x => x.Genre == filter.Genre);
-            }
-            if (filter.Series != null)
-            {
-                fitleredTable = table.Where(x => x.SeriesId == filter.Series);
-            }
-            if (filter.Format != null)
-            {
-                fitleredTable = table.Where(x => x.Format == filter.Format);
-            }
-            if (filter.Take != null)
-            {
-                fitleredTable = table.Take(filter.Take.Value);
-            }
-            if (fitleredTable != null)
-            {
-                // cache filtered queries by a simple key
-                var key = $"books:filter:{filter.Type}:{filter.Genre}:{filter.Series}:{filter.Format}:{filter.Take}";
-                return CacheManager.GetOrAdd(key, () => new ObservableCollection<Book>(fitleredTable).ToList());
-            }
-
-            return CacheManager.GetOrAdd($"books:all:take:{filter.Take}", () => new ObservableCollection<Book>(table).ToList());
-        }
-
-        public List<Book> GetAllBooks(int take)
-        {
-            List<Book> books = XmlDatabase.ReadTable<Book>("BookTable");
-            if (books.Count <= take) { 
-                return books;
-            }
-            return CacheManager.GetOrAdd($"books:all:take:{take}", () => new ObservableCollection<Book>(books.GetRange(0, take)).ToList());
-        }
-
-        public Book GetBook(int id)
+        public async Task<List<Book>> GetBooksAsync()
         {
             try
             {
-                var key = $"books:id:{id}";
-                return CacheManager.GetOrAdd(key, () =>
-                {
-                    var result = XmlDatabase.ReadTable<Book>("BookTable").Where(x => x.Id == id);
-                    return result.FirstOrDefault<Book>();
-                });
+                await MediaItemDatabase.Init();
+
+                return await MediaItemDatabase.database.Table<Book>().ToListAsync();
             }
             catch (Exception ex)
             {
-                return new Book() { Title = "" };
+                return new List<Book>();
             }
         }
 
-        public bool SaveBook(Book item)
+        public async Task<List<Book>> GetBooksNotReadAsync()
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.Table<Book>().Where(t => !t.Read).ToListAsync();
+        }
+
+        public async Task<Book> GetBookAsync(int id)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.Table<Book>().Where(i => i.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<int> SaveBookAsync(Book item)
+        {
+            await MediaItemDatabase.Init();
+            if (item.Id != 0)
+                return await MediaItemDatabase.database.UpdateAsync(item);
+            else
+                return await MediaItemDatabase.database.InsertAsync(item);
+        }
+
+        public async Task<int> DeleteBookAsync(Book item)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.DeleteAsync(item);
+        }
+
+        public async Task<List<Publisher>> GetPublishersAsync()
         {
             try
             {
-                var context = _dbContext;
-                if (item.Id > 0)
-                    XmlDatabase.UpdateInTable<Book>("BookTable", x => x.Id == item.Id, item);
-                else
+                await MediaItemDatabase.Init();
+                return await MediaItemDatabase.database.Table<Publisher>().ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                return new List<Publisher>();
+            }
+        }
+
+        public async Task<int> SavePublisherAsync(Publisher item)
+        {
+            await MediaItemDatabase.Init();
+            if (item.Id != 0)
+                return await MediaItemDatabase.database.UpdateAsync(item);
+            else
+                return await MediaItemDatabase.database.InsertAsync(item);
+        }
+
+        public async Task<int> DeletePublisherAsync(Publisher item)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.DeleteAsync(item);
+        }
+
+
+
+        public async Task<List<BookSeries>> GetAllBookSeriesAsync()
+        {
+            try
+            {
+                await MediaItemDatabase.Init();
+                return await MediaItemDatabase.database.Table<BookSeries>().ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                return new List<BookSeries>();
+            }
+        }
+        public async Task<BookSeries> GetBookSeriesAsync(int id)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.Table<BookSeries>().Where(i => i.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<int> SaveBookSeriesAsync(BookSeries item)
+        {
+            await MediaItemDatabase.Init();
+            if (item.Id != 0)
+                return await MediaItemDatabase.database.UpdateAsync(item);
+            else
+                return await MediaItemDatabase.database.InsertAsync(item);
+        }
+
+        public async Task<int> DeleteBookSeriesAsync(BookSeries item)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.DeleteAsync(item);
+        }
+
+        public async Task<bool> SaveBooksAsync(List<Book> books)
+        {
+            try
+            {
+                await MediaItemDatabase.Init();
+                var db = MediaItemDatabase.database;
+                // Use InsertOrReplace to avoid duplicates (requires primary key)
+                foreach (var b in books)
                 {
-                    context.BookTable.Add(item);
+                    await db.InsertOrReplaceAsync(b);
                 }
-                bool success = XmlDatabase.AddToTable<Book>("BookTable", item);
-                // clear relevant cache entries
-                CacheManager.RemovePrefix("books:");
-                return success;
+                return true;
             }
             catch (Exception ex)
             {
@@ -104,13 +133,34 @@ namespace MauiApp1.BackEnd.Repository
             }
         }
 
-
-        public bool DeleteBook(Book item)
+        public async Task<bool> SaveBookSeriesAsync(List<BookSeries> series)
         {
             try
             {
-                XmlDatabase.DeleteFromTable<Book>("BookTable", x => x.Id == item.Id);
-                CacheManager.RemovePrefix("books:");
+                await MediaItemDatabase.Init();
+                var db = MediaItemDatabase.database;
+                foreach (var s in series)
+                {
+                    await db.InsertOrReplaceAsync(s);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> SavePublishersAsync(List<Publisher> publishers)
+        {
+            try
+            {
+                await MediaItemDatabase.Init();
+                var db = MediaItemDatabase.database;
+                foreach (var p in publishers)
+                {
+                    await db.InsertOrReplaceAsync(p);
+                }
                 return true;
             }
             catch (Exception ex)

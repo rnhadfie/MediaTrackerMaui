@@ -4,7 +4,8 @@ using System.Text;
 
 namespace MauiApp1.BackEnd.Database
 {
-    internal class SQLImport
+    public class SQLImport
     {
+
     }
 }

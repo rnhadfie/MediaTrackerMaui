@@ -1,30 +1,27 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿
+using SQLite;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
+using static MauiApp1.BackEnd.Shared.Enums;
 
 namespace MauiApp1.Modals
 {
     public class Book
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
-        public required string Title { get; set; }
-        public byte[]? Cover { get; set; }
+        public string Title { get; set; }
         public string? Author {  get; set; }
         public string? Artist { get; set; }
         
-        public string? Publisher { get; set; }
-        public int Genre { get; set; }
-        public int Format { get; set; }
-        public int Type { get; set; }
-        public int Volume { get; set; }
+        public int? Publisher { get; set; }
+        public List<Genre> Genre { get; set; }
+        public BookFormat Format { get; set; }
+        public string Volume { get; set; }
+        public bool Read { get; set; }
+        public Language Language { get; set; }
 
-        [ForeignKey("Series")]
-        public int SeriesId { get; set; }
+        public int BookSeries { get; set;  }
+        public BookType? Type { get; set; }
 
     }
 }

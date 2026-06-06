@@ -1,292 +1,204 @@
 
-using MauiApp1.BackEnd.Database;
 using MauiApp1.Controllers;
+using MauiApp1.Front.Components.Books.ViewModels;
+using MauiApp1.BackEnd.Models;
 using MauiApp1.Controllers.ViewModels;
+using System.Collections.Generic;
+using static MauiApp1.BackEnd.Shared.Enums;
+using System.Linq;
+using System.Threading.Tasks;
 using MauiApp1.Modals;
-using MauiApp1.Shared;
-using Microsoft.EntityFrameworkCore;
+using UraniumUI.Material;
 
-namespace MauiApp1.Front.Components.Books;
-
-[QueryProperty(nameof(Add), nameof(Add))]
-[QueryProperty(nameof(BookId), "BookId")]
-public partial class BookForm: ContentPage
+namespace MauiApp1.Front.Components.Books
 {
-	BookSetupViewModel _viewModel;
-    Book _book;
-    BookController controller;
-    private readonly DataContext _dbContext;
-
-    public BookForm(DataContext dataContext)
-	{
-        
-        _dbContext = dataContext;
-
-        InitializeComponent();
-        BindingContext = this;
-        controller = new BookController(_dbContext);
-
-
-        #region Setup 
-        
-        _viewModel = controller.GetBookSetup();
-
-        Book_SeriesCombobox.InputList = _viewModel.Series;
-        Book_Genre.InputList = _viewModel.Genre;
-        Book_FormatRadioButtons.AddData(_viewModel.Format);
-        Book_TypeRadioButtons.AddData(_viewModel.Type);
-
-        #endregion
-
-        _book = new Book()
-        {
-            Id = -1,
-            Title = "",
-        };
-    }
-
-    private bool add;
-
-    public bool Add
+    public partial class BookForm : ContentPage, IQueryAttributable
     {
-        get => add;
-        set
+        private int _id;
+        private readonly BookController _controller;
+
+        public BookForm() : this(0)
         {
-            OnPropertyChanged();
-            add = value;
-            OnPropertyChanged2();
         }
-    }
 
-    // Loading overlay
-    Grid _loadingOverlay;
-    ActivityIndicator _loadingIndicator;
-
-    void EnsureLoadingOverlay()
-    {
-        if (_loadingOverlay != null)
-            return;
-
-        var original = Content as View;
-        var root = new Grid();
-        if (original != null)
-            root.Children.Add(original);
-
-        var overlay = new Grid
+        public BookForm(int id)
         {
-            BackgroundColor = Colors.Black.WithAlpha(0.4f),
-            IsVisible = false,
-            InputTransparent = false
-        };
-
-        var indicator = new ActivityIndicator
-        {
-            IsRunning = true,
-            IsVisible = true,
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
-            Color = Colors.White
-        };
-
-        overlay.Children.Add(indicator);
-        root.Children.Add(overlay);
-
-        Content = root;
-
-        _loadingOverlay = overlay;
-        _loadingIndicator = indicator;
-    }
-
-    void ShowLoading()
-    {
-        EnsureLoadingOverlay();
-        _loadingOverlay.IsVisible = true;
-        _loadingIndicator.IsRunning = true;
-    }
-
-    void HideLoading()
-    {
-        if (_loadingOverlay == null) return;
-        _loadingOverlay.IsVisible = false;
-        _loadingIndicator.IsRunning = false;
-    }
-
-    private int bookId;
-    public int BookId
-    {
-        get => bookId; set
-        {
-            OnPropertyChanged();
-            bookId = value;
-            OnPropertyChanged2();
-        }
-    }
-
-    private void OnPropertyChanged2()
-    {
-        if (!add && bookId > 0)
-        {
-            _book = controller.GetBookInfo(bookId);
-            if (_book != null && _book.Id > 0)
+            InitializeComponent();
+            _id = id;
+            _controller = new BookController();
+           var setup=  _controller.GetBookSetup();
+            if (_id > 0)
             {
-                Book_TitleTextField.Value = _book.Title;
-                Book_AuthorTextField.Value = _book.Author ?? "";
-                Book_ArtistTextField.Value = _book.Artist ?? "";
-                Book_PublisherTextField.Value = _book.Publisher ?? "";
-                Book_VolumeTextField.Value = _book.Volume.ToString();
-                Book_SeriesCombobox.Value = _viewModel.Series.FirstOrDefault(x => x.Value == _book.SeriesId);
-                Book_Genre.Value = _viewModel.Genre.FirstOrDefault(x => x.Value == _book.Genre);
-                Book_FormatRadioButtons.Value = _book.Format;
-                Book_TypeRadioButtons.Value = _book.Type;
-                if (_book.Cover != null && _book.Cover.Length > 0)
+                LoadBook(_id);
+            }
+            
+        }
+
+        private void LoadBook(int id)
+        {
+            // kept for synchronous callers - call the async variant where possible
+            var book = _controller.GetBook(id);
+            if (book == null) return;
+
+            var vm = (BindingContext as BookFormViewModel) ?? new BookFormViewModel();
+
+            vm.Id = book.Id;
+            vm.Title = book.Title;
+            vm.Author = book.Author;
+            vm.Artist = book.Artist;
+            vm.Publisher = book.Publisher;
+            vm.Volume = book.Volume;
+            vm.Genre = book.Genre?.Select(g => (int)g).ToArray() ?? new int[0];
+            vm.Format = (int)book.Format;
+            vm.Read = book.Read;
+            vm.Language = book.Language;
+            vm.BookSeries = book.BookSeries;
+            vm.Type = book.Type;
+
+            // map genres: book.Genre is List<Genre> (enum) -> map to TextValuePair list if available in setup
+            // Leave SelectedGenres empty for now; Set via async setup loader when available
+
+            BindingContext = vm;
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+
+            // load setup and book data asynchronously and update ViewModel
+            var setup = await _controller.GetBookSetup();
+
+            var vm = (BindingContext as BookFormViewModel) ?? new BookFormViewModel();
+
+            // populate lists
+            vm.BookSeriesList = setup.BookSeries?.Select(s => new TextValuePair<string,int>(s.Title, s.Id)).ToList() ?? new List<TextValuePair<string,int>>();
+            vm.Publishers = setup.Publisher?.Select(p => new TextValuePair<string,int>(p.PublisherName ?? string.Empty, p.Id)).ToList() ?? new List<TextValuePair<string,int>>();
+            vm.GenreOptions = setup.Genre?.Select(g => new TextValuePair<string,int>(g.Text, g.Value)).ToList() ?? new List<TextValuePair<string,int>>();
+
+            foreach (var item in setup.Format)
+            {
+                UraniumUI.Material.Controls.RadioButton radioButton = new UraniumUI.Material.Controls.RadioButton();
+                radioButton.Text = item.Text;
+                radioButton.Value = item.Value;
+                BookFormatGroup.Children.Add(radioButton);
+            }
+
+            foreach (var item in setup.Langauge)
+            {
+                UraniumUI.Material.Controls.RadioButton radioButton = new UraniumUI.Material.Controls.RadioButton();
+                radioButton.Text = item.Text;
+                radioButton.Value = item.Value;
+                BookLanguageGroup.Children.Add(radioButton);
+            }
+
+            // If an id was provided, load the book and map genre selections
+            if (_id > 0)
+            {
+                var book = await _controller.GetBookAsync(_id);
+                if (book != null)
                 {
-                    Book_FilePicker.ImageData = _book.Cover;
+                    vm.Id = book.Id;
+                    vm.Title = book.Title;
+                    vm.Author = book.Author;
+                    vm.Artist = book.Artist;
+                    vm.Publisher = book.Publisher;
+                    vm.Volume = book.Volume;
+                    vm.Format = (int)book.Format;
+                    vm.Read = book.Read;
+                    vm.Language = book.Language;
+                    vm.BookSeries = book.BookSeries;
+                    vm.Type = book.Type;
                 }
             }
-            else
+
+            BindingContext = vm;
+        }
+
+        // IQueryAttributable implementation - called when navigating with Shell query parameters
+        // Example navigation: Shell.Current.GoToAsync($"bookform?id={id}");
+        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        {
+            if (query == null)
+                return;
+
+            if (query.TryGetValue("id", out var idObj) || query.TryGetValue("Id", out idObj))
             {
-                _book = new Book()
+                int parsed = 0;
+                if (idObj is string s && int.TryParse(s, out parsed))
                 {
-                    Id = -1,
-                    Title = "",
+                    _id = parsed;
+                }
+                else if (idObj is int i)
+                {
+                    _id = i;
+                }
+
+                if (_id > 0)
+                {
+                    LoadBook(_id);
+                }
+            }
+        }
+
+        private async void OnCancelClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("BookHome");
+        }
+
+        private async void OnSubmitClicked(object sender, EventArgs e)
+        {
+            // Handle save
+            var vm = BindingContext as BookFormViewModel;
+            if (vm == null)
+            {
+                await DisplayAlert("Error", "Unable to read form data.", "OK");
+                return;
+            }
+
+            try
+            {
+                var book = new Book
+                {
+                    Id = vm.Id,
+                    Title = vm.Title,
+                    Author = vm.Author,
+                    Artist = vm.Artist,
+                    Publisher = vm.Publisher,
+                    Volume = vm.Volume ?? string.Empty,
+                    Format = (BookFormat)vm.Format,
+                    Read = vm.Read,
+                    Language = vm.Language,
+                    BookSeries = vm.BookSeries,
+                    Type = vm.Type
                 };
+
+                
+
+                // Map selected genres (if any) to enum list
+                if (vm.SelectedGenres != null && vm.SelectedGenres.Count > 0)
+                {
+                    book.Genre = vm.SelectedGenres.Select(g => (Genre)g.Value).ToList();
+                }
+                else
+                {
+                    book.Genre = new List<Genre>();
+                }
+
+                var result = await _controller.SaveBookAsync(book, vm.NewBookSeriesName);
+                if (result >= 0)
+                {
+                    await DisplayAlert("Saved", "Book saved successfully.", "OK");
+                    await Shell.Current.GoToAsync("BookHome");
+                }
+                else
+                {
+                    await DisplayAlert("Error", "Failed to save book.", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", $"Save failed: {ex.Message}", "OK");
             }
         }
-    }
-
-    private async void OnPickFileButtonClicked(object sender, EventArgs e)
-    {
-        try
-        {
-            // Define file types (optional)
-            var options = new PickOptions
-            {
-                PickerTitle = "Please select a file",
-                FileTypes = new FilePickerFileType(
-                    new Dictionary<DevicePlatform, IEnumerable<string>>
-                    {
-                    { DevicePlatform.Android, new[] { "image/jpeg", "image/png" } }, // Example for images on Android
-                    { DevicePlatform.WinUI, new[] { ".jpg", ".png" } }, // Example for images on Windows
-                    })
-            };
-
-            var result = await FilePicker.Default.PickAsync(options);
-            if (result != null)
-            {
-                string fileName = result.FileName;
-                string fullPath = result.FullPath;
-
-                // Process the selected file (e.g., read its stream)
-                using var stream = await result.OpenReadAsync();
-                // ... use the stream ...
-            }
-        }
-        catch (TaskCanceledException tce)
-        {
-            // User canceled the operation
-        }
-        catch (Exception ex)
-        {
-            // Other errors
-            //await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
-        }
-    }
-
-    private async void Button_Clicked(object sender, EventArgs e)
-    {
-        ShowLoading();
-        try
-        {
-            await Shell.Current.GoToAsync("..");
-        }
-        catch (ArgumentException ex) when (ex.ParamName == "uri" || (ex.Message?.Contains("Ambiguous routes") ?? false))
-        {
-            // Fallback: prefer popping the navigation stack if possible
-            var navigation = Shell.Current?.Navigation;
-            if (navigation != null && navigation.NavigationStack.Count > 1)
-            {
-                await navigation.PopAsync();
-            }
-            else
-            {
-                // Last resort: navigate to a known absolute route / root
-                await Shell.Current.GoToAsync("//MainPage");
-            }
-        }
-        finally
-        {
-            HideLoading();
-        }
-    }
-
-    private async void AddButton_Clicked(object sender, EventArgs e)
-    {
-        //Get and save values
-
-        string title = Book_TitleTextField.Value.ToString();
-        if (title.Length <= 0)
-        { 
-            //Validate 
-        }
-        string author = Book_AuthorTextField.Value.ToString();
-        if (author.Length <= 0)
-        {
-            //Validate 
-        }
-        int volume = -1;
-        if (Book_VolumeTextField.Value.Length > 0 && !Book_VolumeTextField.Value.IsWhiteSpace())
-        { 
-            int.TryParse(Book_VolumeTextField.Value, out volume);
-        }
-        _book.SeriesId = ((TextValuePair<int>)Book_SeriesCombobox.Value).Value;
-        _book.Title = title;
-        _book.Author = author;
-        _book.Publisher = (string)Book_PublisherTextField.Value;
-        _book.Artist = (string)Book_ArtistTextField.Value;
-        _book.Cover = Book_FilePicker.ImageData ?? [];
-        _book.Genre = ((TextValuePair<int>)Book_Genre.Value).Value;
-        _book.Format = Book_FormatRadioButtons.Value;
-        _book.Type = Book_TypeRadioButtons.Value;
-        _book.Volume = volume;
-
-        ShowLoading();
-        try
-        {
-            controller.AddBook(_book);
-            await Shell.Current.GoToAsync("..");
-        }
-        catch (ArgumentException ex) when (ex.ParamName == "uri" || (ex.Message?.Contains("Ambiguous routes") ?? false))
-        {
-            // Fallback: prefer popping the navigation stack if possible
-            var navigation = Shell.Current?.Navigation;
-            if (navigation != null && navigation.NavigationStack.Count > 1)
-            {
-                await navigation.PopAsync();
-            }
-            else
-            {
-                // Last resort: navigate to a known absolute route / root
-                await Shell.Current.GoToAsync("//MainPage");
-            }
-        }
-        finally
-        {
-            HideLoading();
-        }
-    }
-
-    private void SeriesCombobox_SelectionChanged(object sender, EventArgs e)
-    {
-        int seriesId = ((TextValuePair<int>)Book_SeriesCombobox.Value).Value;
-        if (seriesId <= 0)
-        {
-            return;
-        }
-
-        Collection selectedSeries = controller.GetSeriesInfo(seriesId);
-        
-        this.Book_AuthorTextField.Value = selectedSeries.Author ?? "";
-        this.Book_ArtistTextField.Value = selectedSeries.Artist ?? "";
-        this.Book_PublisherTextField.Value = selectedSeries.Publisher ?? "";
     }
 }

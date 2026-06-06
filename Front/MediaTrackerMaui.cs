@@ -1,14 +1,12 @@
 ﻿using CommunityToolkit.Maui;
-using MauiApp1.BackEnd.Database;
+using LiveChartsCore.SkiaSharpView.Maui;
 using MauiApp1.Front.Components.Books;
-using MauiApp1.Front.Components.Music;
-using MauiApp1.Front.Components.Other;
-using MauiApp1.Front.Components.Collections;
-using MauiApp1.Front.Components.Video;
-using Microsoft.EntityFrameworkCore;
+using MauiApp1.Front.Components.Books.ViewModels;
+using Microcharts.Maui;
 using Microsoft.Extensions.Logging;
-using CollectionView = MauiApp1.Front.Components.Collections.CollectionView;
-using static MauiApp1.BackEnd.Shared.Enums;
+using UraniumUI;
+using UraniumUI.Dialogs;
+
 
 namespace MauiApp1
 {
@@ -28,15 +26,23 @@ namespace MauiApp1
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                });
+                })
+                .UseUraniumUI()
+                .UseUraniumUIMaterial()
+                .UseMicrocharts()
+                
+                .UseUraniumUIWebComponents();
 
+           
 
             // Do not register MainPage as a singleton because it consumes a scoped DbContext.
             // Use transient so each activation receives a fresh scoped DbContext and to avoid
             // capturing a scoped service in a singleton which causes tracking/disposal issues.
             builder.Services.AddTransient<MainPage>();
-
-            
+            builder.Services.AddCommunityToolkitDialogs();
+            builder.Services.AddTransient<BookHomeViewModel>();
+            builder.Services.AddTransient<BookHome>();
+            /*
             builder.Services.AddTransient<CollectionForm>();
             builder.Services.AddTransient<CollectionView>();
             builder.Services.AddTransient<CollectionDetailView>();
@@ -57,36 +63,14 @@ namespace MauiApp1
             builder.Services.AddTransient<OtherForm>();
             builder.Services.AddTransient<OtherView>();
             builder.Services.AddTransient<OtherDetailView>();
+            */
 
 
-            builder.Services.AddDbContext<DataContext>(
-                options =>
-                {
-                    var dbPath = Path.Combine(FileSystem.AppDataDirectory, "MediaTrackerSQLite.db");
-                    options.UseSqlite($"Data Source={dbPath}");
-                });
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
             var app = builder.Build();
-            using (var scope = app.Services.CreateScope())
-            {
-                var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-                context.Database.EnsureCreated();
-                if(!context.SeriesTable.Any())
-                {
-                   context.SeriesTable.Add(new Modals.Collection {
-                       SeriesId = 1, 
-                       Title = "Not part of a Series",
-                       Author = "",
-                       Artist = "",
-                       Publisher = "",
-                       TotalVolumes = 0,
-                       CollectionStatus = CollectionStatus.NotCompleting,
-                       type = MediaDataType.All });
-                   context.SaveChanges();
-                }
-            }
+      
 
             return app;
         }

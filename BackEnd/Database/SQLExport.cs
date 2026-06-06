@@ -1,64 +1,54 @@
-﻿using ClosedXML.Excel;
-using MauiApp1.BackEnd.Modals;
-using MauiApp1.Modals;
-using System.Data;
+﻿
 
 
 namespace MauiApp1.BackEnd.Database
 {
-    using static MauiApp1.BackEnd.Shared.Enums;
-    using Collection = MauiApp1.Modals.Collection;
 
     public static class SQLExport
     {
-        public static void Export(DataContext dataContext, string excelFilePath)
-        {
-            // 1. Retrieve Data from SQLite into a DataTable
-            DataTable dataTable = new DataTable();
+        public static void Export(string excelFilePath)
+        { /*
+            var workbook = new XLWorkbook();
 
-            using (dataContext)
-            {
-                // 2. and 3. Create Excel Workbook and Export DataTable
-                var workbook = new XLWorkbook();
+            // Series
+            var seriesList = XmlDatabase.ReadTable<Collection>("SeriesTable") ?? new List<Collection>();
+            var dataTable = seriesList.ToDataTable();
+            dataTable.TableName = "SeriesTable";
+            ExportToExcel(dataTable, ref workbook);
 
-                // Series
-                dataTable = dataContext.SeriesTable.ToDataTable();
-                dataTable.TableName = "SeriesTable";
-                ExportToExcel(dataTable, ref workbook);
+            // Books
+            var bookList = XmlDatabase.ReadTable<Book>("BookTable") ?? new List<Book>();
+            dataTable = bookList.ToDataTable();
+            dataTable.TableName = "BookTable";
+            ExportToExcel(dataTable, ref workbook);
 
-                // Books
-                dataTable = dataContext.BookTable.ToDataTable();
-                dataTable.TableName = "BookTable";
-                ExportToExcel(dataTable, ref workbook);
+            // Videos
+            var videoList = XmlDatabase.ReadTable<Video>("VideoTable") ?? new List<Video>();
+            dataTable = videoList.ToDataTable();
+            dataTable.TableName = "VideoTable";
+            ExportToExcel(dataTable, ref workbook);
 
-                // Videos
-                dataTable = dataContext.VideoTable.ToDataTable();
-                dataTable.TableName = "VideoTable";
-                ExportToExcel(dataTable, ref workbook);
+            // Music
+            var musicList = XmlDatabase.ReadTable<Cd>("MusicTable") ?? new List<Cd>();
+            dataTable = musicList.ToDataTable();
+            dataTable.TableName = "MusicTable";
+            ExportToExcel(dataTable, ref workbook);
 
-                // Music
-                dataTable = dataContext.MusicTable.ToDataTable();
-                dataTable.TableName = "MusicTable";
-                ExportToExcel(dataTable, ref workbook);
+            // Other
+            var otherList = XmlDatabase.ReadTable<Other>("OtherTable") ?? new List<Other>();
+            dataTable = otherList.ToDataTable();
+            dataTable.TableName = "OtherTable";
+            ExportToExcel(dataTable, ref workbook);
 
-                // Other
-                dataTable = dataContext.OtherTable.ToDataTable();
-                dataTable.TableName = "OtherTable";
-                ExportToExcel(dataTable, ref workbook);
-
-                excelFilePath = System.IO.Path.Combine(excelFilePath, "mediaExportfile.xlsx");
-
-                // 4. Save the File
-                workbook.SaveAs(excelFilePath);
-                Console.WriteLine($"Successfully exported data to {excelFilePath}");
-            }
+            excelFilePath = System.IO.Path.Combine(excelFilePath, "mediaExportfile.xlsx");
+            workbook.SaveAs(excelFilePath);
+            Console.WriteLine($"Successfully exported data to {excelFilePath}"); */
         }
-
+        /*
         public static void Import(DataContext dataContext, XLWorkbook workbook)
         {
             try
             {
-                // Helper: build header map for a worksheet
                 static Dictionary<string, int> BuildHeaderMap(IXLWorksheet ws)
                 {
                     var map = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -79,6 +69,7 @@ namespace MauiApp1.BackEnd.Database
                     if (workSheet != null)
                     {
                         var map = BuildHeaderMap(workSheet);
+                        var list = XmlDatabase.ReadTable<Collection>("SeriesTable") ?? new List<Collection>();
                         var headerRow = workSheet.FirstRowUsed();
                         if (headerRow != null && map.Any())
                         {
@@ -92,17 +83,16 @@ namespace MauiApp1.BackEnd.Database
 
                                 int seriesId = (int)idAsDouble;
 
-                                Collection? exists = dataContext.SeriesTable.FirstOrDefault(s => s.SeriesId == seriesId);
-
+                                var exists = list.FirstOrDefault(s => s.SeriesId == seriesId);
 
                                 row.Cell(map["Title"]).TryGetValue<string>(out string series_title);
                                 row.Cell(map["Author"]).TryGetValue<string>(out string series_author);
-                                row.Cell(map["Publisher"]).TryGetValue<string> (out string series_publisher);
+                                row.Cell(map["Publisher"]).TryGetValue<string>(out string series_publisher);
                                 row.Cell(map["Artist"]).TryGetValue<string>(out string series_artist);
                                 row.Cell(map["type"]).TryGetValue<int>(out int series_type);
                                 row.Cell(map["CollectionStatus"]).TryGetValue<int>(out int series_status);
                                 row.Cell(map["TotalVolumes"]).TryGetValue<int?>(out int? series_totalVolumes);
-                                    
+
                                 var newSeries = new Collection
                                 {
                                     SeriesId = seriesId,
@@ -115,32 +105,37 @@ namespace MauiApp1.BackEnd.Database
                                     TotalVolumes = series_totalVolumes,
                                 };
 
-                                if (exists != null) { 
+                                if (exists != null)
+                                {
                                     exists.Title = series_title;
-                                exists.Author = series_author;
-                                exists.Publisher = series_publisher;
-                                exists.Artist = series_artist;
-                                exists.type = (MediaDataType)series_type;
-                                exists.CollectionStatus = (CollectionStatus)series_status;
+                                    exists.Author = series_author;
+                                    exists.Publisher = series_publisher;
+                                    exists.Artist = series_artist;
+                                    exists.type = (MediaDataType)series_type;
+                                    exists.CollectionStatus = (CollectionStatus)series_status;
+                                    exists.TotalVolumes = series_totalVolumes;
+                                    XmlDatabase.UpdateInTable<Collection>("SeriesTable", x => x.SeriesId == exists.SeriesId, exists);
+                                }
+                                else
+                                {
+                                    XmlDatabase.AddToTable<Collection>("SeriesTable", newSeries);
+                                }
+                            }
 
-                                exists.TotalVolumes = series_totalVolumes;
-                                    dataContext.SeriesTable.Update(exists);
-                                    dataContext.SaveChanges();
-                            }
-                                else { 
-                                    dataContext.SeriesTable.Add(newSeries);
-                            }
+                           
                         }
                     }
                 }
 
                 // Book
+                {
                     var bookWorkSheet = workbook.Worksheet("BookTable");
                     if (bookWorkSheet != null)
                     {
                         var map = BuildHeaderMap(bookWorkSheet);
                         if (map.Any())
                         {
+                            var list = XmlDatabase.ReadTable<Book>("BookTable") ?? new List<Book>();
                             foreach (var row in bookWorkSheet.RowsUsed().Skip(1))
                             {
                                 if (!map.ContainsKey("Id")) continue;
@@ -157,7 +152,7 @@ namespace MauiApp1.BackEnd.Database
                                 row.Cell(map["Format"]).TryGetValue<int>(out int book_format);
                                 row.Cell(map["Cover"]).TryGetValue<byte[]?>(out byte[]? book_cover);
 
-                                Book? exists = dataContext.BookTable.FirstOrDefault(s => s.Id == id);
+                                var exists = list.FirstOrDefault(s => s.Id == id);
                                 var entity = new Book
                                 {
                                     Id = id,
@@ -173,33 +168,28 @@ namespace MauiApp1.BackEnd.Database
                                     Volume = book_volume,
                                 };
 
-                                if (exists != null) {
-                                    exists.SeriesId = book_seriesId;
-                                    exists.Title = book_title;
-                                    exists.Author = book_author;
-                                    exists.Publisher = book_publisher;
-                                    exists.Artist = book_artist;
-                                    exists.Cover = book_cover ?? Array.Empty<byte>();
-                                    exists.Genre = book_genre;
-                                    exists.Format = book_format;
-                                    exists.Type = book_type;
-                                    exists.Volume = book_volume;
-                                    dataContext.BookTable.Update(exists);
-                                    dataContext.SaveChanges();
+                                if (exists != null)
+                                {
+                                    XmlDatabase.UpdateInTable<Book>("BookTable", x => x.Id == exists.Id, entity);
                                 }
                                 else
-                                    dataContext.BookTable.Add(entity);
+                                {
+                                    XmlDatabase.AddToTable<Book>("BookTable", entity);
+                                }
                             }
                         }
                     }
+                }
 
                 // Video
+                {
                     var videoWorkSheet = workbook.Worksheet("VideoTable");
                     if (videoWorkSheet != null)
                     {
                         var map = BuildHeaderMap(videoWorkSheet);
                         if (map.Any())
                         {
+                            var list = XmlDatabase.ReadTable<Video>("VideoTable") ?? new List<Video>();
                             foreach (var row in videoWorkSheet.RowsUsed().Skip(1))
                             {
                                 if (!map.ContainsKey("Id")) continue;
@@ -212,7 +202,7 @@ namespace MauiApp1.BackEnd.Database
                                 row.Cell(map["Category"]).TryGetValue<int>(out int video_category);
                                 row.Cell(map["Cover"]).TryGetValue<byte[]?>(out byte[]? video_cover);
 
-                                Video? exists = dataContext.VideoTable.FirstOrDefault(s => s.Id == id);
+                                var exists = list.FirstOrDefault(s => s.Id == id);
                                 var entity = new Video
                                 {
                                     Id = id,
@@ -227,29 +217,26 @@ namespace MauiApp1.BackEnd.Database
 
                                 if (exists != null)
                                 {
-                                    exists.SeriesId = video_seriesId;  
-                                    exists.Cover = video_cover ?? Array.Empty<byte>();
-                                    exists.Genre = video_genre;
-                                    exists.Type = video_type;
-                                    exists.Name = video_name;
-                                    exists.Category = video_category;
-                                    exists.VideoFormat = video_format;
-                                    dataContext.VideoTable.Update(exists);
-                                    dataContext.SaveChanges();
+                                    XmlDatabase.UpdateInTable<Video>("VideoTable", x => x.Id == exists.Id, entity);
                                 }
                                 else
-                                    dataContext.VideoTable.Add(entity);
+                                {
+                                    XmlDatabase.AddToTable<Video>("VideoTable", entity);
+                                }
                             }
                         }
                     }
+                }
 
                 // Music
+                {
                     var musicWorkSheet = workbook.Worksheet("MusicTable");
                     if (musicWorkSheet != null)
                     {
                         var map = BuildHeaderMap(musicWorkSheet);
                         if (map.Any())
                         {
+                            var list = XmlDatabase.ReadTable<Cd>("MusicTable") ?? new List<Cd>();
                             foreach (var row in musicWorkSheet.RowsUsed().Skip(1))
                             {
                                 if (!map.ContainsKey("Id")) continue;
@@ -261,7 +248,7 @@ namespace MauiApp1.BackEnd.Database
                                 row.Cell(map["MusicGenre"]).TryGetValue<int>(out int music_genre);
                                 row.Cell(map["Cover"]).TryGetValue<byte[]?>(out byte[]? music_cover);
 
-                                Cd? exists = dataContext.MusicTable.FirstOrDefault(s => s.Id == id);
+                                var exists = list.FirstOrDefault(s => s.Id == id);
                                 var entity = new Cd
                                 {
                                     Id = id,
@@ -275,28 +262,26 @@ namespace MauiApp1.BackEnd.Database
 
                                 if (exists != null)
                                 {
-                                    exists.Language = music_language;
-                                    exists.MusicGenre = music_genre;
-                                    exists.Collection = music_Collection;
-                                    exists.Artist = music_artist;
-                                    exists.Cover = music_cover ?? Array.Empty<byte>();
-                                    exists.Name = music_name;
-                                    dataContext.MusicTable.Update(exists);
-                                    dataContext.SaveChanges();
+                                    XmlDatabase.UpdateInTable<Cd>("MusicTable", x => x.Id == exists.Id, entity);
                                 }
                                 else
-                                    dataContext.MusicTable.Add(entity);
+                                {
+                                    XmlDatabase.AddToTable<Cd>("MusicTable", entity);
+                                }
                             }
                         }
                     }
+                }
 
                 // Other
+                {
                     var otherWorkbook = workbook.Worksheet("OtherTable");
                     if (otherWorkbook != null)
                     {
                         var map = BuildHeaderMap(otherWorkbook);
                         if (map.Any())
                         {
+                            var list = XmlDatabase.ReadTable<Other>("OtherTable") ?? new List<Other>();
                             foreach (var row in otherWorkbook.RowsUsed().Skip(1))
                             {
                                 if (!map.ContainsKey("Id")) continue;
@@ -305,7 +290,7 @@ namespace MauiApp1.BackEnd.Database
                                 row.Cell(map["Image"]).TryGetValue<byte[]?>(out byte[]? other_image);
                                 row.Cell(map["Collection"]).TryGetValue<int>(out int other_collection);
 
-                                Other? exists = dataContext.OtherTable.FirstOrDefault(s => s.Id == id);
+                                var exists = list.FirstOrDefault(s => s.Id == id);
                                 var entity = new Other
                                 {
                                     Id = id,
@@ -316,26 +301,19 @@ namespace MauiApp1.BackEnd.Database
 
                                 if (exists != null)
                                 {
-                                    exists.Collection = other_collection;
-                                    exists.Name = other_title;
-                                    exists.Image = other_image ?? Array.Empty<byte>();
-
-                                    dataContext.OtherTable.Update(exists);
-                                    dataContext.SaveChanges();
+                                    XmlDatabase.UpdateInTable<Other>("OtherTable", x => x.Id == exists.Id, entity);
                                 }
                                 else
-                                    dataContext.OtherTable.Add(entity);
+                                {
+                                    XmlDatabase.AddToTable<Other>("OtherTable", entity);
+                                }
                             }
                         }
                     }
                 }
-
-                // Persist changes
-                dataContext.SaveChanges();
             }
             catch (Exception ex)
             {
-                // Surface error for debugging; don't swallow silently
                 Console.WriteLine($"Import failed: {ex}");
                 throw;
             }
@@ -344,7 +322,6 @@ namespace MauiApp1.BackEnd.Database
         private static void ExportToExcel(DataTable dataTable, ref XLWorkbook workbook)
         {
             var worksheet = workbook.Worksheets.Add(dataTable.TableName);
-            // Insert the DataTable data, including column headers
             worksheet.Cell(1, 1).InsertTable(dataTable);
             worksheet.Columns().AdjustToContents();
         }
@@ -354,21 +331,18 @@ namespace MauiApp1.BackEnd.Database
             var properties = typeof(T).GetProperties();
             var table = new DataTable();
 
-            // Add columns based on properties
             foreach (var property in properties)
             {
-                // Handle Nullable types
                 var type = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
                 table.Columns.Add(property.Name, type);
             }
 
-            // Add rows based on entity values
             foreach (var entity in entityList)
             {
                 table.Rows.Add(properties.Select(p => p.GetValue(entity, null)).ToArray());
             }
 
             return table;
-        }
+        }*/
     }
 }

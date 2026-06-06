@@ -3,51 +3,23 @@
     x:Class="MauiApp1.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:Book="clr-namespace:MauiApp1.Front.Components.Books"
-    xmlns:Music="clr-namespace:MauiApp1.Front.Components.Music"
-    xmlns:Other="clr-namespace:MauiApp1.Front.Components.Other"
-    xmlns:Series="clr-namespace:MauiApp1.Front.Components.Collections"
-    xmlns:Video="clr-namespace:MauiApp1.Front.Components.Video"
+    xmlns:book="clr-namespace:MauiApp1.Front.Components.Books"
     xmlns:local="clr-namespace:MauiApp1"
-    Title="MauiApp1"
-    FlyoutBehavior="Flyout"
-    MaximumHeightRequest="500"
-    MaximumWidthRequest="400"
-    WidthRequest="350">
+    Title="MauiApp1">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
-    <MenuItem Clicked="OnImportDataClicked" Text="Import Data" />
-
-    <MenuItem Clicked="OnExportDataClicked" Text="Export Data" />
-
-    <FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
-        <ShellContent
-            Title="Books"
-            ContentTemplate="{DataTemplate Book:BookView}"
-            Icon="icons_book_32.png"
-            IsVisible="true" />
-        <ShellContent
-            Title="Series"
-            ContentTemplate="{DataTemplate Series:CollectionView}"
-            Icon="icons_book_32.png"
-            IsVisible="true" />
-        <ShellContent
-            Title="Video"
-            ContentTemplate="{DataTemplate Video:VideoView}"
-            Icon="icons_dvd_32.png"
-            IsVisible="true" />
-        <ShellContent
-            Title="Music"
-            ContentTemplate="{DataTemplate Music:MusicView}"
-            Icon="icons_cd_50.png"
-            IsVisible="true" />
-        <ShellContent
-            Title="Video"
-            ContentTemplate="{DataTemplate Other:OtherView}"
-            Icon="icons_dvd_32.png"
-            IsVisible="true" />
+    <!-- Flyout menu with Home and Books entries -->
+    <FlyoutItem Title="Home">
+        <ShellContent Title="Home" ContentTemplate="{DataTemplate local:MainPage}" />
     </FlyoutItem>
+
+    <FlyoutItem Title="Books">
+        <ShellContent Title="Book Home" ContentTemplate="{DataTemplate book:BookHome}" Route="BookHome" />
+        <ShellContent Title="Add Book" ContentTemplate="{DataTemplate book:BookForm}" Route="BookForm" IsVisible="False" />
+        <ShellContent Title="Add" Route="BookForm" ContentTemplate="{DataTemplate book:BookForm}" />
+    </FlyoutItem>
+
+    <!-- Use MenuItems for route-based absolute navigation -->
+    <MenuItem Text="Books" Clicked="OnMenuBooksClicked" />
+    <MenuItem Text="Home" Clicked="OnMenuHomeClicked" />
+
 </Shell>
