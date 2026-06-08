@@ -6,6 +6,7 @@
     xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
     xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
     xmlns:viewModels="clr-namespace:MauiApp1.Front.Components.Books.ViewModels"
+    xmlns:controls="clr-namespace:Microsoft.Maui.Controls.Compatibility;assembly=Microsoft.Maui.Controls.Compatibility"
     Title="Book Form">
     <ContentPage.ToolbarItems>
         <ToolbarItem
@@ -25,7 +26,7 @@
 
         <!--  Scrollable content so dialog height constraints don't hide inputs  -->
         <ScrollView Grid.Row="0">
-            <StackLayout>
+            <VerticalStackLayout>
                 <material:TextField
                     x:Name="BookTitle"
                     Title="Title"
@@ -38,22 +39,41 @@
                     Text="{Binding Author, Mode=TwoWay}" />
                 <material:PickerField
                     x:Name="BookSeriesPicker"
-                    Title="Pick an option"
+                    Title="Book Series"
                     Padding="8"
-                    ItemsSource="{Binding BookSeriesList, Mode=TwoWay}"
-                    SelectedItem="{Binding BookSeries, Mode=TwoWay}" />
+                    ItemDisplayBinding="{Binding Text}"
+                    SelectedItem="{Binding BookSeries, Mode=TwoWay}">
+                </material:PickerField>
                 <material:TextField
                     x:Name="NewBookSeries"
                     Title="New Book Series"
                     Padding="8"
+                    IsEnabled="{Binding EnableNewSeries}"
                     Text="{Binding NewBookSeriesName, Mode=TwoWay}" />
 
-                <material:MultiplePickerField
+                <material:PickerField
+                    x:Name="BookPublisherPicker"
+                    Title="Publisher"
+                    Padding="8"
+                    ItemDisplayBinding="{Binding Text}"
+                    SelectedItem="{Binding BookSeries, Mode=TwoWay}">
+                </material:PickerField>
+                <material:TextField
+                    x:Name="NewPublisher"
+                    Title="New Publisher"
+                    Padding="8"
+                    IsEnabled="{Binding EnablePublisher}"
+                    Text="{Binding NewBookSeriesName, Mode=TwoWay}" />
+<!--
+                <controls:MultiSelectCollectionView
                     x:Name="BookGenrePicker"
                     Title="Genre"
                     Padding="8"
-                    ItemsSource="{Binding GenreOptions, Mode=TwoWay}"
-                    SelectedItems="{Binding Genre, Mode=TwoWay}" />
+                    VerticalOptions="Fill"
+                    SelectionMode="Multiple"
+                    ItemsSource="{Binding GenreOptions}"
+                    SelectedItems="{Binding Genre, Mode=TwoWay}">
+                </controls:MultiSelectCollectionView> -->
                 <StackLayout Padding="8">
 
                     <Label x:Name="BookFormatLabel" Text="Format:" />
@@ -73,7 +93,7 @@
                     <Label x:Name="BookLanguageLabel" Text="Language:" />
                     <material:RadioButtonGroupView x:Name="BookLanguageGroup" SelectedItem="{Binding Language, Mode=TwoWay}" />
                 </StackLayout>
-            </StackLayout>
+            </VerticalStackLayout>
         </ScrollView>
 
         <!--  Footer row pinned to bottom so buttons remain visible  -->

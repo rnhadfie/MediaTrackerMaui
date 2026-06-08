@@ -1,14 +1,15 @@
 
-using MauiApp1.Controllers;
-using MauiApp1.Front.Components.Books.ViewModels;
 using MauiApp1.BackEnd.Models;
+using MauiApp1.Controllers;
 using MauiApp1.Controllers.ViewModels;
+using MauiApp1.Front.Components.Books.ViewModels;
+using MauiApp1.Modals;
 using System.Collections.Generic;
-using static MauiApp1.BackEnd.Shared.Enums;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using MauiApp1.Modals;
 using UraniumUI.Material;
+using static MauiApp1.BackEnd.Shared.Enums;
 
 namespace MauiApp1.Front.Components.Books
 {
@@ -19,6 +20,7 @@ namespace MauiApp1.Front.Components.Books
 
         public BookForm() : this(0)
         {
+
         }
 
         public BookForm(int id)
@@ -26,6 +28,7 @@ namespace MauiApp1.Front.Components.Books
             InitializeComponent();
             _id = id;
             _controller = new BookController();
+
            var setup=  _controller.GetBookSetup();
             if (_id > 0)
             {
@@ -42,24 +45,26 @@ namespace MauiApp1.Front.Components.Books
 
             var vm = (BindingContext as BookFormViewModel) ?? new BookFormViewModel();
 
-            vm.Id = book.Id;
-            vm.Title = book.Title;
-            vm.Author = book.Author;
-            vm.Artist = book.Artist;
-            vm.Publisher = book.Publisher;
-            vm.Volume = book.Volume;
-            vm.Genre = book.Genre?.Select(g => (int)g).ToArray() ?? new int[0];
-            vm.Format = (int)book.Format;
-            vm.Read = book.Read;
-            vm.Language = book.Language;
-            vm.BookSeries = book.BookSeries;
-            vm.Type = book.Type;
+            // Set the Value on existing Observable<T> instances so bindings remain intact
+            vm.Id.Value = book.Id;
+            vm.Title.Value = book.Title;
+            vm.Author.Value = book.Author;
+            vm.Artist.Value = book.Artist;
+            vm.Publisher.Value = book.Publisher;
+            vm.Volume.Value = string.Join(',', book.Volume ?? new List<int>());
+            vm.Genre = new ObservableCollection<int>(book.Genre?.Select(g => (int)g) ?? new List<int>());
+            vm.Format.Value = (int)book.Format;
+            vm.Read.Value = book.Read;
+            vm.Language.Value = book.Language;
+            vm.BookSeries.Value = book.BookSeries;
+            vm.Type.Value = book.Type;
 
             // map genres: book.Genre is List<Genre> (enum) -> map to TextValuePair list if available in setup
             // Leave SelectedGenres empty for now; Set via async setup loader when available
 
             BindingContext = vm;
         }
+
 
         protected override async void OnAppearing()
         {
@@ -74,6 +79,10 @@ namespace MauiApp1.Front.Components.Books
             vm.BookSeriesList = setup.BookSeries?.Select(s => new TextValuePair<string,int>(s.Title, s.Id)).ToList() ?? new List<TextValuePair<string,int>>();
             vm.Publishers = setup.Publisher?.Select(p => new TextValuePair<string,int>(p.PublisherName ?? string.Empty, p.Id)).ToList() ?? new List<TextValuePair<string,int>>();
             vm.GenreOptions = setup.Genre?.Select(g => new TextValuePair<string,int>(g.Text, g.Value)).ToList() ?? new List<TextValuePair<string,int>>();
+
+            BookSeriesPicker.ItemsSource = new ObservableCollection<TextValuePair<string, int>>(vm.BookSeriesList);
+            //BookGenrePicker.ItemsSource = new ObservableCollection<TextValuePair<string, int>>(vm.GenreOptions);
+            BookPublisherPicker.ItemsSource = new ObservableCollection<TextValuePair<string, int>>(vm.Publishers);
 
             foreach (var item in setup.Format)
             {
@@ -97,17 +106,17 @@ namespace MauiApp1.Front.Components.Books
                 var book = await _controller.GetBookAsync(_id);
                 if (book != null)
                 {
-                    vm.Id = book.Id;
-                    vm.Title = book.Title;
-                    vm.Author = book.Author;
-                    vm.Artist = book.Artist;
-                    vm.Publisher = book.Publisher;
-                    vm.Volume = book.Volume;
-                    vm.Format = (int)book.Format;
-                    vm.Read = book.Read;
-                    vm.Language = book.Language;
-                    vm.BookSeries = book.BookSeries;
-                    vm.Type = book.Type;
+                    vm.Id.Value = book.Id;
+                    vm.Title.Value = book.Title;
+                    vm.Author.Value = book.Author;
+                    vm.Artist.Value = book.Artist;
+                    vm.Publisher.Value = book.Publisher;
+                    vm.Volume.Value = string.Join(',', book.Volume ?? new List<int>());
+                    vm.Format.Value = (int)book.Format;
+                    vm.Read.Value = book.Read;
+                    vm.Language.Value = book.Language;
+                    vm.BookSeries.Value = book.BookSeries;
+                    vm.Type.Value = book.Type;
                 }
             }
 
@@ -157,19 +166,19 @@ namespace MauiApp1.Front.Components.Books
 
             try
             {
-                var book = new Book
+                var book = new BookDT
                 {
-                    Id = vm.Id,
-                    Title = vm.Title,
-                    Author = vm.Author,
-                    Artist = vm.Artist,
-                    Publisher = vm.Publisher,
-                    Volume = vm.Volume ?? string.Empty,
-                    Format = (BookFormat)vm.Format,
-                    Read = vm.Read,
-                    Language = vm.Language,
-                    BookSeries = vm.BookSeries,
-                    Type = vm.Type
+                    Id = vm.Id.Value,
+                    Title = vm.Title.Value,
+                    Author = vm.Author.Value,
+                    Artist = vm.Artist.Value,
+                    Publisher = vm.Publisher.Value,
+                    Volume = vm.Volume.Value != null ? vm.Volume.Value.Split(',').Select(s => int.TryParse(s, out var v) ? v : 0).ToList() : new List<int>(),
+                    Format = (BookFormat)vm.Format.Value,
+                    Read = vm.Read.Value,
+                    Language = vm.Language.Value,
+                    BookSeries = vm.BookSeries.Value,
+                    Type = vm.Type.Value
                 };
 
                 

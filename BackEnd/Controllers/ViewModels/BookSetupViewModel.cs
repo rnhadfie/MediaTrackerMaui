@@ -20,7 +20,7 @@ namespace MauiApp1.Controllers.ViewModels
 
         public ObservableCollection<Publisher> Publisher { get; set; }
 
-        public ObservableCollection<Book> Books { get; set; }
+        public ObservableCollection<BookDT> Books { get; set; }
 
         public BookSetupViewModel()
         {
@@ -30,7 +30,7 @@ namespace MauiApp1.Controllers.ViewModels
             Type = new ObservableCollection<TextValuePair<string, int>>();
             Langauge = new ObservableCollection<TextValuePair<string, int>>();
             Publisher = new ObservableCollection<Publisher>();
-            Books = new ObservableCollection<Book>();
+            Books = new ObservableCollection<BookDT>();
         }
     }
 }

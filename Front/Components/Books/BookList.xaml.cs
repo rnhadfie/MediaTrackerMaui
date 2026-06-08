@@ -19,28 +19,28 @@ public partial class BookList : ContentView
 
     public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(
         nameof(ItemsSource),
-        typeof(IEnumerable<Book>),
+        typeof(IEnumerable<BookDT>),
         typeof(BookList),
-        default(IEnumerable<Book>),
+        default(IEnumerable<BookDT>),
         propertyChanged: OnItemsSourceChanged);
 
-    public IEnumerable<Book> ItemsSource
+    public IEnumerable<BookDT> ItemsSource
     {
-        get => (IEnumerable<Book>)GetValue(ItemsSourceProperty);
+        get => (IEnumerable<BookDT>)GetValue(ItemsSourceProperty);
         set => SetValue(ItemsSourceProperty, value);
     }
 
-    public IEnumerable<Book> OriginalBooks { get; set; }
+    public IEnumerable<BookDT> OriginalBooks { get; set; }
 
     private static void OnItemsSourceChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is BookList control)
         {
-            control.OnItemsSourceChanged((IEnumerable<Book>)oldValue, (IEnumerable<Book>)newValue);
+            control.OnItemsSourceChanged((IEnumerable<BookDT>)oldValue, (IEnumerable<BookDT>)newValue);
         }
     }
 
-    private void OnItemsSourceChanged(IEnumerable<Book> oldValue, IEnumerable<Book> newValue)
+    private void OnItemsSourceChanged(IEnumerable<BookDT> oldValue, IEnumerable<BookDT> newValue)
     {
         // If the inner list view uses ItemsSource binding, update it directly
         if (newValue == null)
@@ -50,10 +50,10 @@ public partial class BookList : ContentView
             return;
         }
 
-        BookListDataGrid.ItemsSource = (ObservableCollection<Book>)newValue;
+        BookListDataGrid.ItemsSource = (ObservableCollection<BookDT>)newValue;
         if (!filtering)
         {
-            OriginalBooks = (ObservableCollection<Book>)newValue;
+            OriginalBooks = (ObservableCollection<BookDT>)newValue;
         }
     }
 

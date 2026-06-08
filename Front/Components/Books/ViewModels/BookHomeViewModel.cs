@@ -63,7 +63,7 @@ namespace MauiApp1.Front.Components.Books.ViewModels
                     SelectedType = TypeOptions[0];
                 }
 
-                ListOfBooks = new ObservableCollection<Book>(SelectedType.Value == 0 ? ViewModel.Setup.Books : ViewModel.Setup.Books.Where(x => (int)x.Type == SelectedType.Value) ?? []);
+                ListOfBooks = new ObservableCollection<BookDT>(SelectedType.Value == 0 ? ViewModel.Setup.Books : ViewModel.Setup.Books.Where(x => (int)x.Type == SelectedType.Value) ?? []);
 
             }
         }
@@ -81,7 +81,7 @@ namespace MauiApp1.Front.Components.Books.ViewModels
         private BookSetupViewModel bookSetup;
 
         [ObservableProperty]
-        private ObservableCollection<Book> listOfBooks;
+        private ObservableCollection<BookDT> listOfBooks;
 
     }
 

@@ -395,7 +395,7 @@ BindableProperty.Create(
         return count;
     }
 
-    private bool BookMatchesGenre(Book book, int genreId)
+    private bool BookMatchesGenre(BookDT book, int genreId)
     {
         if (book.Genre == null)
             return false;
@@ -404,30 +404,30 @@ BindableProperty.Create(
     }
 
 
-    private ObservableCollection<Book> GetCurrentList()
+    private ObservableCollection<BookDT> GetCurrentList()
     {
         if (SelectedItem == null)
         {
-            return ItemsSource == null ? new ObservableCollection<Book>() : ItemsSource.Books;
+            return ItemsSource == null ? new ObservableCollection<BookDT>() : ItemsSource.Books;
         }
         if (ItemsSource == null)
         { 
-            return new ObservableCollection<Book>();
+            return new ObservableCollection<BookDT>();
         }
         switch (SelectedItem.Value)
         {
             case (int)BookType.Novel:
-                return new ObservableCollection<Book>(ItemsSource.Books.Where(x => x.Type == BookType.Novel));
+                return new ObservableCollection<BookDT>(ItemsSource.Books.Where(x => x.Type == BookType.Novel));
             case (int)BookType.GraphicNovel:
-                return new ObservableCollection<Book>(ItemsSource.Books.Where(x => x.Type == BookType.GraphicNovel));
+                return new ObservableCollection<BookDT>(ItemsSource.Books.Where(x => x.Type == BookType.GraphicNovel));
             case (int)BookType.Manga:
-                return new ObservableCollection<Book>(ItemsSource.Books.Where(x => x.Type == BookType.Manga));
+                return new ObservableCollection<BookDT>(ItemsSource.Books.Where(x => x.Type == BookType.Manga));
             case (int)BookType.LightNovel:
-                return new ObservableCollection<Book>(ItemsSource.Books.Where(x => x.Type == BookType.LightNovel));
+                return new ObservableCollection<BookDT>(ItemsSource.Books.Where(x => x.Type == BookType.LightNovel));
             case (int)BookType.ArtBook:
-                return new ObservableCollection<Book>(ItemsSource.Books.Where(x => x.Type == BookType.ArtBook));
+                return new ObservableCollection<BookDT>(ItemsSource.Books.Where(x => x.Type == BookType.ArtBook));
             default:
-                return new ObservableCollection<Book>(ItemsSource.Books);
+                return new ObservableCollection<BookDT>(ItemsSource.Books);
         }
     }
 

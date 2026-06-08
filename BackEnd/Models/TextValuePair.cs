@@ -24,5 +24,10 @@
             _text = text;
             _value = value;
         }
+
+        public override string ToString()
+        {
+            return Text.ToString();
+        }
     }
 }

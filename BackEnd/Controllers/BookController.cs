@@ -40,7 +40,7 @@ namespace MauiApp1.Controllers
 
             BookSetupViewModel bookSetupViewModel = new BookSetupViewModel
             {
-                Books = new System.Collections.ObjectModel.ObservableCollection<Book>(books),
+                Books = new System.Collections.ObjectModel.ObservableCollection<BookDT>(books),
                 BookSeries = new System.Collections.ObjectModel.ObservableCollection<BookSeries>(series),
                 Genre = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string,int>>(genres),
                 Format = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string,int>>(formats),
@@ -64,7 +64,7 @@ namespace MauiApp1.Controllers
 
             BookSetupViewModel bookSetupViewModel = new BookSetupViewModel
             {
-                Books = new System.Collections.ObjectModel.ObservableCollection<Book>(books),
+                Books = new System.Collections.ObjectModel.ObservableCollection<BookDT>(books),
                 BookSeries = new System.Collections.ObjectModel.ObservableCollection<BookSeries>(series),
                 Genre = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string,int>>(genres),
                 Format = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string,int>>(formats),
@@ -75,17 +75,17 @@ namespace MauiApp1.Controllers
             return bookSetupViewModel;
         }
 
-        public async Task<Book> GetBookAsync(int id)
+        public async Task<BookDT> GetBookAsync(int id)
         {
             return await _BookService.GetBookAsync(id);
         }
 
-        public async Task<int> SaveBookAsync(Book item, string newSeries)
+        public async Task<int> SaveBookAsync(BookDT item, string newSeries)
         {
             return await _BookService.SaveBookAsync(item, newSeries);
         }
 
-        public async Task<int> DeleteBookAsync(Book item)
+        public async Task<int> DeleteBookAsync(BookDT item)
         {
             return await _BookService.DeleteBookAsync(item);
         }
@@ -147,7 +147,7 @@ namespace MauiApp1.Controllers
             return setup;
         }
 
-        public Book GetBook(int id)
+        public BookDT GetBook(int id)
         {
             if (id <= 0) return null;
             return _BookService.GetBookAsync(id).Result;

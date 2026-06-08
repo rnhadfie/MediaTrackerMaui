@@ -4,6 +4,7 @@ using MauiApp1.Front.Components.Books;
 using MauiApp1.Front.Components.Books.ViewModels;
 using Microcharts.Maui;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Controls.Compatibility.Hosting;
 using UraniumUI;
 using UraniumUI.Dialogs;
 
@@ -30,7 +31,7 @@ namespace MauiApp1
                 .UseUraniumUI()
                 .UseUraniumUIMaterial()
                 .UseMicrocharts()
-                
+                .UseMauiCompatibility()
                 .UseUraniumUIWebComponents();
 
            
