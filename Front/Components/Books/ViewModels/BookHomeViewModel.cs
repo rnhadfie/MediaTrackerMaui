@@ -1,13 +1,13 @@
-﻿
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MauiApp1.BackEnd.Models;
+using MauiApp1.BackEnd.Shared;
 using MauiApp1.Controllers.ViewModels;
-using MauiApp1.Modals;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using UraniumUI.Dialogs;
 using UraniumUI.Extensions;
+using System.Linq;
 
 namespace MauiApp1.Front.Components.Books.ViewModels
 {
@@ -63,8 +63,29 @@ namespace MauiApp1.Front.Components.Books.ViewModels
                     SelectedType = TypeOptions[0];
                 }
 
-                ListOfBooks = new ObservableCollection<BookDT>(SelectedType.Value == 0 ? ViewModel.Setup.Books : ViewModel.Setup.Books.Where(x => (int)x.Type == SelectedType.Value) ?? []);
+                // Initialize the book list based on the selected type
+                UpdateListOfBooks();
 
+            }
+        }
+
+        // Called by the source-generated ObservableProperty when SelectedType changes
+        partial void OnSelectedTypeChanged(TextValuePair<string, int> value)
+        {
+            UpdateListOfBooks();
+        }
+        
+        private void UpdateListOfBooks()
+        {
+            var source = ViewModel?.Setup?.Books ?? Enumerable.Empty<BookDT>();
+            if (SelectedType == null || SelectedType.Value == 0)
+            {
+                ListOfBooks = new ObservableCollection<BookDT>(source);
+            }
+            else
+            {
+                var filtered = source.Where(x => (int)x.Type == SelectedType.Value);
+                ListOfBooks = new ObservableCollection<BookDT>(filtered);
             }
         }
 

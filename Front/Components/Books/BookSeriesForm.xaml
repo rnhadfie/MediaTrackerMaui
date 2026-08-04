@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiApp1.Front.Components.Books.BookSeriesForm"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:Microsoft.Maui.Controls.Compatibility;assembly=Microsoft.Maui.Controls.Compatibility"
+    xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+    xmlns:models1="clr-namespace:MauiApp1.BackEnd"
+    xmlns:models2="clr-namespace:MauiApp1.BackEnd.Shared"
+    xmlns:models3="clr-namespace:MauiApp1.BackEnd.Models"
+    xmlns:shared="clr-namespace:MauiApp1.Front.Components.Shared"
+    xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+    xmlns:viewModels="clr-namespace:MauiApp1.Front.Components.Books.ViewModels"
+    Title="Book Series">
+    <ContentPage.BindingContext>
+        <viewModels:BookSeriesFormViewModel />
+    </ContentPage.BindingContext>
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Scrollable content so dialog height constraints don't hide inputs  -->
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout>
+                <material:TextField
+                    x:Name="BookSeriesTitle"
+                    Title="Title"
+                    Padding="8"
+                    IsEnabled="{Binding IsEdit.Value}"
+                    Text="{Binding Title.Value, Mode=TwoWay}" />
+                <material:TextField
+                    x:Name="BookSeriesAuthor"
+                    Title="Author"
+                    Padding="8"
+                    IsEnabled="{Binding IsEdit.Value}"
+                    Text="{Binding Author.Value, Mode=TwoWay}" />
+                <material:TextField
+                    x:Name="BookSeriesArtist"
+                    Title="Artist"
+                    Padding="8"
+                    IsEnabled="{Binding IsEdit.Value}"
+                    Text="{Binding Artist.Value, Mode=TwoWay}" />
+                <material:CheckBox
+                    Padding="8"
+                    IsChecked="{Binding Ongoing.Value, Mode=TwoWay}"
+                    IsEnabled="{Binding IsEdit.Value}"
+                    Text="Ongoing Series" />
+                <StackLayout Padding="8">
+                    <shared:RadioButtonGroup
+                        x:Name="BookSeriesCollecting"
+                        Header="Current Collection Status"
+                        IsEdit="{Binding IsEdit.Value}"
+                        SelectedValue="{Binding Collecting.Value, Mode=TwoWay}" />
+                </StackLayout>
+                <material:CheckBox
+                    Padding="8"
+                    IsChecked="{Binding UpToDateComplete.Value, Mode=TwoWay}"
+                    IsEnabled="{Binding IsEdit.Value}"
+                    Text="Up to date or complete" />
+                <material:TextField
+                    x:Name="BookSeriesParent"
+                    Title="Parent Series"
+                    Padding="8"
+                    IsEnabled="{Binding IsEdit.Value}"
+                    Text="{Binding Parent.Value, Mode=TwoWay}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!--  Footer row pinned to bottom so buttons remain visible  -->
+        <FlexLayout
+            Grid.Row="1"
+            Margin="10"
+            Direction="Row"
+            JustifyContent="End">
+            <Button
+                x:Name="CancelButton"
+                Clicked="OnCancelClicked"
+                Text="Back" />
+            <Button
+                x:Name="SubmitButton"
+                Clicked="OnSubmitClicked"
+                IsVisible="{Binding IsEdit}"
+                Text="Save" />
+        </FlexLayout>
+    </Grid>
+</ContentPage>

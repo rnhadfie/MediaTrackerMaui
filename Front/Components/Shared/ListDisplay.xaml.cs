@@ -1,4 +1,4 @@
-using MauiApp1.BackEnd.Models;
+using MauiApp1.BackEnd.Shared;
 
 namespace MauiApp1.Front.Components.Shared;
 

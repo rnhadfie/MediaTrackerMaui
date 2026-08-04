@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using MauiApp1.BackEnd.Controllers.ViewModels;
+﻿
 using MauiApp1.BackEnd.Database;
 using MauiApp1.BackEnd.Models;
 using MauiApp1.BackEnd.Service;
+using MauiApp1.BackEnd.Shared;
 using MauiApp1.Controllers.ViewModels;
-using MauiApp1.Modals;
 
 namespace MauiApp1.Controllers
 {
@@ -31,7 +28,7 @@ namespace MauiApp1.Controllers
         public async Task<BookSetupViewModel> GetBooksAsync()
         {
             var books = await _BookService.GetBooksAsync();
-            var series = await _BookService.GetBookSeriesAsync();
+            var series = await _BookService.GetAllBookSeriesAsync();
             var genres = _SharedService.GetGenres();
             var formats = _BookService.GetBookFormats();
             var types = _BookService.GetBookTypes();
@@ -55,7 +52,7 @@ namespace MauiApp1.Controllers
         public async Task<BookSetupViewModel> GetBooksNotReadAsync()
         {
             var books = await _BookService.GetBooksNotReadAsync();
-            var series = await _BookService.GetBookSeriesAsync();
+            var series = await _BookService.GetAllBookSeriesAsync();
             var genres = _SharedService.GetGenres();
             var formats = _BookService.GetBookFormats();
             var types = _BookService.GetBookTypes();
@@ -80,9 +77,9 @@ namespace MauiApp1.Controllers
             return await _BookService.GetBookAsync(id);
         }
 
-        public async Task<int> SaveBookAsync(BookDT item, string newSeries)
+        public async Task<bool> SaveBookAsync(BookDT item, string newSeries, string newPublisher)
         {
-            return await _BookService.SaveBookAsync(item, newSeries);
+            return await _BookService.SaveBookAsync(item, newSeries, newPublisher);
         }
 
         public async Task<int> DeleteBookAsync(BookDT item)
@@ -105,10 +102,14 @@ namespace MauiApp1.Controllers
             return await _BookService.DeletePublisherAsync(item);
         }
 
-        public async Task<List<BookSeries>> GetBookSeriesAsync()
+        public async Task<BookSeries> GetBookSeriesAsync(int id)
         {
-            await MediaItemDatabase.Init();
-            return await MediaItemDatabase.database.Table<BookSeries>().ToListAsync();
+            return await _BookService.GetBookSeriesAsync(id);
+        }
+
+        public async Task<List<BookSeries>> GetAllBookSeriesAsync()
+        {
+            return await _BookService.GetAllBookSeriesAsync();
         }
 
         public async Task<int> SaveBookSeriesAsync(BookSeries item)
@@ -128,7 +129,7 @@ namespace MauiApp1.Controllers
 
         public async Task<BookSetupViewModel> GetBookSetup()
         {
-            var series = await _BookService.GetBookSeriesAsync();
+            var series = await _BookService.GetAllBookSeriesAsync();
             var genres = _SharedService.GetGenres();
             var formats = _BookService.GetBookFormats();
             var types = _BookService.GetBookTypes();
@@ -147,10 +148,10 @@ namespace MauiApp1.Controllers
             return setup;
         }
 
-        public BookDT GetBook(int id)
+        public async Task<BookDT> GetBook(int id)
         {
             if (id <= 0) return null;
-            return _BookService.GetBookAsync(id).Result;
+            return await _BookService.GetBookAsync(id);
         }
     }
 }

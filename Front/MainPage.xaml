@@ -15,6 +15,11 @@
             <Label Text="Books" />
             <Button Clicked="OnOpenBooksClicked" Text="Open Books" />
         </StackLayout>
+        <StackLayout Padding="10" StyleClass="PrimaryContainer">
+            <Label Text="Videos" />
+            <Button Clicked="OnOpenVideoClicked" Text="Open Videos" />
+        </StackLayout>
+
 
     </VerticalStackLayout>
 </ContentPage>

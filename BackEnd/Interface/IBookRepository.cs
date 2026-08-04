@@ -1,9 +1,5 @@
-﻿using MauiApp1.BackEnd.Controllers.ViewModels;
+﻿
 using MauiApp1.BackEnd.Models;
-using MauiApp1.Modals;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MauiApp1.BackEnd.Interface
 {

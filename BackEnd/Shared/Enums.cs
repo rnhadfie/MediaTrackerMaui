@@ -34,13 +34,15 @@ namespace MauiApp1.BackEnd.Shared
             Music = 17,
         }
 
-        public enum MediaType 
+        public enum MediaType
         {
             Book = 1,
 
         }
 
         #endregion
+
+        #region Book Enums
         public enum BookFormat
         {
             Paperback = 1,
@@ -48,7 +50,7 @@ namespace MauiApp1.BackEnd.Shared
             EBook = 3
         }
 
-   
+
         public enum BookType
         {
             Novel = 1,
@@ -59,6 +61,35 @@ namespace MauiApp1.BackEnd.Shared
             ArtBook = 6,
         }
 
-       
+        #endregion
+
+        #region Video Enums
+
+        public enum VideoFormat
+        {
+            DVD = 1,
+            BluRay = 2,
+            Digital = 3
+        }
+
+        public enum VideoTag
+        {
+            None = 0,
+            Anime = 1,
+            Msytery = 2,
+            Documentary = 3,
+            Concert = 4,
+            WesternAnimation = 5,
+        }
+
+        public enum VideoType
+        {
+            TVShow = 1,
+            Movie = 2,
+            WebSeries = 3,
+            Miniseries = 4,
+        }
+
+        #endregion
     }
 }

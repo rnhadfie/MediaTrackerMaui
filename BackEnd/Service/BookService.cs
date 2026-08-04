@@ -1,11 +1,8 @@
 ﻿
 using ClosedXML.Excel;
-using LiveChartsCore.SkiaSharpView;
 using MauiApp1.BackEnd.Models;
 using MauiApp1.BackEnd.Repository;
-using MauiApp1.Modals;
-using MauiApp1.Shared;
-using System.Text.Json;
+using MauiApp1.BackEnd.Shared;
 using static MauiApp1.BackEnd.Shared.Enums;
 
 namespace MauiApp1.BackEnd.Service
@@ -55,22 +52,51 @@ namespace MauiApp1.BackEnd.Service
             return book.GetBook();
         }
 
-        public async Task<int> SaveBookAsync(BookDT item, string newSeries)
+        public async Task<BookSeries> GetBookSeriesAsync(int id)
         {
-            if (string.IsNullOrWhiteSpace(newSeries) && item.BookSeries > 0)
-            {
-                return await _BookRepository.SaveBookAsync(item.GetBook());
-            }
-            else
-            {
-                BookSeries bookSeries = new BookSeries {
-                    Title = newSeries
-                };
-                var seriesResult = await _BookRepository.SaveBookSeriesAsync(bookSeries);
-                var bookResult = await _BookRepository.SaveBookAsync(item.GetBook());
+            BookSeries bookSeries = await _BookRepository.GetBookSeriesAsync(id);
+            return bookSeries;
+        }
 
-                return seriesResult + bookResult;
+        public async Task<bool> SaveBookAsync(BookDT item, string newSeries, string newPublisher)
+        {
+            bool result = true;
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(newSeries) && item.BookSeries <= 0)
+                {
+                    BookSeries bookSeries = new BookSeries
+                    {
+                        Title = newSeries,
+                        Author = item.Author,
+                        Artist = item.Artist
+
+                    };
+                    int id = await _BookRepository.SaveBookSeriesAsync(bookSeries);
+                    item.BookSeries = id;
+                    
+                    result = result && id > 0;
+
+                }
+                if (!string.IsNullOrWhiteSpace(newPublisher) && (item.Publisher == null || item.Publisher <= 0))
+                {
+                    Publisher newPublisherObj = new Publisher
+                    {
+                        PublisherName = newPublisher
+                    };
+                    int pubId = await _BookRepository.SavePublisherAsync(newPublisherObj);
+                    item.Publisher = pubId;
+                    result = result && pubId > 0;
+                }
+
+
+                return result && await _BookRepository.SaveBookAsync(item.GetBook()) > 0;
             }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            
         }
 
         public async Task<int> DeleteBookAsync(BookDT item)
@@ -94,14 +120,9 @@ namespace MauiApp1.BackEnd.Service
             return await _BookRepository.DeletePublisherAsync(item);
         }
 
-        public async Task<List<BookSeries>> GetBookSeriesAsync()
+        public async Task<List<BookSeries>> GetAllBookSeriesAsync()
         {
             return await _BookRepository.GetAllBookSeriesAsync();
-        }
-
-        public async Task<BookSeries> GetBookSeriesAsync(int id)
-        {
-            return await _BookRepository.GetBookSeriesAsync(id);
         }
 
         public async Task<int> SaveBookSeriesAsync(BookSeries item)
@@ -122,6 +143,26 @@ namespace MauiApp1.BackEnd.Service
         {
             return Enum.GetValues(typeof(BookType)).Cast<BookType>().Select(g => new TextValuePair<string, int>(g.ToString(), (int)g)).ToList();
         }
+
+        public async Task<XLWorkbook> ExportBookData(XLWorkbook workBook)
+        {
+            List<Book> books = await _BookRepository.GetBooksAsync();
+            List<Publisher> publishers = await _BookRepository.GetPublishersAsync();
+            List<BookSeries> bookSeries = await _BookRepository.GetAllBookSeriesAsync();
+
+            var bookSheet = workBook.AddWorksheet("Books");
+            bookSheet.Cell(1, 1).InsertData(books, true);
+
+            var pubSheet = workBook.AddWorksheet("Publishers");
+            pubSheet.Cell(1, 1).InsertData(publishers, true);
+
+            var seriesSheet = workBook.AddWorksheet("BookSeries");
+            seriesSheet.Cell(1, 1).InsertData(publishers, true);
+
+            return workBook;
+        }
+
+
 
         public async Task<bool> ImportBookDataFromExcel(XLWorkbook wb)
         {
@@ -229,19 +270,18 @@ namespace MauiApp1.BackEnd.Service
         {
 
             var genres = dto.Genre.Split(",");
-            List<Genre> bookGenre = new List<Genre>();
+            List<int> bookGenre = new List<int>();
             foreach (var item in genres)
             {
-                bookGenre.Add((Genre)(int.TryParse(item, out var gen) ? gen : 0));
+                bookGenre.Add((int.TryParse(item, out var gen) ? gen : 0));
             }
 
-            var volumes = dto.Genre.Split(",");
+            var volumes = dto.Volume.Split(",");
             List<int> bookVolumes = new List<int>();
-            foreach (var item in genres)
+            foreach (var item in volumes)
             {
-                bookGenre.Add((Genre)(int.TryParse(item, out var gen) ? gen : 0));
+                bookVolumes.Add(int.TryParse(item, out var gen) ? gen : 0);
             }
-
             var book = new BookDT
             {
                 Id = (int.TryParse(dto.Id, out var id) ? id : default),
@@ -252,7 +292,7 @@ namespace MauiApp1.BackEnd.Service
                 Genre = bookGenre,
                 Format = (BookFormat)(int.TryParse(dto.Format, out var f) ? f : default),
                 Volume = bookVolumes,
-                Read = bool.TryParse(dto.Read, out var r) && r,
+                Read = dto.Read == "Y",
                 Language = (Language)(int.TryParse(dto.Language, out var l) ? l : 0),
                 BookSeries = int.TryParse(dto.BookSeries, out var bs) ? bs : 0,
                 Type = (BookType)(int.TryParse(dto.Type, out var t) ? t : default)

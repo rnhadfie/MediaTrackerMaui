@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="MauiApp1.Front.Components.Shared.MultiSelect"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    <VerticalStackLayout
+        x:Name="RootStack"
+        Padding="12"
+        Spacing="8">
+        <Label
+            x:Name="HeaderLabel"
+            FontAttributes="Bold"
+            IsVisible="False"
+            Text="Select items" />
+
+        <!--  Items container populated from code-behind  -->
+        <VerticalStackLayout x:Name="ItemsStack" Spacing="6" />
+    </VerticalStackLayout>
+</ContentView>

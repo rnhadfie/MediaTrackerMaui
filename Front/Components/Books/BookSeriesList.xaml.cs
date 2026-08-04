@@ -4,55 +4,52 @@ using System.Collections.ObjectModel;
 
 namespace MauiApp1.Front.Components.Books;
 
-public partial class BookList : ContentView
+public partial class BookSeriesList : ContentView
 {
     private BookController _book;
-	public BookList()
-	{
-		InitializeComponent();
+    public BookSeriesList()
+    {
+        InitializeComponent();
         _book = new BookController();
-
     }
 
     private bool filtering = false;
 
     public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(
         nameof(ItemsSource),
-        typeof(IEnumerable<BookDT>),
-        typeof(BookList),
-        default(IEnumerable<BookDT>),
+        typeof(IEnumerable<BookSeries>),
+        typeof(BookSeriesList),
+        default(IEnumerable<BookSeries>),
         propertyChanged: OnItemsSourceChanged);
 
-    public IEnumerable<BookDT> ItemsSource
+    public IEnumerable<BookSeries> ItemsSource
     {
-        get => (IEnumerable<BookDT>)GetValue(ItemsSourceProperty);
+        get => (IEnumerable<BookSeries>)GetValue(ItemsSourceProperty);
         set => SetValue(ItemsSourceProperty, value);
     }
 
-    public IEnumerable<BookDT> OriginalBooks { get; set; }
+    public IEnumerable<BookSeries> OriginalBookSeries { get; set; }
 
     private static void OnItemsSourceChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (bindable is BookList control)
+        if (bindable is BookSeriesList control)
         {
-            control.OnItemsSourceChanged((IEnumerable<BookDT>)oldValue, (IEnumerable<BookDT>)newValue);
+            control.OnItemsSourceChanged((IEnumerable<BookSeries>)oldValue, (IEnumerable<BookSeries>)newValue);
         }
     }
 
-    private void OnItemsSourceChanged(IEnumerable<BookDT> oldValue, IEnumerable<BookDT> newValue)
+    private void OnItemsSourceChanged(IEnumerable<BookSeries> oldValue, IEnumerable<BookSeries> newValue)
     {
-        // If the inner list view uses ItemsSource binding, update it directly
         if (newValue == null)
         {
-            // Clear
-            BookListDataGrid.ItemsSource = null;
+            BookSeriesListDataGrid.ItemsSource = null;
             return;
         }
 
-        BookListDataGrid.ItemsSource = (ObservableCollection<BookDT>)newValue;
+        BookSeriesListDataGrid.ItemsSource = (ObservableCollection<BookSeries>)newValue;
         if (!filtering)
         {
-            OriginalBooks = (ObservableCollection<BookDT>)newValue;
+            OriginalBookSeries = (ObservableCollection<BookSeries>)newValue;
         }
     }
 
@@ -60,7 +57,7 @@ public partial class BookList : ContentView
         BindableProperty.Create(
             nameof(EmptyViewText),
             typeof(string),
-            typeof(BookList),
+            typeof(BookSeriesList),
             default(string),
             BindingMode.OneWay);
 
@@ -74,7 +71,7 @@ public partial class BookList : ContentView
         BindableProperty.Create(
             nameof(SearchText),
             typeof(string),
-            typeof(BookList),
+            typeof(BookSeriesList),
             "",
             BindingMode.TwoWay);
 
@@ -86,9 +83,9 @@ public partial class BookList : ContentView
 
     private void TextField_PropertyChanging(object sender, PropertyChangingEventArgs e)
     {
-       
-        if (!string.IsNullOrWhiteSpace(SearchText)) {
-            BookListDataGrid.ItemsSource = ItemsSource.Where(x => x.Title.Contains(SearchText) || x.Author.Contains(SearchText)).ToList();
+        if (!string.IsNullOrWhiteSpace(SearchText))
+        {
+            BookSeriesListDataGrid.ItemsSource = ItemsSource.Where(x => x.Title.Contains(SearchText) || x.Author.Contains(SearchText)).ToList();
         }
     }
 
@@ -99,10 +96,23 @@ public partial class BookList : ContentView
         {
             filtering = true;
             SearchText = e.NewTextValue;
-            List<Book> fitleredList = (List<Book>)OriginalBooks;
-            BookListDataGrid.ItemsSource = fitleredList.FindAll(x => x.Title.ToLower().Contains(SearchText.ToLower()) || (!string.IsNullOrWhiteSpace(x.Author) && x.Author.ToLower().Contains(SearchText.ToLower()))).ToList();
+            List<BookSeries> fitleredList = (List<BookSeries>)OriginalBookSeries;
+            BookSeriesListDataGrid.ItemsSource = fitleredList.FindAll(x => x.Title.ToLower().Contains(SearchText.ToLower()) || (!string.IsNullOrWhiteSpace(x.Author) && x.Author.ToLower().Contains(SearchText.ToLower()))).ToList();
         }
-        
+
+    }
+
+    public async Task<bool> LoadSeriesAsync()
+    {
+        OriginalBookSeries = await _book.GetAllBookSeriesAsync();
+        ItemsSource = OriginalBookSeries;
+        BookSeriesListDataGrid.ItemsSource = (System.Collections.IList)OriginalBookSeries;
+        return true;
+    }
+
+    private async void AddButton_Clicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("/BookSeriesForm?edit=true");
     }
 
     private async void Button_Clicked(object sender, EventArgs e)
@@ -111,36 +121,33 @@ public partial class BookList : ContentView
         {
             if (sender is Button btn)
             {
-                BookDT book = (BookDT)btn.CommandParameter;
+                BookSeries bookSeries = (BookSeries)btn.CommandParameter;
 
-                // Show a bottom-sheet style action sheet using the platform ActionSheet
-                // This is a lightweight bottom sheet alternative that works across MAUI
                 var action = await Application.Current.MainPage.DisplayActionSheet("Actions", "Cancel", null, "View", "Edit", "Delete");
 
                 if (action == "Cancel" || string.IsNullOrEmpty(action))
                     return;
 
-                // Handle actions - these are placeholders for integration with navigation/commands
                 switch (action)
                 {
                     case "View":
-                        await Shell.Current.GoToAsync($"/BookForm?id={book.Id}&edit=false");
+                        await Shell.Current.GoToAsync($"/BookSeriesForm?id={bookSeries.Id}&edit=false");
                         break;
                     case "Edit":
-                        await Shell.Current.GoToAsync($"/BookForm?id={book.Id}&edit=true");
+                        await Shell.Current.GoToAsync($"/BookSeriesForm?id={bookSeries.Id}&edit=true");
                         break;
                     case "Delete":
                         var confirm = await Application.Current.MainPage.DisplayAlert("Confirm", "Delete this item?", "Yes", "No");
                         if (confirm)
                         {
-                            var result = await _book.DeleteBookAsync(book);
+                            var result = await _book.DeleteBookSeriesAsync(bookSeries);
                             if (result > 0)
                             {
-                                await Application.Current.MainPage.DisplayAlert("Deleted", $"Item deleted: {book.Title}", "OK");
+                                await Application.Current.MainPage.DisplayAlert("Deleted", $"Item deleted: {bookSeries.Title}", "OK");
                             }
                             else
                             {
-                                await Application.Current.MainPage.DisplayAlert("Deleted", $"Failed to delete: {book.Title}", "OK");
+                                await Application.Current.MainPage.DisplayAlert("Deleted", $"Failed to delete: {bookSeries.Title}", "OK");
                             }
                         }
                         break;
@@ -153,4 +160,3 @@ public partial class BookList : ContentView
         }
     }
 }
-

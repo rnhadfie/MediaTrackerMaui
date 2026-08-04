@@ -1,9 +1,6 @@
-﻿using MauiApp1.BackEnd.Controllers.ViewModels;
+﻿
 using MauiApp1.BackEnd.Database;
-using MauiApp1.BackEnd.Shared;
 using MauiApp1.BackEnd.Interface;
-using MauiApp1.Modals;
-using System.Collections.ObjectModel;
 using MauiApp1.BackEnd.Models;
 
 namespace MauiApp1.BackEnd.Repository
@@ -42,6 +39,7 @@ namespace MauiApp1.BackEnd.Repository
             if (item.Id != 0)
                 return await MediaItemDatabase.database.UpdateAsync(item);
             else
+                item.Id = null;
                 return await MediaItemDatabase.database.InsertAsync(item);
         }
 
@@ -66,11 +64,24 @@ namespace MauiApp1.BackEnd.Repository
 
         public async Task<int> SavePublisherAsync(Publisher item)
         {
-            await MediaItemDatabase.Init();
-            if (item.Id != 0)
-                return await MediaItemDatabase.database.UpdateAsync(item);
-            else
-                return await MediaItemDatabase.database.InsertAsync(item);
+            try
+            {
+                await MediaItemDatabase.Init();
+                if (item.Id != 0)
+                {
+                    await MediaItemDatabase.database.UpdateAsync(item);
+                    return item.Id;
+                }
+                else
+                {
+                    await MediaItemDatabase.database.InsertAsync(item);
+                    return item.Id;
+                }
+            }
+            catch (Exception ex)
+            {
+                return -1;
+            }
         }
 
         public async Task<int> DeletePublisherAsync(Publisher item)
@@ -101,11 +112,24 @@ namespace MauiApp1.BackEnd.Repository
 
         public async Task<int> SaveBookSeriesAsync(BookSeries item)
         {
-            await MediaItemDatabase.Init();
-            if (item.Id != 0)
-                return await MediaItemDatabase.database.UpdateAsync(item);
-            else
-                return await MediaItemDatabase.database.InsertAsync(item);
+            try
+            {
+                await MediaItemDatabase.Init();
+                if (item.Id != 0)
+                {
+                    await MediaItemDatabase.database.UpdateAsync(item);
+                    return item.Id;
+                }
+                else
+                {
+                    await MediaItemDatabase.database.InsertAsync(item);
+                    return item.Id;
+                }
+            }
+            catch (Exception ex)
+            {
+                return -1;
+            }
         }
 
         public async Task<int> DeleteBookSeriesAsync(BookSeries item)

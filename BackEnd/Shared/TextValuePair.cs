@@ -1,4 +1,8 @@
-﻿namespace MauiApp1.BackEnd.Models
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace MauiApp1.BackEnd.Shared
 {
     public class TextValuePair<T1, T2>
     {
@@ -23,11 +27,6 @@
         {
             _text = text;
             _value = value;
-        }
-
-        public override string ToString()
-        {
-            return Text.ToString();
         }
     }
 }

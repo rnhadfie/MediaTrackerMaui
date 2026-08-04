@@ -2,6 +2,8 @@
 using LiveChartsCore.SkiaSharpView.Maui;
 using MauiApp1.Front.Components.Books;
 using MauiApp1.Front.Components.Books.ViewModels;
+using MauiApp1.Front.Components.Videos.ViewModels;
+using MauiApp1.Front.Components.Videos;
 using Microcharts.Maui;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Compatibility.Hosting;
@@ -43,6 +45,17 @@ namespace MauiApp1
             builder.Services.AddCommunityToolkitDialogs();
             builder.Services.AddTransient<BookHomeViewModel>();
             builder.Services.AddTransient<BookHome>();
+            // BookSeriesHome removed; use embedded BookSeriesList inside BookHome
+            builder.Services.AddTransient<BookSeriesFormViewModel>();
+
+            // Video pages and viewmodels
+            builder.Services.AddTransient<VideoHomeViewModel>();
+            builder.Services.AddTransient<VideoHome>();
+            // VideoSeriesHome removed; use embedded VideoSeriesList inside VideoHome
+            builder.Services.AddTransient<VideoForm>();
+            builder.Services.AddTransient<VideoSeriesForm>();
+            builder.Services.AddTransient<VideoFormViewModel>();
+            builder.Services.AddTransient<VideoSeriesFormViewModel>();
             /*
             builder.Services.AddTransient<CollectionForm>();
             builder.Services.AddTransient<CollectionView>();

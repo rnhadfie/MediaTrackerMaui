@@ -1,80 +1,52 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
-    x:Class="MauiApp1.Front.Components.Books.BookForm"
+    x:Class="MauiApp1.Front.Components.Videos.VideoForm"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:controls="clr-namespace:Microsoft.Maui.Controls.Compatibility;assembly=Microsoft.Maui.Controls.Compatibility"
     xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-    xmlns:models1="clr-namespace:MauiApp1.BackEnd"
-    xmlns:models2="clr-namespace:MauiApp1.BackEnd.Shared"
-    xmlns:models3="clr-namespace:MauiApp1.BackEnd.Models"
     xmlns:shared="clr-namespace:MauiApp1.Front.Components.Shared"
-    xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-    xmlns:viewModels="clr-namespace:MauiApp1.Front.Components.Books.ViewModels"
-    Title="Book Form">
+    xmlns:viewModels="clr-namespace:MauiApp1.Front.Components.Videos.ViewModels"
+    Title="Video Form">
+
     <ContentPage.BindingContext>
-        <viewModels:BookFormViewModel />
+        <viewModels:VideoFormViewModel />
     </ContentPage.BindingContext>
+
     <Grid Padding="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!--  Scrollable content so dialog height constraints don't hide inputs  -->
         <ScrollView Grid.Row="0">
             <VerticalStackLayout>
                 <material:TextField
-                    x:Name="BookTitle"
+                    x:Name="VideoName"
                     Title="Title"
                     Padding="8"
                     IsEnabled="{Binding IsEdit.Value}"
-                    Text="{Binding Title.Value, Mode=TwoWay}" />
-                <material:TextField
-                    x:Name="BookAuthor"
-                    Title="Author"
-                    Padding="8"
-                    IsEnabled="{Binding IsEdit.Value}"
-                    Text="{Binding Author.Value, Mode=TwoWay}" />
-                <material:TextField
-                    x:Name="BookArtist"
-                    Title="Artist"
-                    Padding="8"
-                    IsEnabled="{Binding IsEdit.Value, Mode=TwoWay}"
-                    Text="{Binding Artist.Value, Mode=TwoWay}" />
+                    Text="{Binding Name.Value, Mode=TwoWay}" />
+
                 <material:PickerField
-                    x:Name="BookSeriesPicker"
-                    Title="Book Series"
+                    x:Name="VideoSeriesPicker"
+                    Title="Video Series"
                     Padding="8"
                     IsEnabled="{Binding IsEdit.Value, Mode=TwoWay}"
                     ItemDisplayBinding="{Binding Text}"
-                    SelectedItem="{Binding SelectedBookSeries.Value, Mode=TwoWay}" />
+                    SelectedItem="{Binding SelectedVideoSeries.Value, Mode=TwoWay}" />
                 <material:TextField
-                    x:Name="NewBookSeries"
-                    Title="New Book Series"
+                    x:Name="NewVideoSeries"
+                    Title="New Video Series"
                     Padding="8"
                     IsEnabled="{Binding EnableNewSeries}"
                     IsVisible="{Binding IsEdit.Value, Mode=TwoWay}"
-                    Text="{Binding NewBookSeriesName.Value, Mode=TwoWay}" />
+                    Text="{Binding NewVideoSeriesName.Value, Mode=TwoWay}" />
 
-                <material:PickerField
-                    x:Name="BookPublisherPicker"
-                    Title="Publisher"
-                    Padding="8"
-                    IsEnabled="{Binding IsEdit.Value, Mode=TwoWay}"
-                    ItemDisplayBinding="{Binding Text}"
-                    SelectedItem="{Binding SelectedPublisher.Value, Mode=TwoWay}" />
-                <material:TextField
-                    x:Name="NewPublisher"
-                    Title="New Publisher"
-                    Padding="8"
-                    IsEnabled="{Binding EnablePublisher}"
-                    IsVisible="{Binding IsEdit.Value, Mode=TwoWay}"
-                    Text="{Binding NewPublisher.Value, Mode=TwoWay}" />
+
                 <StackLayout Padding="8">
-                    <Label x:Name="BookGenreLabel" Text="Genre:" />
+                    <Label x:Name="VideoGenreLabel" Text="Genre:" />
                     <shared:MultiSelect
-                        x:Name="BookGenrePicker"
+                        x:Name="VideoGenrePicker"
                         Margin="8"
                         Editable="{Binding IsEdit.Value, Mode=TwoWay}"
                         ItemsSource="{Binding GenreOptions}"
@@ -82,8 +54,6 @@
                         VerticalOptions="Fill" />
                 </StackLayout>
                 <StackLayout Padding="8">
-
-                    <Label x:Name="BookFormatLabel" Text="Format:" />
                     <material:RadioButtonGroupView IsEnabled="{Binding IsEdit.Value}" SelectedItem="{Binding Format.Value, Mode=TwoWay}">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
@@ -96,26 +66,25 @@
                         </BindableLayout.ItemTemplate>
                     </material:RadioButtonGroupView>
                     <shared:RadioButtonGroup
-                        x:Name="BookFormatGroup"
+                        x:Name="VideoFormatGroup"
                         Header="Format"
                         IsEdit="{Binding IsEdit.Value}"
                         SelectedValue="{Binding Format.Value, Mode=TwoWay}" />
                 </StackLayout>
                 <material:TextField
-                    x:Name="BookVolumes"
-                    Title="Volumes"
+                    x:Name="VideoSeason"
+                    Title="Season"
                     Padding="8"
                     IsEnabled="{Binding IsEdit}"
-                    Text="{Binding Volume.Value, Mode=TwoWay}" />
+                    Text="{Binding Season.Value, Mode=TwoWay}" />
                 <material:CheckBox
                     Padding="8"
                     IsChecked="{Binding Read.Value, Mode=TwoWay}"
                     IsEnabled="{Binding IsEdit}"
-                    Text="Read" />
+                    Text="Watched" />
             </VerticalStackLayout>
         </ScrollView>
 
-        <!--  Footer row pinned to bottom so buttons remain visible  -->
         <FlexLayout
             Grid.Row="1"
             Margin="10"

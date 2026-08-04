@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using MauiApp1.BackEnd.Service;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,28 @@ namespace MauiApp1.BackEnd.Controllers
             // Implement logic to read Excel file and import data into the database
             // You can use libraries like ClosedXML or EPPlus to handle Excel files
             BookService bookService = new BookService();
-            return await bookService.ImportBookDataFromExcel(workbook);
+            var result = await bookService.ImportBookDataFromExcel(workbook);
+
+            return result;
+        }
+
+        public static async Task<bool> ExportExcelData(string path)
+        {
+            BookService bookService = new BookService();
+            try
+            {
+                using (XLWorkbook wb = new XLWorkbook())
+                {
+                    await bookService.ExportBookData(wb);
+                    path= path + "\\MediaExcel.xlsx";
+                    wb.SaveAs(path);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }

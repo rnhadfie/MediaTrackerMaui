@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Maui.Storage;
+using DocumentFormat.OpenXml.Spreadsheet;
 using MauiApp1.BackEnd.Controllers;
 using MauiApp1.Front.Components.Books;
+using MauiApp1.Front.Components.Videos;
 
 namespace MauiApp1
 {
@@ -33,12 +35,25 @@ namespace MauiApp1
             ShellRouting.RegisterRouteSafe(nameof(BookView), typeof(BookView));
             ShellRouting.RegisterRouteSafe(nameof(BookDetailView), typeof(BookDetailView));*/
 
-            // Register named routes for BookHome and Home so they can be navigated to by route name
+            // Register named routes for BookHome, BookSeriesHome and a shared 'books' route so they can be navigated to by route name
+            // 'books' should open BookHome by default
+            Routing.RegisterRoute("books", typeof(BookHome));
+            //Routing.RegisterRoute("videos", typeof(VideoHome));
+            // Keep individual named routes available
             Routing.RegisterRoute("bookhome", typeof(BookHome));
+            // bookSerieshome removed - series are embedded in BookHome
+            Routing.RegisterRoute("videohome", typeof(VideoHome));
+            // videoSerieshome removed - series are embedded in VideoHome
             Routing.RegisterRoute("home", typeof(MainPage));
             Routing.RegisterRoute(nameof(BookForm), typeof(BookForm));
             // Ensure BookForm route is registered
             ShellRouting.RegisterRouteSafe(nameof(BookForm), typeof(BookForm));
+
+            ShellRouting.RegisterRouteSafe(nameof(BookSeriesForm), typeof(BookSeriesForm));
+            // Video routes
+            Routing.RegisterRoute("videoform", typeof(VideoForm));
+            ShellRouting.RegisterRouteSafe(nameof(VideoForm), typeof(VideoForm));
+            ShellRouting.RegisterRouteSafe(nameof(VideoSeriesForm), typeof(VideoSeriesForm));
         }
         
         private async void OnImportDataClicked(object sender, EventArgs e)
@@ -72,7 +87,7 @@ namespace MauiApp1
                 await Shell.Current.DisplayAlert("Import", message ?? "", "OK");
             }
         }
-        /*
+        
         private async void OnExportDataClicked(object sender, EventArgs e)
         {
             string path = Path.GetFullPath("downloads");
@@ -83,10 +98,15 @@ namespace MauiApp1
                 {
                     path = result.Folder.Path;
                 }
+                var message = $"Export succeeded";
+                bool importResult = await ExcelController.ExportExcelData(path);
+                if (!importResult)
+                {
+                    message = $"Export failed";
+                }
 
-                var message = $"Import succeeded";
+                
 
-                //SQLExport.Export(_dbContext, path);
 
                 await Shell.Current.DisplayAlert("Export", message ?? "", "OK");
             }
@@ -99,16 +119,22 @@ namespace MauiApp1
                 await Shell.Current.DisplayAlert("Export", message ?? "", "OK");
             }
         }
-        */
+
+        private async void OnMenuVideosClicked(object sender, EventArgs e)
+        {
+            // Navigate to the shared Books route so the Books flyout group is selected
+            await Shell.Current.GoToAsync("videohome");
+        }
 
         private async void OnMenuBooksClicked(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync("//bookhome");
+            // Navigate to the shared Books route so the Books flyout group is selected
+            await Shell.Current.GoToAsync("books");
         }
 
         private async void OnMenuHomeClicked(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync("//home");
+            await Shell.Current.GoToAsync("home");
         }
     }
 

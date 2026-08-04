@@ -3,15 +3,11 @@
 using MauiApp1.BackEnd.Models;
 using MauiApp1.BackEnd.Shared;
 using MauiApp1.Controllers.ViewModels;
-using MauiApp1.Modals;
 using Microcharts;
 
 using SkiaSharp;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Maui.ApplicationModel;
 using static MauiApp1.BackEnd.Shared.Enums;
 using System.Collections.ObjectModel;
 
@@ -277,8 +273,11 @@ BindableProperty.Create(
         foreach (var publisher in publishers)
         {
             var count = CountBooksForPublisher(publisher.Id);
-            var tet = new TextValuePair<string, int>(publisher.PublisherName, count);
-            textValuePairs.Add(tet);
+            if (count > 0)
+            {
+                var tet = new TextValuePair<string, int>(publisher.PublisherName, count);
+                textValuePairs.Add(tet);
+            }
         }
 
         return textValuePairs;
@@ -347,8 +346,11 @@ BindableProperty.Create(
                 return textValuePairs;
             }
             int count = books.Where(x => BookMatchesGenre(x, genre.Value)).Count();
-            var tet = new TextValuePair<string, int>(genre.Text, count);
-            textValuePairs.Add(tet);
+            if (count > 0)
+            {
+                var tet = new TextValuePair<string, int>(genre.Text, count);
+                textValuePairs.Add(tet);
+            }
         }
         return textValuePairs;
     }
@@ -399,8 +401,8 @@ BindableProperty.Create(
     {
         if (book.Genre == null)
             return false;
-        List<Genre> genreList = book.Genre;
-        return genreList.Contains((Genre)genreId);
+        List<int> genreList = book.Genre;
+        return genreList.Contains(genreId);
     }
 
 

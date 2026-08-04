@@ -91,19 +91,30 @@
 		<PackageReference Include="UraniumUI.WebComponents" Version="2.15.0" />
 	</ItemGroup>
 
+	<!-- Pin platform-specific SQLite native provider to a safe version for Android -->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
+		<PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.android" Version="2.1.12-pre20260709125052" />
+	</ItemGroup>
+
 	<ItemGroup>
-	  <Folder Include="BackEnd\Interface\" />
-	  <Folder Include="BackEnd\Repository\" />
 	  <Folder Include="Front\Components\Collections\" />
 	  <Folder Include="Front\Components\Menu\" />
 	  <Folder Include="Front\Components\Music\" />
 	  <Folder Include="Front\Components\Other\" />
 	  <Folder Include="Front\Components\ScrollDisplay\" />
-	  <Folder Include="Front\Components\Video\" />
 	  <Folder Include="LocalStorage\" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Front\Components\Books\BookSeriesForm.xaml.cs">
+	    <DependentUpon>BookSeriesForm.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Front\Components\Books\BookSeriesForm.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Front\Components\Books\BookForm.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -113,10 +124,33 @@
 	  <MauiXaml Update="Front\Components\Books\BookList.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	<!-- BookSeriesHome.xaml removed; series embedded in BookHome -->
+	  <MauiXaml Update="Front\Components\Books\BookSeriesList.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Front\Components\Books\BookVisualization.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Front\Components\Shared\ListDisplay.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Shared\MultiSelect.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Shared\RadioButtonGroup.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Video\VideoForm.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Video\VideoHome.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Video\VideoSeriesForm.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	<!-- VideoSeriesHome.xaml removed; series embedded in VideoHome -->
+	  <MauiXaml Update="Front\Components\Video\VideoSeriesList.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

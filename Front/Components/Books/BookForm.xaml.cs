@@ -1,46 +1,38 @@
-
 using MauiApp1.BackEnd.Models;
+using MauiApp1.BackEnd.Shared;
 using MauiApp1.Controllers;
-using MauiApp1.Controllers.ViewModels;
 using MauiApp1.Front.Components.Books.ViewModels;
-using MauiApp1.Modals;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using UraniumUI.Material;
 using static MauiApp1.BackEnd.Shared.Enums;
 
 namespace MauiApp1.Front.Components.Books
 {
+    [QueryProperty(nameof(id), "id")] // For objects
+    [QueryProperty(nameof(edit), "edit")]
     public partial class BookForm : ContentPage, IQueryAttributable
     {
         private int _id;
+        private bool _edit;
+        public int id;
+        public bool edit = true;
         private readonly BookController _controller;
 
-        public BookForm() : this(0)
-        {
-
-        }
-
-        public BookForm(int id)
+        public BookForm()
         {
             InitializeComponent();
             _id = id;
+            _edit = edit; 
             _controller = new BookController();
 
-           var setup=  _controller.GetBookSetup();
-            if (_id > 0)
-            {
-                LoadBook(_id);
-            }
-            
         }
 
-        private void LoadBook(int id)
+        private async 
+        Task
+        LoadBook(int id)
         {
             // kept for synchronous callers - call the async variant where possible
-            var book = _controller.GetBook(id);
+            var book = await _controller.GetBook(id);
+            
             if (book == null) return;
 
             var vm = (BindingContext as BookFormViewModel) ?? new BookFormViewModel();
@@ -59,45 +51,70 @@ namespace MauiApp1.Front.Components.Books
             vm.BookSeries.Value = book.BookSeries;
             vm.Type.Value = book.Type;
 
+            vm.IsEdit = _edit;
+
+
             // map genres: book.Genre is List<Genre> (enum) -> map to TextValuePair list if available in setup
             // Leave SelectedGenres empty for now; Set via async setup loader when available
 
+
             BindingContext = vm;
+
+            BookGenrePicker.SelectedValues = vm.Genre;
+            //BookLanguageGroup.SelectedItem = vm.Language;
+            BookFormatGroup.SelectedValue = vm.Format;
         }
 
+        private void DisableFields(bool isEnabled)
+        {
+            BookArtist.IsEnabled = isEnabled;
+            BookTitle.IsEnabled = isEnabled;
+            BookAuthor.IsEnabled = isEnabled;
+            BookPublisherPicker.IsEnabled = isEnabled;
+            BookFormatGroup.IsEnabled = isEnabled;
+            BookGenrePicker.IsEnabled = isEnabled;
+            NewPublisher.IsEnabled = isEnabled;
+            NewBookSeries.IsEnabled = isEnabled;
+            BookSeriesPicker.IsEnabled = isEnabled;
 
+        }
         protected override async void OnAppearing()
         {
             base.OnAppearing();
 
             // load setup and book data asynchronously and update ViewModel
             var setup = await _controller.GetBookSetup();
+            await LoadBook(_id);
 
             var vm = (BindingContext as BookFormViewModel) ?? new BookFormViewModel();
 
             // populate lists
             vm.BookSeriesList = setup.BookSeries?.Select(s => new TextValuePair<string,int>(s.Title, s.Id)).ToList() ?? new List<TextValuePair<string,int>>();
             vm.Publishers = setup.Publisher?.Select(p => new TextValuePair<string,int>(p.PublisherName ?? string.Empty, p.Id)).ToList() ?? new List<TextValuePair<string,int>>();
-            vm.GenreOptions = setup.Genre?.Select(g => new TextValuePair<string,int>(g.Text, g.Value)).ToList() ?? new List<TextValuePair<string,int>>();
+            vm.GenreOptions = setup.Genre != null
+                ? setup.Genre
+                : new ObservableCollection<TextValuePair<string, int>>();
 
             BookSeriesPicker.ItemsSource = new ObservableCollection<TextValuePair<string, int>>(vm.BookSeriesList);
-            //BookGenrePicker.ItemsSource = new ObservableCollection<TextValuePair<string, int>>(vm.GenreOptions);
+            BookGenrePicker.ItemsSource = new ObservableCollection<TextValuePair<string, int>>(vm.GenreOptions);
+
+
             BookPublisherPicker.ItemsSource = new ObservableCollection<TextValuePair<string, int>>(vm.Publishers);
 
+            List<TextValuePair<string, int>> formats = new List<TextValuePair<string, int>>();
             foreach (var item in setup.Format)
             {
                 UraniumUI.Material.Controls.RadioButton radioButton = new UraniumUI.Material.Controls.RadioButton();
-                radioButton.Text = item.Text;
-                radioButton.Value = item.Value;
-                BookFormatGroup.Children.Add(radioButton);
+                formats.Add(new TextValuePair<string, int>(item.Text, item.Value));
             }
+            BookFormatGroup.ItemsSource = formats;
 
             foreach (var item in setup.Langauge)
             {
                 UraniumUI.Material.Controls.RadioButton radioButton = new UraniumUI.Material.Controls.RadioButton();
                 radioButton.Text = item.Text;
                 radioButton.Value = item.Value;
-                BookLanguageGroup.Children.Add(radioButton);
+                //BookLanguageGroup.Children.Add(radioButton);
             }
 
             // If an id was provided, load the book and map genre selections
@@ -130,6 +147,19 @@ namespace MauiApp1.Front.Components.Books
             if (query == null)
                 return;
 
+            if (query.TryGetValue("edit", out var editObj) || query.TryGetValue("Edit", out editObj))
+            {
+                if (editObj is string editStr && bool.TryParse(editStr, out var editBool))
+                {
+                    _edit = editBool;
+                }
+                else if (editObj is bool editBoolVal)
+                {
+                    _edit = editBoolVal;
+                }
+                DisableFields(_edit);
+            }
+
             if (query.TryGetValue("id", out var idObj) || query.TryGetValue("Id", out idObj))
             {
                 int parsed = 0;
@@ -147,11 +177,13 @@ namespace MauiApp1.Front.Components.Books
                     LoadBook(_id);
                 }
             }
+
+            
         }
 
         private async void OnCancelClicked(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync("BookHome");
+            await Shell.Current.GoToAsync("bookhome");
         }
 
         private async void OnSubmitClicked(object sender, EventArgs e)
@@ -186,18 +218,18 @@ namespace MauiApp1.Front.Components.Books
                 // Map selected genres (if any) to enum list
                 if (vm.SelectedGenres != null && vm.SelectedGenres.Count > 0)
                 {
-                    book.Genre = vm.SelectedGenres.Select(g => (Genre)g.Value).ToList();
+                    book.Genre = vm.SelectedGenres.Select(g => g.Value).ToList();
                 }
                 else
                 {
-                    book.Genre = new List<Genre>();
+                    book.Genre = new List<int>();
                 }
 
-                var result = await _controller.SaveBookAsync(book, vm.NewBookSeriesName);
-                if (result >= 0)
+                var result = await _controller.SaveBookAsync(book, vm.NewBookSeriesName, vm.NewPublisher);
+                if (result)
                 {
                     await DisplayAlert("Saved", "Book saved successfully.", "OK");
-                    await Shell.Current.GoToAsync("BookHome");
+                    await Shell.Current.GoToAsync("bookhome");
                 }
                 else
                 {

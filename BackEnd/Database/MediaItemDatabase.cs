@@ -1,5 +1,5 @@
 ﻿using MauiApp1.BackEnd.Models;
-using MauiApp1.Modals;
+using MauiApp1.BackEnd.Models.Video;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -22,6 +22,10 @@ namespace MauiApp1.BackEnd.Database
                 var bookResult = await database.CreateTableAsync<Book>();
                 var publisherResult = await database.CreateTableAsync<Publisher>();
                 var bookSeriesResult = await database.CreateTableAsync<BookSeries>();
+
+                // Ensure video-related tables exist
+                var videoSeriesResult = await database.CreateTableAsync<VideoSeries>();
+                var videoResult = await database.CreateTableAsync<Video>();
             }
             catch (Exception ex)
             {

@@ -7,6 +7,8 @@ namespace MauiApp1.BackEnd.Models
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
         public string Title { get; set; }
+        public string Author { get; set; }
+        public string Artist { get; set; }
         public bool Ongoing { get; set; }
         public string Collecting { get; set; }
         public bool UpToDateComplete { get; set; }

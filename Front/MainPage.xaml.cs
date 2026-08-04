@@ -20,7 +20,13 @@ namespace MauiApp1
         private async void OnOpenBooksClicked(object sender, EventArgs e)
         {
             // Navigate to the Books page via the named route using absolute navigation
-            await Shell.Current.GoToAsync("bookhome");
+            await Shell.Current.GoToAsync("books");
+        }
+
+        private async void OnOpenVideoClicked(object sender, EventArgs e)
+        {
+            // Navigate to the Books page via the named route using absolute navigation
+            await Shell.Current.GoToAsync("videohome");
         }
     }
 }
