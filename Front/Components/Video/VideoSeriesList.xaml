@@ -8,13 +8,29 @@
     <ScrollView>
         <VerticalStackLayout>
             <HorizontalStackLayout>
-                <material:TextField
-                    Title="Search"
-                    Text="{Binding SearchText, Source={x:Reference this}}"
-                    TextChanged="TextField_TextChanged" HorizontalOptions="Fill"/>
-                <Button Text="Add" Clicked="AddButton_Clicked" HorizontalOptions="End" />
+                <Grid
+                    Padding="20"
+                    ColumnDefinitions="*,Auto"
+                    ColumnSpacing="16">
+                    <material:TextField
+                        Title="Search"
+                        Grid.Column="0"
+                        HorizontalOptions="FillAndExpand"
+                        Text="{Binding SearchText, Source={x:Reference this}}"
+                        TextChanged="TextField_TextChanged"
+                        VerticalOptions="Center" />
+                    <Button
+                        Grid.Column="1"
+                        Clicked="AddButton_Clicked"
+                        HorizontalOptions="End"
+                        Text="Add"
+                        VerticalOptions="Center" />
+                </Grid>
             </HorizontalStackLayout>
-            <material:DataGrid x:Name="VideoSeriesListDataGrid" ItemsSource="{Binding ItemsSource, Source={x:Reference this}}">
+            <material:DataGrid
+                x:Name="VideoSeriesListDataGrid"
+                BackgroundColor="White"
+                ItemsSource="{Binding ItemsSource, Source={x:Reference this}}">
 
                 <material:DataGrid.EmptyView>
                     <Label

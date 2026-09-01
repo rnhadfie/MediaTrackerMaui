@@ -6,6 +6,10 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using static MauiApp1.BackEnd.Shared.Enums;
+using MauiApp1.BackEnd.Models;
+using MauiApp1.Controllers;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace MauiApp1.Front.Components.Books.ViewModels
 {
@@ -23,18 +27,9 @@ namespace MauiApp1.Front.Components.Books.ViewModels
             Author.PropertyChanged += (_, __) => Notify(nameof(Author));
             Artist.PropertyChanged += (_, __) => Notify(nameof(Artist));
             IsEdit.PropertyChanged += (_, __) => Notify(nameof(IsEdit));
-            Format.PropertyChanged += (_, __) => Notify(nameof(Format));
-            Language.PropertyChanged += (_, __) => Notify(nameof(Language));
             Genre.CollectionChanged += (_, __) => Notify(nameof(Genre));
             IsEdit.PropertyChanged += (_, __) => Notify(nameof(IsEdit));
             GenreOptions.CollectionChanged += OnSelectedItemsChanged;
-
-            BookSeries.PropertyChanged += (_, __) =>
-            {
-                Notify(nameof(EnableNewSeries));
-                // sync selected object when the id changes
-                SyncSelectedBookSeriesFromBookSeries();
-            };
 
             Publisher.PropertyChanged += (_, __) =>
             {
@@ -43,13 +38,6 @@ namespace MauiApp1.Front.Components.Books.ViewModels
             };
 
             // Keep SelectedBookSeries/SelectedPublisher in sync when UI selects items
-            SelectedBookSeries.PropertyChanged += (_, __) =>
-            {
-                // when selected object changes, update the id value
-                var sel = SelectedBookSeries.Value;
-                BookSeries.Value = sel?.Value ?? 0;
-                Notify(nameof(SelectedBookSeries));
-            };
             SelectedPublisher.PropertyChanged += (_, __) =>
             {
                 var sel = SelectedPublisher.Value;
@@ -63,7 +51,7 @@ namespace MauiApp1.Front.Components.Books.ViewModels
             try
             {
                 if (Publishers == null) return;
-                var match = Publishers.Find(p => p.Value == Publisher.Value.GetValueOrDefault());
+                var match = Publishers.FirstOrDefault(p => p.Value == Publisher.Value.GetValueOrDefault());
                 if (match != null)
                 {
                     if (!EqualityComparer<TextValuePair<string,int>?>.Default.Equals(SelectedPublisher.Value, match))
@@ -82,6 +70,38 @@ namespace MauiApp1.Front.Components.Books.ViewModels
             }
         }
 
+        // Load a book by id and populate viewmodel fields
+        public async Task LoadAsync(int id)
+        {
+            if (id <= 0) return;
+
+            var controller = new BookController();
+            var book = await controller.GetBook(id);
+            if (book == null) return;
+
+            // Set the Value on existing Observable<T> instances so bindings remain intact
+            Id.Value = book.Id;
+            Title.Value = book.Title;
+            Author.Value = book.Author;
+            Artist.Value = book.Artist;
+            Publisher.Value = book.Publisher;
+
+            // Map genres (book.Genre -> selected ids)
+            Genre = new ObservableCollection<int>(book.Genre?.Select(g => (int)g) ?? new List<int>());
+
+            // Map selected genre objects if GenreOptions already loaded
+            try
+            {
+                SelectedGenres = GenreOptions?.Where(opt => Genre.Contains(opt.Value)).ToList() ?? new List<TextValuePair<string,int>>();
+            }
+            catch
+            {
+                SelectedGenres = new List<TextValuePair<string,int>>();
+            }
+
+            Type.Value = book.Type;
+        }
+
         private void OnSelectedItemsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
         }
@@ -92,12 +112,22 @@ namespace MauiApp1.Front.Components.Books.ViewModels
         public Observable<string?> Artist { get; set; } = new Observable<string?>(null);
 
         public Observable<int?> Publisher { get; set; } = new Observable<int?>(null);
+
+        public Observable<string?> NewPublisher { get; set; } = new Observable<string?>(null);
+
         public ObservableCollection<int> Genre { get; set; } = new ObservableCollection<int>();
-        public Observable<int> Format { get; set; } = new Observable<int>(0);
-        public Observable<string?> Volume { get; set; } = new Observable<string?>(null);
-        public Observable<bool> Read { get; set; } = new Observable<bool>(false);
+
+        public Observable<BookType> Type { get; set; } = new Observable<BookType>(BookType.Novel);
+
         public Observable<bool> IsEdit { get; set; } = new Observable<bool>(true);
-        public Observable<Language> Language { get; set; } = new Observable<Language>(default!);
+
+        public Observable<bool> Ongoing { get; set; } = new Observable<bool>(true);
+
+        public Observable<bool> Collecting { get; set; } = new Observable<bool>(false);
+        public Observable<bool> Completed { get; set; } = new Observable<bool>(false);
+        public Observable<int> Tag { get; set; } = new Observable<int>(-1);
+
+        public Observable<string?> NewTag { get; set; } = new Observable<string?>(null);
 
         // Selected items from multi-picker (stores selected option objects)
         public List<TextValuePair<string, int>> SelectedGenres { get; set; } = new List<TextValuePair<string, int>>();
@@ -108,47 +138,84 @@ namespace MauiApp1.Front.Components.Books.ViewModels
         public Observable<TextValuePair<string,int>?> SelectedBookSeries { get; set; } = new Observable<TextValuePair<string,int>?>(null);
         public Observable<TextValuePair<string,int>?> SelectedPublisher { get; set; } = new Observable<TextValuePair<string,int>?>(null);
 
+        public Observable<TextValuePair<string, int>?> SelectedTag{ get; set; } = new Observable<TextValuePair<string, int>?>(null);
+
         public Observable<int> BookSeries { get; set; } = new Observable<int>(0);
 
-        public Observable<bool> IsSeriesSelected { get; set; } = new Observable<bool>(false);
-        public Observable<BookType?> Type { get; set; } = new Observable<BookType?>(null);
 
         public Observable<string?> NewBookSeriesName { get; set; } = new Observable<string?>(null);
 
-        public Observable<string?> NewPublisher { get; set; } = new Observable<string?>(null);
-        public List<TextValuePair<string, int>> BookSeriesList { get; set; } = new List<TextValuePair<string, int>>();
-        public List<TextValuePair<string, int>> Publishers { get; set; } = new List<TextValuePair<string, int>>();
+        
+        public ObservableCollection<TextValuePair<string, int>> Publishers { get; set; } = new ObservableCollection<TextValuePair<string, int>>();
+
+        public ObservableCollection<TextValuePair<string, int>> Tags { get; set; } = new ObservableCollection<TextValuePair<string, int>>();
 
         public ObservableCollection<TextValuePair<string, int>> GenreOptions { get; set; } = new ObservableCollection<TextValuePair<string, int>>();
 
-        public bool EnableNewSeries => BookSeries.Value <= 0;
-
-        public bool EnablePublisher => Publisher.Value == null || Publisher.Value <= 0;
-
-        private void SyncSelectedBookSeriesFromBookSeries()
+        // Load setup data (publishers, genres, tags) into the view model
+        public async Task LoadSetupAsync()
         {
+            var controller = new BookController();
+            var setup = await controller.GetBookSetup();
+
+            if (setup?.Genre != null)
+            {
+                GenreOptions = setup.Genre;
+            }
+
+            // Map publishers from setup Publisher collection if present
             try
             {
-                if (BookSeriesList == null) return;
-                var match = BookSeriesList.Find(p => p.Value == BookSeries.Value);
-                if (match != null)
-                {
-                    // avoid reassigning same object reference
-                    if (!EqualityComparer<TextValuePair<string,int>?>.Default.Equals(SelectedBookSeries.Value, match))
-                    {
-                        SelectedBookSeries.Value = match;
-                    }
-                }
-                else
-                {
-                    SelectedBookSeries.Value = null;
-                }
+                var pubs = await controller.GetPublishersAsync();
+                Publishers = new ObservableCollection<TextValuePair<string, int>>(pubs.Select(p => new TextValuePair<string, int>(p.PublisherName ?? string.Empty, p.Id)).ToList());
             }
             catch
             {
-                // swallow - best effort sync
+                // ignore publisher load errors
             }
         }
+
+        // Book items for the current book (volumes/entries)
+        public ObservableCollection<BookItem> BookItems { get; set; } = new ObservableCollection<BookItem>();
+
+        public void AddBookItem(BookItem item)
+        {
+            if (item == null) return;
+            BookItems.Add(item);
+            SortBookItems();
+            Notify(nameof(BookItems));
+        }
+
+        public void RemoveBookItem(BookItem item)
+        {
+            if (item == null) return;
+            BookItems.Remove(item);
+            Notify(nameof(BookItems));
+        }
+
+        public void SortBookItems()
+        {
+            try
+            {
+                var ordered = BookItems.OrderBy(b =>
+                {
+                    if (int.TryParse(b.VolumeNumber, out var n)) return (object)n;
+                    return (object)(b.VolumeNumber ?? b.VolumeTitle ?? string.Empty);
+                }).ToList();
+
+                BookItems.Clear();
+                foreach (var it in ordered) BookItems.Add(it);
+            }
+            catch
+            {
+                // ignore ordering errors
+            }
+        }
+
+
+        public bool EnablePublisher => Publisher.Value == null || Publisher.Value <= 0;
+
+        public bool EnableTag => Tag.Value == -1;
     }
 }
 

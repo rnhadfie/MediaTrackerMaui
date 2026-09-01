@@ -39,7 +39,7 @@ namespace MauiApp1.BackEnd.Controllers.ViewModels
             VideoSetupViewModel videoSetupViewModel = new VideoSetupViewModel
             {
                 Video = new System.Collections.ObjectModel.ObservableCollection<Video>(videos),
-                VideoSeries = new System.Collections.ObjectModel.ObservableCollection<VideoSeries>(series),
+                VideoSeries = new System.Collections.ObjectModel.ObservableCollection<VideoItem>(series),
                 Genre = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(genres),
                 Format = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(formats),
                 Type = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(types),
@@ -61,7 +61,7 @@ namespace MauiApp1.BackEnd.Controllers.ViewModels
             VideoSetupViewModel videoSetupViewModel = new VideoSetupViewModel
             {
                 Video = new System.Collections.ObjectModel.ObservableCollection<Video>(videos),
-                VideoSeries = new System.Collections.ObjectModel.ObservableCollection<VideoSeries>(series),
+                VideoSeries = new System.Collections.ObjectModel.ObservableCollection<VideoItem>(series),
                 Genre = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(genres),
                 Format = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(formats),
                 Type = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(types),
@@ -85,17 +85,17 @@ namespace MauiApp1.BackEnd.Controllers.ViewModels
             return await _VideoService.DeleteVideoAsync(item);
         }
 
-        public async Task<VideoSeries> GetVideoSeriesAsync(int id)
+        public async Task<VideoItem> GetVideoSeriesAsync(int id)
         {
             return await _VideoService.GetVideoSeriesAsync(id);
         }
 
-        public async Task<List<VideoSeries>> GetAllVideoSeriesAsync()
+        public async Task<List<VideoItem>> GetAllVideoSeriesAsync()
         {
             return await _VideoService.GetAllVideoSeriesAsync();
         }
 
-        public async Task<int> SaveVideoSeriesAsync(VideoSeries item)
+        public async Task<int> SaveVideoSeriesAsync(VideoItem item)
         {
             await MediaItemDatabase.Init();
             if (item.Id != 0)
@@ -104,7 +104,7 @@ namespace MauiApp1.BackEnd.Controllers.ViewModels
                 return await MediaItemDatabase.database.InsertAsync(item);
         }
 
-        public async Task<int> DeleteVideoSeriesAsync(VideoSeries item)
+        public async Task<int> DeleteVideoSeriesAsync(VideoItem item)
         {
             await MediaItemDatabase.Init();
             return await MediaItemDatabase.database.DeleteAsync(item);
@@ -120,7 +120,7 @@ namespace MauiApp1.BackEnd.Controllers.ViewModels
 
             VideoSetupViewModel setup = new VideoSetupViewModel
             {
-                VideoSeries = new System.Collections.ObjectModel.ObservableCollection<VideoSeries>(series),
+                VideoSeries = new System.Collections.ObjectModel.ObservableCollection<VideoItem>(series),
                 Genre = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(genres),
                 Format = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(formats),
                 Type = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(types),

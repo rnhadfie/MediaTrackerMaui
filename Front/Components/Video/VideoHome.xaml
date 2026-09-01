@@ -17,31 +17,6 @@
 
     <Grid>
         <Grid ColumnDefinitions="*" RowDefinitions="Auto,*">
-            <HorizontalStackLayout Grid.Row="0">
-                <uranium:GridLayout
-                    Margin="20"
-                    ColumnCount="2"
-                    ColumnGridLength="1*"
-                    ColumnSpacing="16"
-                    RowCount="1"
-                    RowGridLength="1*"
-                    RowSpacing="16">
-                    <uranium:Dropdown
-                        x:Name="BookTypeDropDown"
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        ItemsSource="{Binding TypeOptions, Mode=TwoWay}"
-                        SelectedItem="{Binding SelectedType, Mode=TwoWay}" />
-                    <Button
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        Clicked="AddButton_Clicked"
-                        HorizontalOptions="End"
-                        Text="Add" />
-                </uranium:GridLayout>
-
-            </HorizontalStackLayout>
-
             <material:TabView Grid.Row="1">
                 <material:TabItem Title="Display">
                     <material:TabItem.Content>
@@ -54,59 +29,75 @@
                 </material:TabItem>
                 <material:TabItem Title="List">
                     <material:TabItem.Content>
-                        <material:DataGrid x:Name="VideoListDataGrid" ItemsSource="{Binding ListOfVideos}">
-                            <material:DataGrid.EmptyView>
-                                <Label
-                                    Padding="12"
-                                    HorizontalOptions="Center"
-                                    Text="No Videos" />
-                            </material:DataGrid.EmptyView>
+                        <VerticalStackLayout>
+                            <HorizontalStackLayout Grid.Row="0">
+                                <Grid
+                                    Padding="20"
+                                    ColumnDefinitions="*,Auto"
+                                    ColumnSpacing="16">
+                                    <uranium:Dropdown
+                                        x:Name="BookTypeDropDown"
+                                        Grid.Column="0"
+                                        HorizontalOptions="FillAndExpand"
+                                        ItemsSource="{Binding TypeOptions, Mode=TwoWay}"
+                                        SelectedItem="{Binding SelectedType, Mode=TwoWay}"
+                                        VerticalOptions="Center" />
+                                    <Button
+                                        Grid.Column="1"
+                                        Clicked="AddButton_Clicked"
+                                        HorizontalOptions="End"
+                                        Text="Add"
+                                        VerticalOptions="Center" />
+                                </Grid>
+                            </HorizontalStackLayout>
+                            <material:DataGrid
+                                x:Name="VideoListDataGrid"
+                                BackgroundColor="White"
+                                ItemsSource="{Binding ListOfVideos}">
 
-                            <material:DataGrid.Columns>
-                                <material:DataGridColumn Width="*">
-                                    <material:DataGridColumn.CellItemTemplate>
-                                        <DataTemplate>
-                                            <VerticalStackLayout>
-                                                <Label FontAttributes="Bold" Text="{Binding Title}" />
-                                                <Label FontAttributes="Italic" Text="{Binding Director}" />
-                                            </VerticalStackLayout>
-                                        </DataTemplate>
-                                    </material:DataGridColumn.CellItemTemplate>
-                                </material:DataGridColumn>
-                                <material:DataGridColumn Title="Actions" ValueBinding="{Binding Id}">
-                                    <material:DataGridColumn.CellItemTemplate>
-                                        <DataTemplate>
-                                            <Button
-                                                Clicked="Button_Clicked"
-                                                CommandParameter="{Binding .}"
-                                                Text="..." />
-                                        </DataTemplate>
-                                    </material:DataGridColumn.CellItemTemplate>
-                                </material:DataGridColumn>
-                            </material:DataGrid.Columns>
-                        </material:DataGrid>
+                                <material:DataGrid.EmptyView>
+                                    <Label
+                                        Padding="12"
+                                        HorizontalOptions="Center"
+                                        Text="No Videos" />
+                                </material:DataGrid.EmptyView>
+
+                                <material:DataGrid.Columns>
+                                    <material:DataGridColumn Width="*">
+                                        <material:DataGridColumn.CellItemTemplate>
+                                            <DataTemplate>
+                                                <VerticalStackLayout>
+                                                    <Label FontAttributes="Bold" Text="{Binding Title}" />
+                                                    <Label FontAttributes="Italic" Text="{Binding Director}" />
+                                                </VerticalStackLayout>
+                                            </DataTemplate>
+                                        </material:DataGridColumn.CellItemTemplate>
+                                    </material:DataGridColumn>
+                                    <material:DataGridColumn Title="Actions" ValueBinding="{Binding Id}">
+                                        <material:DataGridColumn.CellItemTemplate>
+                                            <DataTemplate>
+                                                <Button
+                                                    Clicked="Button_Clicked"
+                                                    CommandParameter="{Binding .}"
+                                                    Text="..." />
+                                            </DataTemplate>
+                                        </material:DataGridColumn.CellItemTemplate>
+                                    </material:DataGridColumn>
+                                </material:DataGrid.Columns>
+                            </material:DataGrid>
+                        </VerticalStackLayout>
+
                     </material:TabItem.Content>
                 </material:TabItem>
                 <material:TabItem Title="Series">
                     <material:TabItem.Content>
-                        <video:VideoSeriesList x:Name="VideoSeriesListView" EmptyViewText="No Series" />
+                        <video:VideoSeriesList
+                            x:Name="VideoSeriesListView"
+                            EmptyViewText="No Series"
+                            ItemsSource="{Binding ListOfVideoSeries}" />
                     </material:TabItem.Content>
                 </material:TabItem>
             </material:TabView>
         </Grid>
-
-        <Button
-            x:Name="AddFloatingButton"
-            Margin="20"
-            BackgroundColor="CadetBlue"
-            Clicked="ShowDialog_Clicked"
-            CornerRadius="28"
-            FontSize="20"
-            HeightRequest="56"
-            HorizontalOptions="End"
-            Text="+"
-            TextColor="White"
-            VerticalOptions="End"
-            WidthRequest="56" />
     </Grid>
 </ContentPage>

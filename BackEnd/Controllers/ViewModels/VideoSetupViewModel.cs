@@ -10,7 +10,7 @@ namespace MauiApp1.BackEnd.Controllers.ViewModels
 {
     public class VideoSetupViewModel
     {
-        public ObservableCollection<VideoSeries> VideoSeries { get; set; }
+        public ObservableCollection<VideoItem> VideoSeries { get; set; }
         public ObservableCollection<TextValuePair<string, int>> Genre { get; set; }
         public ObservableCollection<TextValuePair<string, int>> Format { get; set; }
         public ObservableCollection<TextValuePair<string, int>> Type { get; set; }
@@ -22,7 +22,7 @@ namespace MauiApp1.BackEnd.Controllers.ViewModels
 
         public VideoSetupViewModel()
         {
-            VideoSeries = new ObservableCollection<VideoSeries>();
+            VideoSeries = new ObservableCollection<VideoItem>();
             Genre = new ObservableCollection<TextValuePair<string, int>>();
             Format = new ObservableCollection<TextValuePair<string, int>>();
             Type = new ObservableCollection<TextValuePair<string, int>>();

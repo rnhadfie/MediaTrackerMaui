@@ -42,9 +42,9 @@ namespace MauiApp1.Front.Components.Books
 
             // Set the Value on existing Observable<T> instances so bindings remain intact
             vm.Id.Value = bookSeries.Id;
-            vm.Title.Value = bookSeries.Title;
-            vm.Author.Value = bookSeries.Author;
-            vm.Artist.Value = bookSeries.Artist;
+            //vm.Title.Value = bookSeries.Title;
+            //vm.Author.Value = bookSeries.Author;
+            //vm.Artist.Value = bookSeries.Artist;
    
             BindingContext = vm;
         }
@@ -76,14 +76,6 @@ namespace MauiApp1.Front.Components.Books
                 formats.Add(new TextValuePair<string, int>(item.Text, item.Value));
             }
 
-            foreach (var item in setup.Langauge)
-            {
-                UraniumUI.Material.Controls.RadioButton radioButton = new UraniumUI.Material.Controls.RadioButton();
-                radioButton.Text = item.Text;
-                radioButton.Value = item.Value;
-                //BookLanguageGroup.Children.Add(radioButton);
-            }
-
             // If an id was provided, load the book and map genre selections
             if (_id > 0)
             {
@@ -91,12 +83,12 @@ namespace MauiApp1.Front.Components.Books
                 if (bookSeries != null)
                 {
                     vm.Id.Value = bookSeries.Id;
-                    vm.Title.Value = bookSeries.Title;
-                    vm.Author.Value = bookSeries.Author;
-                    vm.Artist.Value = bookSeries.Artist;
-                    vm.Collecting.Value = bookSeries.Collecting;
-                    vm.Ongoing.Value = bookSeries.Ongoing;
-                    vm.Parent.Value = bookSeries.Parent;
+                    //vm.Title.Value = bookSeries.Title;
+                    //vm.Author.Value = bookSeries.Author;
+                    //vm.Artist.Value = bookSeries.Artist;
+                    //vm.Collecting.Value = bookSeries.Collecting;
+                    //vm.Ongoing.Value = bookSeries.Ongoing;
+                    //vm.Parent.Value = bookSeries.Parent;
                 }
             }
 
@@ -162,16 +154,16 @@ namespace MauiApp1.Front.Components.Books
 
             try
             {
-                var bookSeries = new BookSeries
+                var bookSeries = new BookItem
                 {
                     Id = vm.Id.Value,
-                    Title = vm.Title.Value,
-                    Author = vm.Author.Value,
-                     Artist = vm.Artist.Value,
-                    Collecting = vm.Collecting.Value,
-                    Ongoing = vm.Ongoing.Value,
-                    Parent = vm.Parent.Value,
-                    UpToDateComplete = vm.UpToDateComplete.Value,
+                   // Title = vm.Title.Value,
+                   // Author = vm.Author.Value,
+                    // Artist = vm.Artist.Value,
+                  //  Collecting = vm.Collecting.Value,
+                  //  Ongoing = vm.Ongoing.Value,
+                  //  Parent = vm.Parent.Value,
+                  //  UpToDateComplete = vm.UpToDateComplete.Value,
                 };
 
                 

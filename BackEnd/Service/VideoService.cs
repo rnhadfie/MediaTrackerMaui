@@ -41,26 +41,27 @@ namespace MauiApp1.BackEnd.Service
             return video;
         }
 
-        public async Task<VideoSeries> GetVideoSeriesAsync(int id)
+        public async Task<VideoItem> GetVideoSeriesAsync(int id)
         {
-            VideoSeries videoSeries = await _VideoRepository.GetVideoSeriesAsync(id);
+            VideoItem videoSeries = await _VideoRepository.GetVideoSeriesAsync(id);
             return videoSeries;
         }
 
         public async Task<bool> SaveVideoAsync(Video item, string newSeries)
         {
+            /*
             bool result = true;
             try
             {
-                if (!string.IsNullOrWhiteSpace(newSeries) && item.SeriesId <= 0)
+                if (!string.IsNullOrWhiteSpace(newSeries) && item.Series <= 0)
                 {
-                    VideoSeries videoSeries = new VideoSeries
+                    VideoItem videoSeries = new VideoItem
                     {
                         Title = newSeries,
 
                     };
                     int id = await _VideoRepository.SaveVideoSeriesAsync(videoSeries);
-                    item.SeriesId = id;
+                    item.Series = id;
 
                     result = result && id > 0;
 
@@ -70,7 +71,8 @@ namespace MauiApp1.BackEnd.Service
             catch (Exception ex)
             {
                 return false;
-            }
+            } */
+            return false;
 
         }
 
@@ -81,16 +83,16 @@ namespace MauiApp1.BackEnd.Service
         }
 
 
-        public async Task<List<VideoSeries>> GetAllVideoSeriesAsync()
+        public async Task<List<VideoItem>> GetAllVideoSeriesAsync()
         {
             return await _VideoRepository.GetAllVideoSeriesAsync();
         }
 
-        public async Task<int> SaveVideoSeriesAsync(VideoSeries item)
+        public async Task<int> SaveVideoSeriesAsync(VideoItem item)
         {
             return await _VideoRepository.SaveVideoSeriesAsync(item);
         }
-        public async Task<int> DeleteVideoSeriesAsync(VideoSeries item)
+        public async Task<int> DeleteVideoSeriesAsync(VideoItem item)
         {
             return await _VideoRepository.DeleteVideoSeriesAsync(item);
         }
@@ -113,7 +115,7 @@ namespace MauiApp1.BackEnd.Service
         public async Task<XLWorkbook> ExportVideoData(XLWorkbook workBook)
         {
             List<Video> videos = await _VideoRepository.GetVideosAsync();
-            List<VideoSeries> videoSeries = await _VideoRepository.GetAllVideoSeriesAsync();
+            List<VideoItem> videoSeries = await _VideoRepository.GetAllVideoSeriesAsync();
 
             var videoSheet = workBook.AddWorksheet("Videos");
             videoSheet.Cell(1, 1).InsertData(videos, true);
@@ -176,8 +178,8 @@ namespace MauiApp1.BackEnd.Service
             }
             return list;
         } 
-
-        public List<VideoSeries> ReadVideoSeriesFromExcel(XLWorkbook wb)
+        /*
+        public List<VideoItem> ReadVideoSeriesFromExcel(XLWorkbook wb)
         {
             var ws = wb.Worksheet(2);
             var headerRow = ws.Row(1);
@@ -185,10 +187,10 @@ namespace MauiApp1.BackEnd.Service
                 .Select((c, i) => new { Name = c.GetString().Trim(), Index = i + 1 })
                 .ToDictionary(x => x.Name, x => x.Index);
 
-            var list = new List<VideoSeries>();
+            var list = new List<VideoItem>();
             foreach (var row in ws.RowsUsed().Skip(1))
             {
-                var dto = new VideoSeries
+                var dto = new VideoItem
                 {
                     Id = headers.ContainsKey("Id") ? int.TryParse(row.Cell(headers["Id"]).GetString(), out var id) ? id : 0 : 0,
                     Title = headers.ContainsKey("Title") ? row.Cell(headers["Title"]).GetString() : null,
@@ -201,7 +203,7 @@ namespace MauiApp1.BackEnd.Service
             }
             return list;
         }
-
+        /*
         public Book MapDtoToBook(BookExcelDto dto)
         {
 
@@ -234,6 +236,6 @@ namespace MauiApp1.BackEnd.Service
                 Type = (BookType)(int.TryParse(dto.Type, out var t) ? t : default)
             };
             return book.GetBook();
-        }
+        }*/
     }
 }

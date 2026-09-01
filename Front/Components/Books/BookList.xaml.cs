@@ -18,28 +18,28 @@ public partial class BookList : ContentView
 
     public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(
         nameof(ItemsSource),
-        typeof(IEnumerable<BookDT>),
+        typeof(IEnumerable<Book>),
         typeof(BookList),
-        default(IEnumerable<BookDT>),
+        default(IEnumerable<Book>),
         propertyChanged: OnItemsSourceChanged);
 
-    public IEnumerable<BookDT> ItemsSource
+    public IEnumerable<Book> ItemsSource
     {
-        get => (IEnumerable<BookDT>)GetValue(ItemsSourceProperty);
+        get => (IEnumerable<Book>)GetValue(ItemsSourceProperty);
         set => SetValue(ItemsSourceProperty, value);
     }
 
-    public IEnumerable<BookDT> OriginalBooks { get; set; }
+    public IEnumerable<Book> OriginalBooks { get; set; }
 
     private static void OnItemsSourceChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is BookList control)
         {
-            control.OnItemsSourceChanged((IEnumerable<BookDT>)oldValue, (IEnumerable<BookDT>)newValue);
+            control.OnItemsSourceChanged((IEnumerable<Book>)oldValue, (IEnumerable<Book>)newValue);
         }
     }
 
-    private void OnItemsSourceChanged(IEnumerable<BookDT> oldValue, IEnumerable<BookDT> newValue)
+    private void OnItemsSourceChanged(IEnumerable<Book> oldValue, IEnumerable<Book> newValue)
     {
         // If the inner list view uses ItemsSource binding, update it directly
         if (newValue == null)
@@ -49,10 +49,10 @@ public partial class BookList : ContentView
             return;
         }
 
-        BookListDataGrid.ItemsSource = (ObservableCollection<BookDT>)newValue;
+        BookListDataGrid.ItemsSource = (ObservableCollection<Book>)newValue;
         if (!filtering)
         {
-            OriginalBooks = (ObservableCollection<BookDT>)newValue;
+            OriginalBooks = (ObservableCollection<Book>)newValue;
         }
     }
 
@@ -105,13 +105,24 @@ public partial class BookList : ContentView
         
     }
 
+    private async void AddButton_Clicked(object sender, EventArgs e)
+    {
+        // Prompt the user to choose between adding an item or a series
+        var choice = await Application.Current.MainPage.DisplayActionSheet("Add", "Cancel", null, "Item", "Series");
+        if (string.IsNullOrEmpty(choice) || choice == "Cancel") return;
+        if (choice == "Item")
+        {
+            await Shell.Current.GoToAsync($"/BookForm?id=0&edit=true");
+        }
+    }
+
     private async void Button_Clicked(object sender, EventArgs e)
     {
         try
         {
             if (sender is Button btn)
             {
-                BookDT book = (BookDT)btn.CommandParameter;
+                Book book = (Book)btn.CommandParameter;
 
                 // Show a bottom-sheet style action sheet using the platform ActionSheet
                 // This is a lightweight bottom sheet alternative that works across MAUI

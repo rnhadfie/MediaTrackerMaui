@@ -1,3 +1,4 @@
+using System.Linq;
 using MauiApp1.BackEnd.Models;
 using MauiApp1.BackEnd.Shared;
 using MauiApp1.Controllers;
@@ -26,44 +27,7 @@ namespace MauiApp1.Front.Components.Books
 
         }
 
-        private async 
-        Task
-        LoadBook(int id)
-        {
-            // kept for synchronous callers - call the async variant where possible
-            var book = await _controller.GetBook(id);
-            
-            if (book == null) return;
-
-            var vm = (BindingContext as BookFormViewModel) ?? new BookFormViewModel();
-
-            // Set the Value on existing Observable<T> instances so bindings remain intact
-            vm.Id.Value = book.Id;
-            vm.Title.Value = book.Title;
-            vm.Author.Value = book.Author;
-            vm.Artist.Value = book.Artist;
-            vm.Publisher.Value = book.Publisher;
-            vm.Volume.Value = string.Join(',', book.Volume ?? new List<int>());
-            vm.Genre = new ObservableCollection<int>(book.Genre?.Select(g => (int)g) ?? new List<int>());
-            vm.Format.Value = (int)book.Format;
-            vm.Read.Value = book.Read;
-            vm.Language.Value = book.Language;
-            vm.BookSeries.Value = book.BookSeries;
-            vm.Type.Value = book.Type;
-
-            vm.IsEdit = _edit;
-
-
-            // map genres: book.Genre is List<Genre> (enum) -> map to TextValuePair list if available in setup
-            // Leave SelectedGenres empty for now; Set via async setup loader when available
-
-
-            BindingContext = vm;
-
-            BookGenrePicker.SelectedValues = vm.Genre;
-            //BookLanguageGroup.SelectedItem = vm.Language;
-            BookFormatGroup.SelectedValue = vm.Format;
-        }
+        // Book loading moved to the ViewModel: call await vm.LoadAsync(id) instead
 
         private void DisableFields(bool isEnabled)
         {
@@ -71,73 +35,43 @@ namespace MauiApp1.Front.Components.Books
             BookTitle.IsEnabled = isEnabled;
             BookAuthor.IsEnabled = isEnabled;
             BookPublisherPicker.IsEnabled = isEnabled;
-            BookFormatGroup.IsEnabled = isEnabled;
             BookGenrePicker.IsEnabled = isEnabled;
             NewPublisher.IsEnabled = isEnabled;
-            NewBookSeries.IsEnabled = isEnabled;
-            BookSeriesPicker.IsEnabled = isEnabled;
 
         }
         protected override async void OnAppearing()
         {
             base.OnAppearing();
 
-            // load setup and book data asynchronously and update ViewModel
-            var setup = await _controller.GetBookSetup();
-            await LoadBook(_id);
-
             var vm = (BindingContext as BookFormViewModel) ?? new BookFormViewModel();
 
-            // populate lists
-            vm.BookSeriesList = setup.BookSeries?.Select(s => new TextValuePair<string,int>(s.Title, s.Id)).ToList() ?? new List<TextValuePair<string,int>>();
-            vm.Publishers = setup.Publisher?.Select(p => new TextValuePair<string,int>(p.PublisherName ?? string.Empty, p.Id)).ToList() ?? new List<TextValuePair<string,int>>();
-            vm.GenreOptions = setup.Genre != null
-                ? setup.Genre
-                : new ObservableCollection<TextValuePair<string, int>>();
+            // let the VM load setup data (genres, publishers, etc.)
+            await vm.LoadSetupAsync();
 
-            BookSeriesPicker.ItemsSource = new ObservableCollection<TextValuePair<string, int>>(vm.BookSeriesList);
+            // load the book data and leave selections in the VM via ViewModel
+            await vm.LoadAsync(_id);
+
+            // Populate BookItems for this book from the setup (BookSeries in setup are actually BookItem entries)
+            try
+            {
+                var setup = await _controller.GetBookSetup();
+                var items = setup.BookSeries?.Where(i => i.Series == vm.Id.Value).OrderBy(i =>
+                {
+                    if (int.TryParse(i.VolumeNumber, out var n)) return (object)n;
+                    return (object)(i.VolumeNumber ?? i.VolumeTitle ?? string.Empty);
+                }).ToList() ?? new List<BookItem>();
+
+                vm.BookItems = new ObservableCollection<BookItem>(items);
+            }
+            catch
+            {
+                vm.BookItems = new ObservableCollection<BookItem>();
+            }
+
             BookGenrePicker.ItemsSource = new ObservableCollection<TextValuePair<string, int>>(vm.GenreOptions);
 
-
-            BookPublisherPicker.ItemsSource = new ObservableCollection<TextValuePair<string, int>>(vm.Publishers);
-
-            List<TextValuePair<string, int>> formats = new List<TextValuePair<string, int>>();
-            foreach (var item in setup.Format)
-            {
-                UraniumUI.Material.Controls.RadioButton radioButton = new UraniumUI.Material.Controls.RadioButton();
-                formats.Add(new TextValuePair<string, int>(item.Text, item.Value));
-            }
-            BookFormatGroup.ItemsSource = formats;
-
-            foreach (var item in setup.Langauge)
-            {
-                UraniumUI.Material.Controls.RadioButton radioButton = new UraniumUI.Material.Controls.RadioButton();
-                radioButton.Text = item.Text;
-                radioButton.Value = item.Value;
-                //BookLanguageGroup.Children.Add(radioButton);
-            }
-
-            // If an id was provided, load the book and map genre selections
-            if (_id > 0)
-            {
-                var book = await _controller.GetBookAsync(_id);
-                if (book != null)
-                {
-                    vm.Id.Value = book.Id;
-                    vm.Title.Value = book.Title;
-                    vm.Author.Value = book.Author;
-                    vm.Artist.Value = book.Artist;
-                    vm.Publisher.Value = book.Publisher;
-                    vm.Volume.Value = string.Join(',', book.Volume ?? new List<int>());
-                    vm.Format.Value = (int)book.Format;
-                    vm.Read.Value = book.Read;
-                    vm.Language.Value = book.Language;
-                    vm.BookSeries.Value = book.BookSeries;
-                    vm.Type.Value = book.Type;
-                }
-            }
-
             BindingContext = vm;
+
         }
 
         // IQueryAttributable implementation - called when navigating with Shell query parameters
@@ -174,7 +108,10 @@ namespace MauiApp1.Front.Components.Books
 
                 if (_id > 0)
                 {
-                    LoadBook(_id);
+                    // kick off VM load (fire-and-forget to mirror previous behavior)
+                    var vm = (BindingContext as BookFormViewModel) ?? new BookFormViewModel();
+                    _ = vm.LoadAsync(_id);
+                    BindingContext = vm;
                 }
             }
 
@@ -198,19 +135,14 @@ namespace MauiApp1.Front.Components.Books
 
             try
             {
-                var book = new BookDT
+                var book = new Book
                 {
                     Id = vm.Id.Value,
                     Title = vm.Title.Value,
                     Author = vm.Author.Value,
                     Artist = vm.Artist.Value,
                     Publisher = vm.Publisher.Value,
-                    Volume = vm.Volume.Value != null ? vm.Volume.Value.Split(',').Select(s => int.TryParse(s, out var v) ? v : 0).ToList() : new List<int>(),
-                    Format = (BookFormat)vm.Format.Value,
-                    Read = vm.Read.Value,
-                    Language = vm.Language.Value,
-                    BookSeries = vm.BookSeries.Value,
-                    Type = vm.Type.Value
+                    //Type = vm.Type.Value!
                 };
 
                 
@@ -225,15 +157,16 @@ namespace MauiApp1.Front.Components.Books
                     book.Genre = new List<int>();
                 }
 
-                var result = await _controller.SaveBookAsync(book, vm.NewBookSeriesName, vm.NewPublisher);
+                // Save book and its items in bulk
+                var result = await _controller.SaveBookAsync(book, vm.BookItems?.ToList(), vm.NewBookSeriesName, vm.NewPublisher);
                 if (result)
                 {
-                    await DisplayAlert("Saved", "Book saved successfully.", "OK");
+                    await DisplayAlert("Saved", "Book and items saved successfully.", "OK");
                     await Shell.Current.GoToAsync("bookhome");
                 }
                 else
                 {
-                    await DisplayAlert("Error", "Failed to save book.", "OK");
+                    await DisplayAlert("Error", "Failed to save book and/or items.", "OK");
                 }
             }
             catch (Exception ex)
@@ -241,5 +174,117 @@ namespace MauiApp1.Front.Components.Books
                 await DisplayAlert("Error", $"Save failed: {ex.Message}", "OK");
             }
         }
+
+        private async void OnAddItemClicked(object sender, EventArgs e)
+        {
+            var vm = BindingContext as BookFormViewModel;
+            if (vm == null) return;
+
+            // create a new blank BookItem and persist it
+            var newItem = new BookItem
+            {
+                Series = vm.Id.Value,
+                VolumeNumber = string.Empty,
+                VolumeTitle = "",
+                Read = false,
+                Owned = false,
+                Format = 0
+            };
+
+            try
+            {
+                var id = await _controller.SaveBookSeriesAsync(newItem);
+                if (id > 0)
+                {
+                    newItem.Id = id;
+                }
+            }
+            catch
+            {
+                // ignore persistence errors for now
+            }
+
+            vm.AddBookItem(newItem);
+        }
+
+        private async void OnRemoveItemClicked(object sender, EventArgs e)
+        {
+            var vm = BindingContext as BookFormViewModel;
+            if (vm == null) return;
+            if (sender is Button btn && btn.CommandParameter is BookItem item)
+            {
+                var confirm = await DisplayAlert("Confirm", "Remove this item?", "Yes", "No");
+                if (!confirm) return;
+
+                try
+                {
+                    if (item.Id != 0)
+                    {
+                        await _controller.DeleteBookSeriesAsync(item);
+                    }
+                }
+                catch
+                {
+                    // ignore deletion errors
+                }
+
+                vm.RemoveBookItem(item);
+            }
+        }
+
+        private async void OnEditItemClicked(object sender, EventArgs e)
+        {
+            var vm = BindingContext as BookFormViewModel;
+            if (vm == null) return;
+            if (sender is Button btn && btn.CommandParameter is BookItem item)
+            {
+                await EditBookItemAsync(item);
+                vm.SortBookItems();
+            }
+        }
+
+        private async Task EditBookItemAsync(BookItem item)
+        {
+            if (item == null) return;
+            try
+            {
+                // Prompt for Volume Number (allow empty)
+                var volNum = await DisplayPromptAsync("Edit Item", "Volume number (leave empty if none)", initialValue: item.VolumeNumber ?? string.Empty);
+                if (volNum != null)
+                {
+                    item.VolumeNumber = volNum;
+                }
+
+                // Prompt for Volume Title
+                var volTitle = await DisplayPromptAsync("Edit Item", "Volume title", initialValue: item.VolumeTitle ?? string.Empty);
+                if (volTitle != null)
+                {
+                    item.VolumeTitle = volTitle;
+                }
+
+                // persist changes if possible
+                try
+                {
+                    var id = await _controller.SaveBookSeriesAsync(item);
+                    if (id > 0)
+                    {
+                        item.Id = id;
+                    }
+                }
+                catch
+                {
+                    // ignore persistence errors for now
+                }
+                // update vm collection ordering
+                var vm = BindingContext as BookFormViewModel;
+                vm?.SortBookItems();
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", $"Edit failed: {ex.Message}", "OK");
+            }
+        }
+
+       
     }
 }

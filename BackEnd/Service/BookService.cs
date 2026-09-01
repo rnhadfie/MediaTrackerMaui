@@ -17,92 +17,73 @@ namespace MauiApp1.BackEnd.Service
             BookRepository = new Lazy<BookRepository>(() => new BookRepository());
             _BookRepository = BookRepository.Value;
         }
+        
 
-        public async Task<List<BookDT>> GetBooksAsync()
+        public async Task<List<Book>> GetBooksAsync()
         {
             List<Book> books = await _BookRepository.GetBooksAsync();
-            List<BookDT> bookDTs = new List<BookDT>();
+            /*List<BookDT> bookDTs = new List<BookDT>();
             if (books != null && books.Count > 0)
             {
                 foreach (var book in books)
                 {
                     bookDTs.Add(book.GetBook());
                 }
-            }
-            return bookDTs;
+            }*/
+            return books;
         }
 
-        public async Task<List<BookDT>> GetBooksNotReadAsync()
+        public async Task<List<Book>> GetBooksNotReadAsync()
         {
             List<Book> books = await _BookRepository.GetBooksNotReadAsync();
-            List<BookDT> bookDTs = new List<BookDT>();
+            /*List<BookDT> bookDTs = new List<BookDT>();
             if (books != null && books.Count > 0)
             {
                 foreach (var book in books)
                 {
                     bookDTs.Add(book.GetBook());
                 }
-            }
-            return bookDTs;
+            }*/
+            return books;
         }
 
-        public async Task<BookDT> GetBookAsync(int id)
+        public async Task<Book> GetBookAsync(int id)
         {
             Book book = await _BookRepository.GetBookAsync(id);
-            return book.GetBook();
+            return book;
         }
 
-        public async Task<BookSeries> GetBookSeriesAsync(int id)
+        public async Task<BookItem> GetBookSeriesAsync(int id)
         {
-            BookSeries bookSeries = await _BookRepository.GetBookSeriesAsync(id);
+            BookItem bookSeries = await _BookRepository.GetBookSeriesAsync(id);
             return bookSeries;
         }
 
-        public async Task<bool> SaveBookAsync(BookDT item, string newSeries, string newPublisher)
+        public async Task<int> SaveBookAsync(Book item, string newSeries, string newPublisher)
         {
-            bool result = true;
             try
             {
-                if (!string.IsNullOrWhiteSpace(newSeries) && item.BookSeries <= 0)
-                {
-                    BookSeries bookSeries = new BookSeries
-                    {
-                        Title = newSeries,
-                        Author = item.Author,
-                        Artist = item.Artist
-
-                    };
-                    int id = await _BookRepository.SaveBookSeriesAsync(bookSeries);
-                    item.BookSeries = id;
-                    
-                    result = result && id > 0;
-
-                }
-                if (!string.IsNullOrWhiteSpace(newPublisher) && (item.Publisher == null || item.Publisher <= 0))
-                {
-                    Publisher newPublisherObj = new Publisher
-                    {
-                        PublisherName = newPublisher
-                    };
-                    int pubId = await _BookRepository.SavePublisherAsync(newPublisherObj);
-                    item.Publisher = pubId;
-                    result = result && pubId > 0;
-                }
-
-
-                return result && await _BookRepository.SaveBookAsync(item.GetBook()) > 0;
+                var result = await _BookRepository.SaveBookAsync(item);
+                return result;
             }
             catch (Exception ex)
             {
-                return false;
+                return -1;
             }
-            
         }
 
-        public async Task<int> DeleteBookAsync(BookDT item)
+        public async Task<bool> SaveBookSeriesAsync(List<BookItem> series)
         {
+            return await _BookRepository.SaveBookSeriesAsync(series);
+        }
+        public async Task<bool> SaveBookAndSeriesAsync(Book book, List<BookItem> series, string newPublisherName)
+        {
+            return await _BookRepository.SaveBookAndSeriesAsync(book, series, newPublisherName);
+        }
 
-            return await _BookRepository.DeleteBookAsync(item.GetBook());
+        public async Task<int> DeleteBookAsync(Book item)
+        {
+            return await _BookRepository.DeleteBookAsync(item);
         }
 
         public async Task<List<Publisher>> GetPublishersAsync()
@@ -120,16 +101,17 @@ namespace MauiApp1.BackEnd.Service
             return await _BookRepository.DeletePublisherAsync(item);
         }
 
-        public async Task<List<BookSeries>> GetAllBookSeriesAsync()
+        public async Task<List<BookItem>> GetAllBookSeriesAsync()
         {
             return await _BookRepository.GetAllBookSeriesAsync();
         }
 
-        public async Task<int> SaveBookSeriesAsync(BookSeries item)
+        public async Task<int> SaveBookSeriesAsync(BookItem item)
         {
             return await _BookRepository.SaveBookSeriesAsync(item);
         }
-         public async Task<int> DeleteBookSeriesAsync(BookSeries item)
+
+        public async Task<int> DeleteBookSeriesAsync(BookItem item)
         {
             return await _BookRepository.DeleteBookSeriesAsync(item);
         }
@@ -139,7 +121,7 @@ namespace MauiApp1.BackEnd.Service
             return Enum.GetValues(typeof(BookFormat)).Cast<BookFormat>().Select(g => new TextValuePair<string, int>(g.ToString(), (int)g)).ToList();
         }
 
-         public List<TextValuePair<string, int>> GetBookTypes()
+        public List<TextValuePair<string, int>> GetBookTypes()
         {
             return Enum.GetValues(typeof(BookType)).Cast<BookType>().Select(g => new TextValuePair<string, int>(g.ToString(), (int)g)).ToList();
         }
@@ -148,7 +130,7 @@ namespace MauiApp1.BackEnd.Service
         {
             List<Book> books = await _BookRepository.GetBooksAsync();
             List<Publisher> publishers = await _BookRepository.GetPublishersAsync();
-            List<BookSeries> bookSeries = await _BookRepository.GetAllBookSeriesAsync();
+            List<BookItem> bookSeries = await _BookRepository.GetAllBookSeriesAsync();
 
             var bookSheet = workBook.AddWorksheet("Books");
             bookSheet.Cell(1, 1).InsertData(books, true);
@@ -162,7 +144,7 @@ namespace MauiApp1.BackEnd.Service
             return workBook;
         }
 
-
+        /*
 
         public async Task<bool> ImportBookDataFromExcel(XLWorkbook wb)
         {
@@ -186,7 +168,7 @@ namespace MauiApp1.BackEnd.Service
                 return false;
             }
         }
-
+        
         public List<BookExcelDto> ReadBooksFromExcel(XLWorkbook wb)
         {
             var ws = wb.Worksheet(1);
@@ -239,7 +221,7 @@ namespace MauiApp1.BackEnd.Service
             return list;
         }
 
-        public List<BookSeries> ReadBookSeriesFromExcel(XLWorkbook wb)
+        public List<BookItem> ReadBookSeriesFromExcel(XLWorkbook wb)
         {
             var ws = wb.Worksheet(2);
             var headerRow = ws.Row(1);
@@ -247,10 +229,10 @@ namespace MauiApp1.BackEnd.Service
                 .Select((c, i) => new { Name = c.GetString().Trim(), Index = i + 1 })
                 .ToDictionary(x => x.Name, x => x.Index);
 
-            var list = new List<BookSeries>();
+            var list = new List<BookItem>();
             foreach (var row in ws.RowsUsed().Skip(1))
             {
-                var dto = new BookSeries
+                var dto = new BookItem
                 {
                     Id = headers.ContainsKey("Id") ? int.TryParse(row.Cell(headers["Id"]).GetString(), out var id) ? id : 0 : 0,
                     Title = headers.ContainsKey("Title") ? row.Cell(headers["Title"]).GetString() : null,
@@ -298,7 +280,7 @@ namespace MauiApp1.BackEnd.Service
                 Type = (BookType)(int.TryParse(dto.Type, out var t) ? t : default)
             };
             return book.GetBook();
-        }
+        } */
 
 
     }

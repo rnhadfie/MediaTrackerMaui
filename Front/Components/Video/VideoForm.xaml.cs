@@ -40,12 +40,12 @@ public partial class VideoForm : ContentPage, IQueryAttributable
         var vm = (BindingContext as VideoFormViewModel) ?? new VideoFormViewModel();
 
         // Set the Value on existing Observable<T> instances so bindings remain intact
-        vm.Id.Value = video.Id.Value;
-        vm.Name.Value = video.Name;
-        vm.Season.Value = video.Season;
-        vm.Genre = new ObservableCollection<int>(video.Genre?.Select(g => (int)g) ?? new List<int>());
-        vm.Format.Value = (int)video.Format;
-        vm.Watched.Value = video.Watched;
+        //vm.Id.Value = video.Id.Value;
+        //vm.Name.Value = video.Name;
+        //vm.Season.Value = video.Season;
+        //vm.Genre = new ObservableCollection<int>(video.Genre?.Select(g => (int)g) ?? new List<int>());
+        //vm.Format.Value = (int)video.Format;
+        //  vm.Watched.Value = video.Watched;
         //vm.Language.Value = new ObservableCollection<int>(video.Language?.Select(g => (int)g) ?? new List<int>()); ;
         //vm.SelectedVideoSeries.Value = video.SeriesId;
         vm.Type.Value = video.Type;
@@ -74,7 +74,7 @@ public partial class VideoForm : ContentPage, IQueryAttributable
         var vm = (BindingContext as VideoFormViewModel) ?? new VideoFormViewModel();
 
         // populate lists
-        vm.VideoSeriesList = setup.VideoSeries?.Select(s => new TextValuePair<string, int>(s.Title, s.Id)).ToList() ?? new List<TextValuePair<string, int>>();
+        vm.VideoSeriesList = setup.VideoSeries?.Select(s => new TextValuePair<string, int>(s.DiscTitle, s.Id)).ToList() ?? new List<TextValuePair<string, int>>();
 
         vm.GenreOptions = setup.Genre != null
             ? setup.Genre
@@ -96,12 +96,12 @@ public partial class VideoForm : ContentPage, IQueryAttributable
             var video = await _controller.GetVideoAsync(_id);
             if (video != null)
             {
-                vm.Id.Value = video.Id.Value;
-                vm.Name.Value = video.Name;
-                vm.Season.Value = video.Season;
-                vm.Format.Value = (int)video.Format;
-                vm.Read.Value = video.Watched;
-                vm.SeriesId.Value = video.SeriesId;
+               // vm.Id.Value = video.Id.Value;
+                //vm.Name.Value = video.Name;
+                //vm.Season.Value = video.Season;
+                //vm.Format.Value = (int)video.Format;
+               // vm.Read.Value = video.Watched;
+               // vm.SeriesId.Value = video.SeriesId;
                 vm.Type.Value = video.Type;
             }
         }
@@ -166,10 +166,10 @@ public partial class VideoForm : ContentPage, IQueryAttributable
             var video = new Video
             {
                 Id = vm.Id.Value,
-                Name = vm.Name.Value,
-                Season = vm.Season.Value ?? -1,
-                Format = (VideoFormat)vm.Format.Value,
-                Watched = vm.Read.Value,
+               // Name = vm.Name.Value,
+                //Season = vm.Season.Value ?? -1,
+                //Format = (VideoFormat)vm.Format.Value,
+               // Watched = vm.Read.Value,
                 Type = (VideoType)vm.Type.Value
             };
 

@@ -45,10 +45,10 @@ public partial class VideoSeriesForm : ContentPage
 
         // Set the Value on existing Observable<T> instances so bindings remain intact
         vm.Id.Value = videoSeries.Id;
-        vm.Title.Value = videoSeries.Title;
-        vm.Collecting.Value = videoSeries.Collecting;
-        vm.Ongoing.Value = videoSeries.Ongoing;
-        vm.Parent.Value = videoSeries.Parent;
+        //vm.Title.Value = videoSeries.Title;
+        //vm.Collecting.Value = videoSeries.Collecting;
+        //vm.Ongoing.Value = videoSeries.Ongoing;
+        //vm.Parent.Value = videoSeries.Parent;
 
 
         // Ensure the viewmodel's edit mode matches the parsed query value
@@ -63,26 +63,28 @@ public partial class VideoSeriesForm : ContentPage
         VideoSeriesCollecting.IsEnabled = isEnabled;
         VideoSeriesParent.IsEnabled = isEnabled;
     }
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
 
-        // load setup and book data asynchronously and update ViewModel
-        var setup = await _controller.GetVideoSetup();
-        await LoadBook(_id);
+            var vm = (BindingContext as VideoSeriesFormViewModel) ?? new VideoSeriesFormViewModel();
 
-        var vm = (BindingContext as VideoSeriesFormViewModel) ?? new VideoSeriesFormViewModel();
+            // let the VM load setup data (genres, formats)
+            await vm.LoadSetupAsync();
+
+            await LoadBook(_id);
+
 
 
 
         List<TextValuePair<string, int>> formats = new List<TextValuePair<string, int>>();
-        foreach (var item in setup.Format)
+        foreach (var item in vm.Format)
         {
             UraniumUI.Material.Controls.RadioButton radioButton = new UraniumUI.Material.Controls.RadioButton();
             formats.Add(new TextValuePair<string, int>(item.Text, item.Value));
         }
 
-        foreach (var item in setup.Langauge)
+        foreach (var item in vm.Langauge)
         {
             UraniumUI.Material.Controls.RadioButton radioButton = new UraniumUI.Material.Controls.RadioButton();
             radioButton.Text = item.Text;
@@ -97,10 +99,10 @@ public partial class VideoSeriesForm : ContentPage
             if (videoSeries != null)
             {
                 vm.Id.Value = videoSeries.Id;
-                vm.Title.Value = videoSeries.Title;
-                vm.Collecting.Value = videoSeries.Collecting;
-                vm.Ongoing.Value = videoSeries.Ongoing;
-                vm.Parent.Value = videoSeries.Parent;
+                //vm.Title.Value = videoSeries.Title;
+                //vm.Collecting.Value = videoSeries.Collecting;
+                //vm.Ongoing.Value = videoSeries.Ongoing;
+                //vm.Parent.Value = videoSeries.Parent;
             }
         }
 
@@ -166,14 +168,14 @@ public partial class VideoSeriesForm : ContentPage
 
         try
         {
-            var videoSeries = new VideoSeries
+            var videoSeries = new VideoItem
             {
                 Id = vm.Id.Value,
-                Title = vm.Title.Value,
-                Collecting = vm.Collecting.Value,
-                Ongoing = vm.Ongoing.Value,
-                Parent = vm.Parent.Value,
-                UpToDateComplete = vm.UpToDateComplete.Value,
+                //Title = vm.Title.Value,
+                //Collecting = vm.Collecting.Value,
+                //Ongoing = vm.Ongoing.Value,
+                //Parent = vm.Parent.Value,
+                //UpToDateComplete = vm.UpToDateComplete.Value,
             };
 
 

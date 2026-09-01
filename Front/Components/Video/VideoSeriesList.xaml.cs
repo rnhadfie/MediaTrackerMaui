@@ -1,5 +1,9 @@
-using MauiApp1.BackEnd.Models.Video;
+using LiveChartsCore.Geo;
 using MauiApp1.BackEnd.Controllers.ViewModels;
+using MauiApp1.BackEnd.Models;
+using MauiApp1.BackEnd.Models.Video;
+using MauiApp1.Controllers;
+using MauiApp1.Front.Components.Books;
 using System.Collections.ObjectModel;
 
 namespace MauiApp1.Front.Components.Videos;
@@ -14,43 +18,46 @@ public partial class VideoSeriesList : ContentView
         _videoController = new BackEnd.Controllers.ViewModels.VideoController();
     }
 
+
     private bool filtering = false;
 
     public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(
         nameof(ItemsSource),
-        typeof(IEnumerable<VideoSeries>),
+        typeof(IEnumerable<VideoItem>),
         typeof(VideoSeriesList),
-        default(IEnumerable<VideoSeries>),
+        default(IEnumerable<VideoItem>),
         propertyChanged: OnItemsSourceChanged);
 
-    public IEnumerable<VideoSeries> ItemsSource
+    public IEnumerable<VideoItem> ItemsSource
     {
-        get => (IEnumerable<VideoSeries>)GetValue(ItemsSourceProperty);
+        get => (IEnumerable<VideoItem>)GetValue(ItemsSourceProperty);
         set => SetValue(ItemsSourceProperty, value);
     }
 
-    public IEnumerable<VideoSeries> OriginalSeries { get; set; }
+    public IEnumerable<VideoItem> OriginalVideos { get; set; }
 
     private static void OnItemsSourceChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is VideoSeriesList control)
         {
-            control.OnItemsSourceChanged((IEnumerable<VideoSeries>)oldValue, (IEnumerable<VideoSeries>)newValue);
+            control.OnItemsSourceChanged((IEnumerable<VideoItem>)oldValue, (IEnumerable<VideoItem>)newValue);
         }
     }
 
-    private void OnItemsSourceChanged(IEnumerable<VideoSeries> oldValue, IEnumerable<VideoSeries> newValue)
+    private void OnItemsSourceChanged(IEnumerable<VideoItem> oldValue, IEnumerable<VideoItem> newValue)
     {
+        // If the inner list view uses ItemsSource binding, update it directly
         if (newValue == null)
         {
+            // Clear
             VideoSeriesListDataGrid.ItemsSource = null;
             return;
         }
 
-        VideoSeriesListDataGrid.ItemsSource = (ObservableCollection<VideoSeries>)newValue;
+        VideoSeriesListDataGrid.ItemsSource = (ObservableCollection<VideoItem>)newValue;
         if (!filtering)
         {
-            OriginalSeries = (ObservableCollection<VideoSeries>)newValue;
+            OriginalVideos = (ObservableCollection<VideoItem>)newValue;
         }
     }
 
@@ -72,7 +79,7 @@ public partial class VideoSeriesList : ContentView
         BindableProperty.Create(
             nameof(SearchText),
             typeof(string),
-            typeof(VideoSeriesList),
+            typeof(BookList),
             "",
             BindingMode.TwoWay);
 
@@ -84,9 +91,10 @@ public partial class VideoSeriesList : ContentView
 
     private void TextField_PropertyChanging(object sender, PropertyChangingEventArgs e)
     {
+
         if (!string.IsNullOrWhiteSpace(SearchText))
         {
-            VideoSeriesListDataGrid.ItemsSource = ItemsSource.Where(x => x.Title.Contains(SearchText)).ToList();
+            VideoSeriesListDataGrid.ItemsSource = ItemsSource.Where(x => x.DiscTitle.Contains(SearchText)).ToList();
         }
     }
 
@@ -97,23 +105,10 @@ public partial class VideoSeriesList : ContentView
         {
             filtering = true;
             SearchText = e.NewTextValue;
-            List<VideoSeries> fitleredList = (List<VideoSeries>)OriginalSeries;
-            VideoSeriesListDataGrid.ItemsSource = fitleredList.FindAll(x => x.Title.ToLower().Contains(SearchText.ToLower())).ToList();
+            List<VideoItem> fitleredList = (List<VideoItem>)OriginalVideos;
+            VideoSeriesListDataGrid.ItemsSource = fitleredList.FindAll(x => x.DiscTitle.ToLower().Contains(SearchText.ToLower())).ToList();
         }
 
-    }
-
-    public async Task<bool> LoadSeriesAsync()
-    {
-        OriginalSeries = await _videoController.GetAllVideoSeriesAsync();
-        ItemsSource = OriginalSeries;
-        VideoSeriesListDataGrid.ItemsSource = (System.Collections.IList)OriginalSeries;
-        return true;
-    }
-
-    private async void AddButton_Clicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("/VideoSeriesForm?edit=true");
     }
 
     private async void Button_Clicked(object sender, EventArgs e)
@@ -122,27 +117,37 @@ public partial class VideoSeriesList : ContentView
         {
             if (sender is Button btn)
             {
-                var series = (VideoSeries)btn.CommandParameter;
+                VideoItem videoSeries = (VideoItem)btn.CommandParameter;
+
+                // Show a bottom-sheet style action sheet using the platform ActionSheet
+                // This is a lightweight bottom sheet alternative that works across MAUI
                 var action = await Application.Current.MainPage.DisplayActionSheet("Actions", "Cancel", null, "View", "Edit", "Delete");
-                if (action == "Cancel" || string.IsNullOrEmpty(action)) return;
+
+                if (action == "Cancel" || string.IsNullOrEmpty(action))
+                    return;
+
+                // Handle actions - these are placeholders for integration with navigation/commands
                 switch (action)
                 {
                     case "View":
-                        await Shell.Current.GoToAsync($"/VideoSeriesForm?id={series.Id}&edit=false");
+                        await Shell.Current.GoToAsync($"/BookForm?id={videoSeries.Id}&edit=false");
                         break;
                     case "Edit":
-                        await Shell.Current.GoToAsync($"/VideoSeriesForm?id={series.Id}&edit=true");
+                        await Shell.Current.GoToAsync($"/BookForm?id={videoSeries.Id}&edit=true");
                         break;
                     case "Delete":
                         var confirm = await Application.Current.MainPage.DisplayAlert("Confirm", "Delete this item?", "Yes", "No");
                         if (confirm)
                         {
-                            var result = await _videoController.DeleteVideoSeriesAsync(series);
+                            var result = await _videoController.DeleteVideoSeriesAsync(videoSeries);
                             if (result > 0)
-                                await Application.Current.MainPage.DisplayAlert("Deleted", $"Item deleted: {series.Title}", "OK");
+                            {
+                                await Application.Current.MainPage.DisplayAlert("Deleted", $"Item deleted: {videoSeries.DiscTitle}", "OK");
+                            }
                             else
-                                await Application.Current.MainPage.DisplayAlert("Deleted", $"Failed to delete: {series.Title}", "OK");
-                            await LoadSeriesAsync();
+                            {
+                                await Application.Current.MainPage.DisplayAlert("Deleted", $"Failed to delete: {videoSeries.DiscTitle}", "OK");
+                            }
                         }
                         break;
                 }
@@ -152,5 +157,10 @@ public partial class VideoSeriesList : ContentView
         {
             await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "OK");
         }
+    }
+
+    private async void AddButton_Clicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("/VideoSeriesForm?edit=true");
     }
 }

@@ -91,6 +91,17 @@
 		<PackageReference Include="UraniumUI.WebComponents" Version="2.15.0" />
 	</ItemGroup>
 
+	<!-- Pin Microcharts.Maui to a safe version per TFM (windows keeps the older 1.0.1) -->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
+		<PackageReference Update="Microcharts.Maui" Version="2.0.0.3" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0-ios'">
+		<PackageReference Update="Microcharts.Maui" Version="2.0.0.3" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0-maccatalyst'">
+		<PackageReference Update="Microcharts.Maui" Version="2.0.0.3" />
+	</ItemGroup>
+
 	<!-- Pin platform-specific SQLite native provider to a safe version for Android -->
 	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
 		<PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.android" Version="2.1.12-pre20260709125052" />
@@ -129,6 +140,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Front\Components\Books\BookVisualization.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Shared\ComboPicker.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Front\Components\Shared\ListDisplay.xaml">

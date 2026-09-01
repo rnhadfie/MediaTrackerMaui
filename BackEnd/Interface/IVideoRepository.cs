@@ -16,15 +16,15 @@ namespace MauiApp1.BackEnd.Interface
         public Task<int> SaveVideoAsync(Video item);
 
         public Task<int> DeleteVideoAsync(Video item);
-        public Task<List<VideoSeries>> GetAllVideoSeriesAsync();
+        public Task<List<VideoItem>> GetAllVideoSeriesAsync();
 
-        public Task<VideoSeries> GetVideoSeriesAsync(int id);
+        public Task<VideoItem> GetVideoSeriesAsync(int id);
 
-        public Task<int> SaveVideoSeriesAsync(VideoSeries item);
+        public Task<int> SaveVideoSeriesAsync(VideoItem item);
 
-        public Task<int> DeleteVideoSeriesAsync(VideoSeries item);
+        public Task<int> DeleteVideoSeriesAsync(VideoItem item);
 
-        public Task<bool> SaveVideoSeriesAsync(List<VideoSeries> series);
+        public Task<bool> SaveVideoSeriesAsync(List<VideoItem> series);
 
         public Task<bool> SaveVideosAsync(List<Video> videos);
     }

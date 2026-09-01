@@ -17,21 +17,6 @@ public partial class VideoHome : ContentPage
         //VideoTypeDropDown.ItemDisplayBinding = new Binding("Text");
     }
 
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-        try
-        {
-            if (VideoSeriesListView != null)
-            {
-                await VideoSeriesListView.LoadSeriesAsync();
-            }
-        }
-        catch
-        {
-            // ignore
-        }
-    }
 
     private async void AddButton_Clicked(object sender, EventArgs e)
     {
@@ -72,9 +57,9 @@ public partial class VideoHome : ContentPage
                             var controller = new BackEnd.Controllers.ViewModels.VideoController();
                             var result = await controller.DeleteVideoAsync(video);
                             if (result > 0)
-                                await Application.Current.MainPage.DisplayAlert("Deleted", $"Item deleted: {video.Name}", "OK");
+                                await Application.Current.MainPage.DisplayAlert("Deleted", $"Item deleted: {video.Series}", "OK");
                             else
-                                await Application.Current.MainPage.DisplayAlert("Deleted", $"Failed to delete: {video.Name}", "OK");
+                                await Application.Current.MainPage.DisplayAlert("Deleted", $"Failed to delete: {video.Series}", "OK");
 
                             // Refresh list
                             await _vm.LoadSetupAsync();

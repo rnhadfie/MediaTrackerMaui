@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using MauiApp1.BackEnd.Controllers.ViewModels;
+using MauiApp1.BackEnd.Models;
 using MauiApp1.BackEnd.Models.Video;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -25,6 +26,12 @@ public partial class VideoHomeViewModel : ObservableObject
         types.Insert(0, all);
         TypeOptions = new ObservableCollection<MauiApp1.BackEnd.Shared.TextValuePair<string, int>>(setup.Type);
         SelectedType = TypeOptions.FirstOrDefault();
+
+        var source = VideoSetup?.VideoSeries ?? Enumerable.Empty<VideoItem>();
+        if (SelectedType == null || SelectedType.Value == 0)
+        {
+            listOfVideoSeries = new ObservableCollection<VideoItem>(source);
+        }
         UpdateListOfVideos();
     }
 
@@ -58,4 +65,7 @@ public partial class VideoHomeViewModel : ObservableObject
 
     [ObservableProperty]
     private ObservableCollection<MauiApp1.BackEnd.Models.Video.Video> listOfVideos;
+
+    [ObservableProperty]
+    private ObservableCollection<MauiApp1.BackEnd.Models.Video.VideoItem> listOfVideoSeries;
 }

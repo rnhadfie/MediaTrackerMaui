@@ -22,7 +22,7 @@ namespace MauiApp1.BackEnd.Controllers
             // Implement logic to read Excel file and import data into the database
             // You can use libraries like ClosedXML or EPPlus to handle Excel files
             BookService bookService = new BookService();
-            var result = await bookService.ImportBookDataFromExcel(workbook);
+            var result = false; //await bookService.ImportBookDataFromExcel(workbook);
 
             return result;
         }

@@ -16,15 +16,17 @@ namespace MauiApp1.BackEnd.Interface
         public Task<List<Publisher>> GetPublishersAsync();
         public Task<int> SavePublisherAsync(Publisher item);
         public Task<int> DeletePublisherAsync(Publisher item);
-        public Task<List<BookSeries>> GetAllBookSeriesAsync();
+        public Task<List<BookItem>> GetAllBookSeriesAsync();
 
-        public Task<BookSeries> GetBookSeriesAsync(int id);
+        public Task<BookItem> GetBookSeriesAsync(int id);
 
-        public Task<int> SaveBookSeriesAsync(BookSeries item);
+        public Task<int> SaveBookSeriesAsync(BookItem item);
 
-        public Task<int> DeleteBookSeriesAsync(BookSeries item);
+        public Task<int> DeleteBookSeriesAsync(BookItem item);
 
-        public Task<bool> SaveBookSeriesAsync(List<BookSeries> series);
+        public Task<bool> SaveBookSeriesAsync(List<BookItem> series);
+
+        public Task<bool> SaveBookAndSeriesAsync(Book book, List<BookItem> series, string newPublisherName);
 
         public Task<bool> SavePublishersAsync(List<Publisher> publishers);
 

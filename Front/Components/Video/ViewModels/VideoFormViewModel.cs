@@ -23,11 +23,11 @@ public class VideoFormViewModel : INotifyPropertyChanged
         return new MauiApp1.BackEnd.Models.Video.Video
         {
             Id = Id.Value,
-            Name = Name.Value,
+            //Name = Name.Value,
             Type = (Enums.VideoType)SelectedType.Value,
-            Format = (Enums.VideoFormat)SelectedFormat.Value,
-            SeriesId = SelectedVideoSeries.Value?.Value ?? 0,
-            Watched = Watched.Value
+            //Format = (Enums.VideoFormat)SelectedFormat.Value,
+           // SeriesId = SelectedVideoSeries.Value?.Value ?? 0,
+            //Watched = Watched.Value
         };
     }
 

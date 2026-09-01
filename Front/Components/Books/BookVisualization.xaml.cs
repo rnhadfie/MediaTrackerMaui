@@ -232,19 +232,20 @@ BindableProperty.Create(
 
            var currentBooks = GetCurrentList();
 
-            float readPercent = ItemsSource != null && currentBooks != null && currentBooks.Count > 0
-                ? (float)currentBooks.Where(x => x.Read).Count() / currentBooks.Count * 100
-                : 0;
+        float readPercent = 0;
+           // float readPercent = ItemsSource != null && currentBooks != null && currentBooks.Count > 0
+           //  ? (float)currentBooks.Where(x => x.Read).Count() / currentBooks.Count * 100
+           //  : 0;
         view.ReadPecentage = "Read " + readPercent.ToString() + "%";
         view.ReadText.Text = view.ReadPecentage;
-        
-        var currentSeries = ItemsSource != null && currentBooks != null ? ItemsSource.BookSeries.Where(x => currentBooks.Any(y => y.BookSeries == x.Id)) : new List<BookSeries>();
+        /*
+        var currentSeries = ItemsSource != null && currentBooks != null ? ItemsSource.BookSeries.Where(x => currentBooks.Any(y => y.BookSeries == x.Id)) : new List<BookItem>();
          view.TotalSeries = "Total Series " + (currentSeries != null ? currentSeries.Count() : 0).ToString();
         view.TotalText.Text = view.TotalSeries;
 
 
         view.OngoingSeries = "Ongoing Series " + (currentSeries != null ? currentSeries.Where(x => x.UpToDateComplete).Count() : 0).ToString();
-        view.OngoingText.Text = view.OngoingSeries;
+        view.OngoingText.Text = view.OngoingSeries;*/
 
         view.BookFormatChartData = new PieChart { Entries = GetBookFormatData(), LabelTextSize = 12f };
         view.BookFormatChart.Chart = BookFormatChartData;
@@ -297,7 +298,7 @@ BindableProperty.Create(
             if (books == null)
                 continue;
 
-            int count = books.Where(x => x.Format == (BookFormat)format.Value).Count();
+            int count = 1;//books.Where(x => x.Format == (BookFormat)format.Value).Count();
             var tet = new ChartEntry(count)
             {
                 Label = format.Text,
@@ -360,12 +361,12 @@ BindableProperty.Create(
             return Array.Empty<ChartEntry>();
         var books = GetCurrentList();
         if (books == null) return Array.Empty<ChartEntry>();
-
-        var currentSeries = ItemsSource != null && books != null ? ItemsSource.BookSeries.Where<BookSeries>(x => books.Any(y => y.BookSeries == x.Id)) : [];
-
-        int collectingCount = currentSeries.Where(x => x.Collecting == "Y").Count();
-        int collectedCount = currentSeries.Where(x => x.Collecting == "C").Count();
-        int notCollectingCount = currentSeries.Where(x => x.Collecting == "N").Count();
+        /*
+        var currentSeries = ItemsSource != null && books != null ? ItemsSource.BookSeries.Where<BookItem>(x => books.Any(y => y.BookSeries == x.Id)) : [];
+        */
+        int collectingCount = 0; //currentSeries.Where(x => x.Collecting == "Y").Count();
+        int collectedCount = 0; //currentSeries.Where(x => x.Collecting == "C").Count();
+        int notCollectingCount = 0; //currentSeries.Where(x => x.Collecting == "N").Count();
         var collectedEntry = new ChartEntry(collectingCount)
         {
             Label = CollectionStatusText("C"),
@@ -397,7 +398,7 @@ BindableProperty.Create(
         return count;
     }
 
-    private bool BookMatchesGenre(BookDT book, int genreId)
+    private bool BookMatchesGenre(Book book, int genreId)
     {
         if (book.Genre == null)
             return false;
@@ -406,30 +407,30 @@ BindableProperty.Create(
     }
 
 
-    private ObservableCollection<BookDT> GetCurrentList()
+    private ObservableCollection<Book> GetCurrentList()
     {
         if (SelectedItem == null)
         {
-            return ItemsSource == null ? new ObservableCollection<BookDT>() : ItemsSource.Books;
+            return ItemsSource == null ? new ObservableCollection<Book>() : ItemsSource.Books;
         }
         if (ItemsSource == null)
         { 
-            return new ObservableCollection<BookDT>();
+            return new ObservableCollection<Book>();
         }
         switch (SelectedItem.Value)
         {
             case (int)BookType.Novel:
-                return new ObservableCollection<BookDT>(ItemsSource.Books.Where(x => x.Type == BookType.Novel));
+                return new ObservableCollection<Book>(ItemsSource.Books.Where(x => x.Type == BookType.Novel));
             case (int)BookType.GraphicNovel:
-                return new ObservableCollection<BookDT>(ItemsSource.Books.Where(x => x.Type == BookType.GraphicNovel));
+                return new ObservableCollection<Book>(ItemsSource.Books.Where(x => x.Type == BookType.GraphicNovel));
             case (int)BookType.Manga:
-                return new ObservableCollection<BookDT>(ItemsSource.Books.Where(x => x.Type == BookType.Manga));
+                return new ObservableCollection<Book>(ItemsSource.Books.Where(x => x.Type == BookType.Manga));
             case (int)BookType.LightNovel:
-                return new ObservableCollection<BookDT>(ItemsSource.Books.Where(x => x.Type == BookType.LightNovel));
+                return new ObservableCollection<Book>(ItemsSource.Books.Where(x => x.Type == BookType.LightNovel));
             case (int)BookType.ArtBook:
-                return new ObservableCollection<BookDT>(ItemsSource.Books.Where(x => x.Type == BookType.ArtBook));
+                return new ObservableCollection<Book>(ItemsSource.Books.Where(x => x.Type == BookType.ArtBook));
             default:
-                return new ObservableCollection<BookDT>(ItemsSource.Books);
+                return new ObservableCollection<Book>(ItemsSource.Books);
         }
     }
 

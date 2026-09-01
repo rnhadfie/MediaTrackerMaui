@@ -63,6 +63,12 @@ namespace MauiApp1.Front.Components.Books.ViewModels
                     SelectedType = TypeOptions[0];
                 }
 
+                var source = ViewModel?.Setup?.BookSeries ?? Enumerable.Empty<BookItem>();
+                if (SelectedType == null || SelectedType.Value == 0)
+                {
+                    ListOfBookSeries = new ObservableCollection<BookItem>(source);
+                }
+
                 // Initialize the book list based on the selected type
                 UpdateListOfBooks();
 
@@ -77,15 +83,15 @@ namespace MauiApp1.Front.Components.Books.ViewModels
         
         private void UpdateListOfBooks()
         {
-            var source = ViewModel?.Setup?.Books ?? Enumerable.Empty<BookDT>();
+            var source = ViewModel?.Setup?.Books ?? Enumerable.Empty<Book>();
             if (SelectedType == null || SelectedType.Value == 0)
             {
-                ListOfBooks = new ObservableCollection<BookDT>(source);
+                ListOfBooks = new ObservableCollection<Book>(source);
             }
             else
             {
                 var filtered = source.Where(x => (int)x.Type == SelectedType.Value);
-                ListOfBooks = new ObservableCollection<BookDT>(filtered);
+                ListOfBooks = new ObservableCollection<Book>(filtered);
             }
         }
 
@@ -102,7 +108,10 @@ namespace MauiApp1.Front.Components.Books.ViewModels
         private BookSetupViewModel bookSetup;
 
         [ObservableProperty]
-        private ObservableCollection<BookDT> listOfBooks;
+        private ObservableCollection<Book> listOfBooks;
+
+        [ObservableProperty]
+        private ObservableCollection<BookItem> listOfBookSeries;
 
     }
 

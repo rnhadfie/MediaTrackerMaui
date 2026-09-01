@@ -1,44 +1,260 @@
 using MauiApp1.BackEnd.Shared;
+using System.Collections;
 using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Reflection;
+using System.Linq;
+using System.Collections.Generic;
+using Microsoft.Maui;
+using Microsoft.Maui.Controls.Compatibility;
+using Microsoft.Maui.Controls;
 
 namespace MauiApp1.Front.Components.Shared;
 
 public partial class MultiSelect : ContentView
 {
-	// Backing store for checkboxes
-	private readonly Dictionary<int, CheckBox> _checkboxes = new();
+	// Backing store for checkboxes (keyed by the item's value)
+	private readonly Dictionary<object, CheckBox> _checkboxes = new();
 	private bool _suppressSelectedValuesChanged;
 	private INotifyCollectionChanged? _selectedValuesNotifier;
+	private INotifyCollectionChanged? _itemsSourceNotifier;
 
 	public MultiSelect()
 	{
 		InitializeComponent();
+		// Try to hook picker notifications and set its items whenever this control is constructed.
+		try
+		{
+			HookPickerNotifications();
+			ApplyPickerItemsSource();
+		}
+        catch
+        {
+            // best-effort only; ignore failures to avoid breaking construction
+        }
+
+        // Ensure the items stack is scrollable so action buttons aren't pushed off-screen
+        // when the list of items grows too large. Wrap ItemsStack in a ScrollView
+        // at runtime if the XAML hasn't already done so.
+        try
+		{
+			if (ItemsStack != null && ItemsStack.Parent is not ScrollView)
+			{
+				var parent = ItemsStack.Parent;
+				var scroll = new ScrollView { Content = ItemsStack, VerticalOptions = LayoutOptions.FillAndExpand };
+				// Cap the scrollable area so action buttons remain visible when the list is long.
+				const double maxHeight = 300.0; // adjust as needed
+				try
+				{
+					// If the platform/framework exposes a MaximumHeightRequest, prefer that.
+					var maxProp = scroll.GetType().GetProperty("MaximumHeightRequest");
+					if (maxProp != null && maxProp.CanWrite)
+					{
+						maxProp.SetValue(scroll, maxHeight);
+					}
+					else
+					{
+						scroll.HeightRequest = maxHeight;
+					}
+				}
+				catch
+				{
+					// best-effort only
+					scroll.HeightRequest = maxHeight;
+				}
+
+				if (parent is Layout<View> layout)
+				{
+					// Preserve the position in the parent's children collection
+					var idx = layout.Children.IndexOf(ItemsStack);
+					if (idx >= 0)
+					{
+						layout.Children.RemoveAt(idx);
+						layout.Children.Insert(idx, scroll);
+
+						// Preserve Grid attached properties when applicable
+						if (layout is Microsoft.Maui.Controls.Grid)
+						{
+							Microsoft.Maui.Controls.Grid.SetRow(scroll, Microsoft.Maui.Controls.Grid.GetRow(ItemsStack));
+							Microsoft.Maui.Controls.Grid.SetColumn(scroll, Microsoft.Maui.Controls.Grid.GetColumn(ItemsStack));
+							Microsoft.Maui.Controls.Grid.SetRowSpan(scroll, Microsoft.Maui.Controls.Grid.GetRowSpan(ItemsStack));
+							Microsoft.Maui.Controls.Grid.SetColumnSpan(scroll, Microsoft.Maui.Controls.Grid.GetColumnSpan(ItemsStack));
+						}
+					}
+				}
+				else if (parent is ContentView cv)
+				{
+					cv.Content = scroll;
+				}
+			}
+		}
+		catch
+		{
+			// best-effort only; ignore failures to avoid breaking construction
+		}
+		
+	}
+
+
+	void ApplyPickerItemsSource()
+	{
+		if (MultiPicker == null)
+			return;
+
+		var prop = MultiPicker.GetType().GetProperty("ItemsSource");
+		if (prop != null && prop.CanWrite)
+		{
+			prop.SetValue(MultiPicker, ItemsSource);
+			return;
+		}
+
+		// Fallback: try to find a field backing
+		var f = MultiPicker.GetType().GetField("itemsSource", BindingFlags.Instance | BindingFlags.NonPublic);
+		if (f != null)
+			f.SetValue(MultiPicker, ItemsSource);
+	}
+
+	void HookPickerNotifications()
+	{
+		if (MultiPicker == null)
+			return;
+
+		// If the control supports INotifyPropertyChanged, monitor it for selection-related property updates.
+		if (MultiPicker is INotifyPropertyChanged inpc)
+		{
+			inpc.PropertyChanged += Picker_PropertyChanged;
+			return;
+		}
+
+		// Try to attach to common selection events by name.
+		var evt = MultiPicker.GetType().GetEvent("SelectionChanged") ?? MultiPicker.GetType().GetEvent("SelectedItemsChanged") ?? MultiPicker.GetType().GetEvent("SelectedValueChanged");
+		if (evt != null)
+		{
+			try
+			{
+				var handler = new EventHandler((s, e) => SyncSelectedValuesFromPicker());
+				evt.AddEventHandler(MultiPicker, handler);
+			}
+			catch
+			{
+				// ignore if delegate signature doesn't match
+			}
+		}
+	}
+
+	private void Picker_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+	{
+		if (string.Equals(e.PropertyName, "SelectedItems", StringComparison.OrdinalIgnoreCase) ||
+			string.Equals(e.PropertyName, "SelectedItem", StringComparison.OrdinalIgnoreCase) ||
+			string.Equals(e.PropertyName, "SelectedValues", StringComparison.OrdinalIgnoreCase))
+		{
+			SyncSelectedValuesFromPicker();
+		}
+	}
+
+	void SyncSelectedValuesFromPicker()
+	{
+		if (MultiPicker == null)
+			return;
+
+		object? selected = null;
+		var p = MultiPicker.GetType().GetProperty("SelectedItems") ?? MultiPicker.GetType().GetProperty("SelectedValues") ?? MultiPicker.GetType().GetProperty("Selected");
+		if (p != null)
+			selected = p.GetValue(MultiPicker);
+		else
+		{
+			var single = MultiPicker.GetType().GetProperty("SelectedItem");
+			if (single != null)
+				selected = single.GetValue(MultiPicker);
+		}
+
+		if (selected == null)
+			return;
+
+		var values = new List<object>();
+		if (selected is IEnumerable enumerable && !(selected is string))
+		{
+			foreach (var it in enumerable)
+			{
+				if (it == null) continue;
+				// Map to value using SelectedValuePath when available
+				if (!string.IsNullOrWhiteSpace(SelectedValuePath))
+				{
+					var vp = it.GetType().GetProperty(SelectedValuePath);
+					if (vp != null)
+						values.Add(vp.GetValue(it) ?? it);
+					else
+						values.Add(it);
+				}
+				else
+				{
+					values.Add(it);
+				}
+			}
+		}
+		else
+		{
+			// single value
+			var it = selected;
+			if (!string.IsNullOrWhiteSpace(SelectedValuePath) && it != null)
+			{
+				var vp = it.GetType().GetProperty(SelectedValuePath);
+				if (vp != null)
+					values.Add(vp.GetValue(it) ?? it);
+				else
+					values.Add(it);
+			}
+			else if (it != null)
+			{
+				values.Add(it);
+			}
+		}
+
+		// Update SelectedValues without re-entrancy
+		try
+		{
+			_suppressSelectedValuesChanged = true;
+			if (SelectedValues is IList list)
+			{
+				list.Clear();
+				foreach (var v in values)
+					list.Add(v);
+			}
+			else
+			{
+				SetValue(SelectedValuesProperty, values.ToList());
+			}
+		}
+		finally
+		{
+			_suppressSelectedValuesChanged = false;
+		}
 	}
 
 	public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(
 		nameof(ItemsSource),
-		typeof(IList<TextValuePair<string, int>>),
+		typeof(System.Collections.IEnumerable),
 		typeof(MultiSelect),
-		default(IList<TextValuePair<string, int>>),
+		default(System.Collections.IEnumerable),
 		propertyChanged: OnItemsSourceChanged);
 
-	public IList<TextValuePair<string, int>> ItemsSource
+	public System.Collections.IEnumerable ItemsSource
 	{
-		get => (IList<TextValuePair<string, int>>)GetValue(ItemsSourceProperty);
+		get => (System.Collections.IEnumerable?)GetValue(ItemsSourceProperty) ?? Array.Empty<object>();
 		set => SetValue(ItemsSourceProperty, value);
 	}
 
 	public static readonly BindableProperty SelectedValuesProperty = BindableProperty.Create(
 		nameof(SelectedValues),
-		typeof(IList<int>),
+		typeof(System.Collections.IList),
 		typeof(MultiSelect),
-		default(IList<int>),
+		default(System.Collections.IList),
 		BindingMode.TwoWay,
 		propertyChanged: OnSelectedValuesChanged);
 
-	public IList<int> SelectedValues
+	public System.Collections.IList SelectedValues
 	{
-		get => (IList<int>)GetValue(SelectedValuesProperty);
+		get => (System.Collections.IList?)GetValue(SelectedValuesProperty) ?? new System.Collections.ArrayList();
 		set => SetValue(SelectedValuesProperty, value);
 	}
 
@@ -69,6 +285,83 @@ public partial class MultiSelect : ContentView
 	}
 
 	private static void OnItemsSourceChanged(BindableObject bindable, object oldVal, object newVal)
+	{
+		if (bindable is MultiSelect ctrl)
+		{
+			// unsubscribe previous collection change notifications
+			if (oldVal is INotifyCollectionChanged oldColl)
+				oldColl.CollectionChanged -= ctrl.ItemsSource_CollectionChanged;
+
+			// subscribe to new collection change notifications when possible
+			if (newVal is INotifyCollectionChanged newColl)
+				newColl.CollectionChanged += ctrl.ItemsSource_CollectionChanged;
+
+			ctrl._itemsSourceNotifier = newVal as INotifyCollectionChanged;
+
+			// Ensure the inner picker's ItemsSource is set to the new collection
+			// before we attempt to add items to it in RebuildList.
+			ctrl.ApplyPickerItemsSource();
+
+			// rebuild UI and propagate to picker
+			ctrl.RebuildList();
+		}
+	}
+
+	private void ItemsSource_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+	{
+		// Rebuild list on the UI thread when the underlying collection changes (add/remove/reset, etc.)
+		try
+		{
+			// Use Dispatcher if available to ensure UI thread access
+			if (Dispatcher?.IsDispatchRequired ?? false)
+			{
+				Dispatcher.Dispatch(() => RebuildList());
+			}
+			else
+			{
+				RebuildList();
+			}
+		}
+		catch
+		{
+			// Best-effort: if dispatch fails, still attempt to rebuild
+			RebuildList();
+		}
+	}
+
+	public static readonly BindableProperty DisplayMemberPathProperty = BindableProperty.Create(
+		nameof(DisplayMemberPath),
+		typeof(string),
+		typeof(MultiSelect),
+		default(string),
+		propertyChanged: OnDisplayMemberPathChanged);
+
+	public string DisplayMemberPath
+	{
+		get => (string)GetValue(DisplayMemberPathProperty);
+		set => SetValue(DisplayMemberPathProperty, value);
+	}
+
+	private static void OnDisplayMemberPathChanged(BindableObject bindable, object oldVal, object newVal)
+	{
+		if (bindable is MultiSelect ctrl)
+			ctrl.RebuildList();
+	}
+
+	public static readonly BindableProperty SelectedValuePathProperty = BindableProperty.Create(
+		nameof(SelectedValuePath),
+		typeof(string),
+		typeof(MultiSelect),
+		default(string),
+		propertyChanged: OnSelectedValuePathChanged);
+
+	public string SelectedValuePath
+	{
+		get => (string)GetValue(SelectedValuePathProperty);
+		set => SetValue(SelectedValuePathProperty, value);
+	}
+
+	private static void OnSelectedValuePathChanged(BindableObject bindable, object oldVal, object newVal)
 	{
 		if (bindable is MultiSelect ctrl)
 			ctrl.RebuildList();
@@ -126,41 +419,85 @@ public partial class MultiSelect : ContentView
 	private void RebuildList()
 	{
 		_checkboxes.Clear();
-		ItemsStack.Children.Clear();
+		// Ensure ItemsStack (the popup content) is present and cleared so the picker popup shows items and action buttons
+		if (ItemsStack != null)
+			ItemsStack.Children.Clear();
+        var items = ItemsSource;
+        
 
-		var items = ItemsSource;
-		if (items == null)
+        if (items == null)
 			return;
+		
 
-		foreach (var pair in items)
+        foreach (var obj in items)
 		{
+			// determine display and value via TextValuePair or reflection
+			string display;
+			object? value;
+
+			if (obj is TextValuePair<string, int> tvp)
+			{
+				display = tvp.Text?.ToString() ?? string.Empty;
+				value = tvp.Value;
+			}
+			else
+			{
+				// use DisplayMemberPath / SelectedValuePath when available
+				if (!string.IsNullOrWhiteSpace(DisplayMemberPath))
+				{
+					var dp = obj?.GetType().GetProperty(DisplayMemberPath);
+					var dv = dp?.GetValue(obj);
+					display = dv?.ToString() ?? string.Empty;
+				}
+				else
+				{
+					display = obj?.ToString() ?? string.Empty;
+				}
+
+				if (!string.IsNullOrWhiteSpace(SelectedValuePath))
+				{
+					var vp = obj?.GetType().GetProperty(SelectedValuePath);
+					value = vp?.GetValue(obj) ?? obj;
+				}
+				else
+				{
+					value = obj;
+				}
+			}
+
 			var row = new HorizontalStackLayout { Spacing = 8 };
 
 			var cb = new CheckBox
 			{
-				IsChecked = SelectedValues?.Contains(pair.Value) == true,
+				IsChecked = SelectedValues?.Contains(value) == true,
 				IsEnabled = Editable,
 				VerticalOptions = LayoutOptions.Center
 			};
 
-			_checkboxes[pair.Value] = cb;
+			_checkboxes[value ?? obj ?? new object()] = cb;
 
-			cb.CheckedChanged += (s, e) => OnCheckBoxToggled(pair.Value, e.Value);
+			cb.CheckedChanged += (s, e) => OnCheckBoxToggled(value ?? obj ?? new object(), e.Value);
 
 			var lbl = new Label
 			{
-				Text = pair.Text?.ToString() ?? string.Empty,
+				Text = display,
 				VerticalTextAlignment = TextAlignment.Center
 			};
 
 			row.Add(cb);
 			row.Add(lbl);
-
-			ItemsStack.Children.Add(row);
-		}
+			// Do not add UI rows to the inner picker's ItemsSource. ApplyPickerItemsSource
+			// assigns the data ItemsSource (which may be a strongly-typed collection),
+			// so adding a HorizontalStackLayout here can cause an ArgumentException.
+			// MultiPicker.ItemsSource.Add(row);
+			if (ItemsStack != null)
+			{
+				ItemsStack.Children.Add(row);
+			}
+        }
 	}
 
-	private void OnCheckBoxToggled(int value, bool isChecked)
+	private void OnCheckBoxToggled(object value, bool isChecked)
 	{
 		try
 		{
@@ -168,7 +505,7 @@ public partial class MultiSelect : ContentView
 
 			// If SelectedValues supports collection change notifications (e.g., ObservableCollection<int>),
 			// modify it in-place so bindings receive CollectionChanged events.
-			if (SelectedValues is INotifyCollectionChanged && SelectedValues is IList<int> mutableList)
+			if (SelectedValues is INotifyCollectionChanged && SelectedValues is IList mutableList)
 			{
 				if (isChecked)
 				{
@@ -184,7 +521,13 @@ public partial class MultiSelect : ContentView
 			else
 			{
 				// Fallback: create a new list instance and set the bindable property so property change fires.
-				var list = SelectedValues?.ToList() ?? new List<int>();
+				var list = new List<object>();
+				if (SelectedValues != null)
+				{
+					foreach (var it in SelectedValues)
+						list.Add(it);
+				}
+
 				if (isChecked)
 				{
 					if (!list.Contains(value))
@@ -221,8 +564,12 @@ public partial class MultiSelect : ContentView
 		}
 	}
 
-	public IList<int> GetSelectedValues()
+	public IList<object> GetSelectedValues()
 	{
-		return SelectedValues?.ToList() ?? new List<int>();
+		var result = new List<object>();
+		if (SelectedValues == null) return result;
+		foreach (var it in SelectedValues)
+			result.Add(it);
+		return result;
 	}
 }

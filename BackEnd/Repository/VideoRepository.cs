@@ -27,7 +27,7 @@ namespace MauiApp1.BackEnd.Repository
         public async Task<List<Video>> GetVideosNotReadAsync()
         {
             await MediaItemDatabase.Init();
-            return await MediaItemDatabase.database.Table<Video>().Where(t => !t.Watched).ToListAsync();
+            return await MediaItemDatabase.database.Table<Video>().ToListAsync();
         }
 
         public async Task<Video> GetVideoAsync(int id)
@@ -42,7 +42,7 @@ namespace MauiApp1.BackEnd.Repository
             if (item.Id != 0)
                 return await MediaItemDatabase.database.UpdateAsync(item);
             else
-                item.Id = null;
+                item.Id = -1;
             return await MediaItemDatabase.database.InsertAsync(item);
         }
 
@@ -53,25 +53,25 @@ namespace MauiApp1.BackEnd.Repository
         }
 
       
-        public async Task<List<VideoSeries>> GetAllVideoSeriesAsync()
+        public async Task<List<VideoItem>> GetAllVideoSeriesAsync()
         {
             try
             {
                 await MediaItemDatabase.Init();
-                return await MediaItemDatabase.database.Table<VideoSeries>().ToListAsync();
+                return await MediaItemDatabase.database.Table<VideoItem>().ToListAsync();
             }
             catch (Exception ex)
             {
-                return new List<VideoSeries>();
+                return new List<VideoItem>();
             }
         }
-        public async Task<VideoSeries> GetVideoSeriesAsync(int id)
+        public async Task<VideoItem> GetVideoSeriesAsync(int id)
         {
             await MediaItemDatabase.Init();
-            return await MediaItemDatabase.database.Table<VideoSeries>().Where(i => i.Id == id).FirstOrDefaultAsync();
+            return await MediaItemDatabase.database.Table<VideoItem>().Where(i => i.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<int> SaveVideoSeriesAsync(VideoSeries item)
+        public async Task<int> SaveVideoSeriesAsync(VideoItem item)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace MauiApp1.BackEnd.Repository
             }
         }
 
-        public async Task<int> DeleteVideoSeriesAsync(VideoSeries item)
+        public async Task<int> DeleteVideoSeriesAsync(VideoItem item)
         {
             await MediaItemDatabase.Init();
             return await MediaItemDatabase.database.DeleteAsync(item);
@@ -118,7 +118,7 @@ namespace MauiApp1.BackEnd.Repository
             }
         }
 
-        public async Task<bool> SaveVideoSeriesAsync(List<VideoSeries> series)
+        public async Task<bool> SaveVideoSeriesAsync(List<VideoItem> series)
         {
             try
             {

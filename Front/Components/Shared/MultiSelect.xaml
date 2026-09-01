@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView
     x:Class="MauiApp1.Front.Components.Shared.MultiSelect"
+    x:Name="This"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
     <VerticalStackLayout
         x:Name="RootStack"
@@ -13,7 +16,11 @@
             IsVisible="False"
             Text="Select items" />
 
-        <!--  Items container populated from code-behind  -->
-        <VerticalStackLayout x:Name="ItemsStack" Spacing="6" />
+        <material:MultiplePickerField Title="Pick some options" x:Name="MultiPicker" HorizontalOptions="FillAndExpand">
+            <material:MultiplePickerField.ItemsSource>
+
+                <VerticalStackLayout x:Name="ItemsStack" Spacing="6" />
+            </material:MultiplePickerField.ItemsSource>
+        </material:MultiplePickerField>
     </VerticalStackLayout>
 </ContentView>

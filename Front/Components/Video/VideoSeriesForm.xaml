@@ -4,8 +4,8 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-    xmlns:viewModels="clr-namespace:MauiApp1.Front.Components.Videos.ViewModels"
     xmlns:shared="clr-namespace:MauiApp1.Front.Components.Shared"
+    xmlns:viewModels="clr-namespace:MauiApp1.Front.Components.Videos.ViewModels"
     Title="Video Series">
 
     <ContentPage.BindingContext>
@@ -26,6 +26,17 @@
                     Padding="8"
                     IsEnabled="{Binding IsEdit.Value}"
                     Text="{Binding Title.Value, Mode=TwoWay}" />
+                <StackLayout Padding="8">
+                    <Label x:Name="VideoGenreLabel" Text="Genre:" />
+                    <shared:MultiSelect
+                        x:Name="VideoGenrePicker"
+                        Margin="8"
+                        Editable="{Binding IsEdit.Value, Mode=TwoWay}"
+                        ItemsSource="{Binding GenreOptions}"
+                        SelectedValues="{Binding Genre, Mode=TwoWay}"
+                        Header="Genres"
+                        VerticalOptions="Fill" />
+                </StackLayout>
                 <material:CheckBox
                     Padding="8"
                     IsChecked="{Binding Ongoing.Value, Mode=TwoWay}"
@@ -52,9 +63,20 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <FlexLayout Grid.Row="1" Margin="10" Direction="Row" JustifyContent="End">
-            <Button x:Name="CancelButton" Clicked="OnCancelClicked" Text="Back" />
-            <Button x:Name="SubmitButton" Clicked="OnSubmitClicked" IsVisible="{Binding IsEdit}" Text="Save" />
+        <FlexLayout
+            Grid.Row="1"
+            Margin="10"
+            Direction="Row"
+            JustifyContent="End">
+            <Button
+                x:Name="CancelButton"
+                Clicked="OnCancelClicked"
+                Text="Back" />
+            <Button
+                x:Name="SubmitButton"
+                Clicked="OnSubmitClicked"
+                IsVisible="{Binding IsEdit}"
+                Text="Save" />
         </FlexLayout>
     </Grid>
 </ContentPage>

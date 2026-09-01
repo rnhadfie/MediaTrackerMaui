@@ -37,12 +37,11 @@ namespace MauiApp1.Controllers
 
             BookSetupViewModel bookSetupViewModel = new BookSetupViewModel
             {
-                Books = new System.Collections.ObjectModel.ObservableCollection<BookDT>(books),
-                BookSeries = new System.Collections.ObjectModel.ObservableCollection<BookSeries>(series),
+                Books = new System.Collections.ObjectModel.ObservableCollection<Book>(books),
+                BookSeries = new System.Collections.ObjectModel.ObservableCollection<BookItem>(series),
                 Genre = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string,int>>(genres),
                 Format = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string,int>>(formats),
                 Type = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string,int>>(types),
-                Langauge = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string,int>>(languages),
                 Publisher = new System.Collections.ObjectModel.ObservableCollection<Publisher>(publishers)
             };
 
@@ -61,28 +60,29 @@ namespace MauiApp1.Controllers
 
             BookSetupViewModel bookSetupViewModel = new BookSetupViewModel
             {
-                Books = new System.Collections.ObjectModel.ObservableCollection<BookDT>(books),
-                BookSeries = new System.Collections.ObjectModel.ObservableCollection<BookSeries>(series),
+                Books = new System.Collections.ObjectModel.ObservableCollection<Book>(books),
+                BookSeries = new System.Collections.ObjectModel.ObservableCollection<BookItem>(series),
                 Genre = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string,int>>(genres),
                 Format = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string,int>>(formats),
                 Type = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string,int>>(types),
-                Langauge = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string,int>>(languages),
                 Publisher = new System.Collections.ObjectModel.ObservableCollection<Publisher>(publishers)
             };
             return bookSetupViewModel;
         }
 
-        public async Task<BookDT> GetBookAsync(int id)
+        public async Task<Book> GetBookAsync(int id)
         {
             return await _BookService.GetBookAsync(id);
         }
 
-        public async Task<bool> SaveBookAsync(BookDT item, string newSeries, string newPublisher)
+        public async Task<bool> SaveBookAsync(Book item, List<BookItem> items, string newSeries, string newPublisher)
         {
-            return await _BookService.SaveBookAsync(item, newSeries, newPublisher);
+            // Delegate to service which will run a transactional save for book, its series and optional publisher creation
+            var ok = await _BookService.SaveBookAndSeriesAsync(item, items, newPublisher);
+            return ok;
         }
 
-        public async Task<int> DeleteBookAsync(BookDT item)
+        public async Task<int> DeleteBookAsync(Book item)
         {
             return await _BookService.DeleteBookAsync(item);
         }
@@ -102,17 +102,17 @@ namespace MauiApp1.Controllers
             return await _BookService.DeletePublisherAsync(item);
         }
 
-        public async Task<BookSeries> GetBookSeriesAsync(int id)
+        public async Task<BookItem> GetBookSeriesAsync(int id)
         {
             return await _BookService.GetBookSeriesAsync(id);
         }
 
-        public async Task<List<BookSeries>> GetAllBookSeriesAsync()
+        public async Task<List<BookItem>> GetAllBookSeriesAsync()
         {
             return await _BookService.GetAllBookSeriesAsync();
         }
 
-        public async Task<int> SaveBookSeriesAsync(BookSeries item)
+        public async Task<int> SaveBookSeriesAsync(BookItem item)
         {
             await MediaItemDatabase.Init();
             if (item.Id != 0)
@@ -121,7 +121,7 @@ namespace MauiApp1.Controllers
                 return await MediaItemDatabase.database.InsertAsync(item);
         }
 
-        public async Task<int> DeleteBookSeriesAsync(BookSeries item)
+        public async Task<int> DeleteBookSeriesAsync(BookItem item)
         {
             await MediaItemDatabase.Init();
             return await MediaItemDatabase.database.DeleteAsync(item);
@@ -138,17 +138,16 @@ namespace MauiApp1.Controllers
 
             BookSetupViewModel setup = new BookSetupViewModel
             {
-                BookSeries = new System.Collections.ObjectModel.ObservableCollection<BookSeries>(series),
+                BookSeries = new System.Collections.ObjectModel.ObservableCollection<BookItem>(series),
                 Genre = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(genres),
                 Format = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(formats),
                 Type = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(types),
-                Langauge = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(languages),
                 Publisher = new System.Collections.ObjectModel.ObservableCollection<Publisher>(publishers)
             };
             return setup;
         }
 
-        public async Task<BookDT> GetBook(int id)
+        public async Task<Book> GetBook(int id)
         {
             if (id <= 0) return null;
             return await _BookService.GetBookAsync(id);

@@ -32,12 +32,6 @@
                         Grid.Column="0"
                         ItemsSource="{Binding TypeOptions, Mode=TwoWay}"
                         SelectedItem="{Binding SelectedType, Mode=TwoWay}" />
-                    <Button
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        Clicked="AddButton_Clicked"
-                        HorizontalOptions="End"
-                        Text="Add" />
                 </uranium:GridLayout>
 
             </HorizontalStackLayout>
@@ -55,11 +49,7 @@
                         <book:BookList x:Name="BookListView" ItemsSource="{Binding ListOfBooks}" />
                     </material:TabItem.Content>
                 </material:TabItem>
-                <material:TabItem Title="Series">
-                    <material:TabItem.Content>
-                        <book:BookSeriesList x:Name="BookSeriesListView" EmptyViewText="No Series" />
-                    </material:TabItem.Content>
-                </material:TabItem>
+                <!--  Series tab removed: series/items are managed from the Book form  -->
             </material:TabView>
         </Grid>
     </Grid>
