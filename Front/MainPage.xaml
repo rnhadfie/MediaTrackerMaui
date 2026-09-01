@@ -3,29 +3,24 @@
     x:Class="MauiApp1.MainPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:MauiApp1.Components.ScrollDisplay">
+    xmlns:book="clr-namespace:MauiApp1.Front.Components.Books"
+    xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+    Title="">
+    <VerticalStackLayout>
+        <Label
+            FontSize="16"
+            HorizontalOptions="Center"
+            Text="Hello, World!" />
+        <StackLayout Padding="10" StyleClass="PrimaryContainer">
+            <Label Text="Books" />
+            <Button Clicked="OnOpenBooksClicked" Text="Open Books" />
+        </StackLayout>
+        <StackLayout Padding="10" StyleClass="PrimaryContainer">
+            <Label Text="Videos" />
+            <Button Clicked="OnOpenVideoClicked" Text="Open Videos" />
+        </StackLayout>
 
-    <ScrollView>
-        <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25"
-            VerticalOptions="Fill">
-            <Label
-                SemanticProperties.HeadingLevel="Level1"
-                Style="{StaticResource Headline}"
-                Text="Hello" />
-            <local:ScrollView />
-            <ImageButton
-                x:Name="AddItem"
-                AnchorX="24"
-                AnchorY="24"
-                Clicked="OnOpenMenu"
-                HeightRequest="36"
-                HorizontalOptions="End"
-                Source="icons_add_50.png"
-                VerticalOptions="End"
-                WidthRequest="36" />
-        </VerticalStackLayout>
-    </ScrollView>
+
+    </VerticalStackLayout>
 </ContentPage>
 

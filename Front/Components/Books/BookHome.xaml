@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiApp1.Front.Components.Books.BookHome"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:book="clr-namespace:MauiApp1.Front.Components.Books"
+    xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+    xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+    xmlns:micro="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
+    xmlns:shared="clr-namespace:MauiApp1.Front.Components.Shared"
+    xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+    xmlns:viewModels="clr-namespace:MauiApp1.Front.Components.Books.ViewModels"
+    x:Name="this"
+    x:DataType="viewModels:BookHomeViewModel">
+    <ContentPage.BindingContext>
+        <viewModels:BookHomeViewModel />
+    </ContentPage.BindingContext>
+    <Grid>
+        <Grid ColumnDefinitions="*" RowDefinitions="Auto,*">
+            <HorizontalStackLayout Grid.Row="0">
+                <uranium:GridLayout
+                    Margin="20"
+                    ColumnCount="2"
+                    ColumnGridLength="1*"
+                    ColumnSpacing="16"
+                    RowCount="1"
+                    RowGridLength="1*"
+                    RowSpacing="16">
+                    <uranium:Dropdown
+                        x:Name="BookTypeDropDown"
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        ItemsSource="{Binding TypeOptions, Mode=TwoWay}"
+                        SelectedItem="{Binding SelectedType, Mode=TwoWay}" />
+                    <Button
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Clicked="AddButton_Clicked"
+                        HorizontalOptions="End"
+                        Text="Add" />
+                </uranium:GridLayout>
+
+            </HorizontalStackLayout>
+            <material:TabView Grid.Row="1">
+                <material:TabItem x:Name="BookDisplayTab" Title="Display">
+                    <material:TabItem.Content>
+                        <book:BookVisualization
+                            x:Name="BookDisplayView"
+                            ItemsSource="{Binding BookSetup}"
+                            SelectedItem="{Binding SelectedType}" />
+                    </material:TabItem.Content>
+                </material:TabItem>
+                <material:TabItem x:Name="BookListTab" Title="List">
+                    <material:TabItem.Content>
+                        <book:BookList x:Name="BookListView" ItemsSource="{Binding ListOfBooks}" />
+                    </material:TabItem.Content>
+                </material:TabItem>
+                <material:TabItem Title="Series">
+                    <material:TabItem.Content>
+                        <book:BookSeriesList x:Name="BookSeriesListView" EmptyViewText="No Series" />
+                    </material:TabItem.Content>
+                </material:TabItem>
+            </material:TabView>
+        </Grid>
+    </Grid>
+</ContentPage>

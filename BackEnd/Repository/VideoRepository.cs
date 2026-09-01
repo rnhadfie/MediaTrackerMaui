@@ -1,66 +1,144 @@
 ﻿using MauiApp1.BackEnd.Database;
-using MauiApp1.Service.Modals;
+using MauiApp1.BackEnd.Interface;
+using MauiApp1.BackEnd.Models;
+using MauiApp1.BackEnd.Models.Video;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Text;
 
 namespace MauiApp1.BackEnd.Repository
 {
-    public class VideoRepository
+    public class VideoRepository: IVideoRepository
     {
-        DataContext _dbContext;
-
-        public VideoRepository(DataContext dataContext)
-        {
-            _dbContext = dataContext;
-        }
-
-        public async Task<List<Video>> GetBooksAsync()
-        {
-            return new ObservableCollection<Video>(_dbContext.VideoTable).ToList();
-        }
-
-        public Video GetSeriesAsync(int id)
+        public async Task<List<Video>> GetVideosAsync()
         {
             try
             {
-                var context = _dbContext;
-                var result = (Video)context.VideoTable.Where(x => x.Id == id);
-                return result;
+                await MediaItemDatabase.Init();
+
+                return await MediaItemDatabase.database.Table<Video>().ToListAsync();
             }
             catch (Exception ex)
             {
-                return new Video() { Name = "" };
+                return new List<Video>();
             }
         }
 
-        public bool SaveVideo(Video item)
+        public async Task<List<Video>> GetVideosNotReadAsync()
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.Table<Video>().Where(t => !t.Watched).ToListAsync();
+        }
+
+        public async Task<Video> GetVideoAsync(int id)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.Table<Video>().Where(i => i.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<int> SaveVideoAsync(Video item)
+        {
+            await MediaItemDatabase.Init();
+            if (item.Id != 0)
+                return await MediaItemDatabase.database.UpdateAsync(item);
+            else
+                item.Id = null;
+            return await MediaItemDatabase.database.InsertAsync(item);
+        }
+
+        public async Task<int> DeleteVideoAsync(Video item)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.DeleteAsync(item);
+        }
+
+      
+        public async Task<List<VideoSeries>> GetAllVideoSeriesAsync()
         {
             try
             {
-                var context = _dbContext;
-                if (item.Id > 0)
-                    context.VideoTable.Update(item);
+                await MediaItemDatabase.Init();
+                return await MediaItemDatabase.database.Table<VideoSeries>().ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                return new List<VideoSeries>();
+            }
+        }
+        public async Task<VideoSeries> GetVideoSeriesAsync(int id)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.Table<VideoSeries>().Where(i => i.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<int> SaveVideoSeriesAsync(VideoSeries item)
+        {
+            try
+            {
+                await MediaItemDatabase.Init();
+                if (item.Id != 0)
+                {
+                    await MediaItemDatabase.database.UpdateAsync(item);
+                    return item.Id;
+                }
                 else
                 {
-                    int maxId = 1;
-                    if (context.VideoTable.Any())
-                    {
-                        maxId = context.VideoTable.Max(x => x.Id);
-                    }
-                    item.Series = maxId + 1;
-
-                    context.VideoTable.Add(item);
-
+                    await MediaItemDatabase.database.InsertAsync(item);
+                    return item.Id;
                 }
-                int result = context.SaveChanges();
-                return result > 0;
+            }
+            catch (Exception ex)
+            {
+                return -1;
+            }
+        }
+
+        public async Task<int> DeleteVideoSeriesAsync(VideoSeries item)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.DeleteAsync(item);
+        }
+
+        public async Task<bool> SaveBooksAsync(List<Book> books)
+        {
+            try
+            {
+                await MediaItemDatabase.Init();
+                var db = MediaItemDatabase.database;
+                // Use InsertOrReplace to avoid duplicates (requires primary key)
+                foreach (var b in books)
+                {
+                    await db.InsertOrReplaceAsync(b);
+                }
+                return true;
             }
             catch (Exception ex)
             {
                 return false;
             }
+        }
+
+        public async Task<bool> SaveVideoSeriesAsync(List<VideoSeries> series)
+        {
+            try
+            {
+                await MediaItemDatabase.Init();
+                var db = MediaItemDatabase.database;
+                foreach (var s in series)
+                {
+                    await db.InsertOrReplaceAsync(s);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public Task<bool> SaveVideosAsync(List<Video> videos)
+        {
+            throw new NotImplementedException();
         }
     }
 }

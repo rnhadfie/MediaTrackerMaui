@@ -1,22 +1,32 @@
-﻿using CommunityToolkit.Maui.Extensions;
+﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Maui.Storage;
+using MauiApp1.BackEnd.Controllers;
 using MauiApp1.BackEnd.Database;
-using MauiApp1.Components;
+using MauiApp1.Front.Components.Books;
+
 
 namespace MauiApp1
 {
     public partial class MainPage : ContentPage
     {
-        private readonly DataContext _dbContext;
-        public MainPage(DataContext dataContext)
+
+        public MainPage()
         {
             InitializeComponent();
-            _dbContext = dataContext;
+
         }
 
-
-        private void OnOpenMenu(object? sender, EventArgs e)
+        private async void OnOpenBooksClicked(object sender, EventArgs e)
         {
-            this.ShowPopup(new PopupMenuPage(_dbContext));
+            // Navigate to the Books page via the named route using absolute navigation
+            await Shell.Current.GoToAsync("books");
+        }
+
+        private async void OnOpenVideoClicked(object sender, EventArgs e)
+        {
+            // Navigate to the Books page via the named route using absolute navigation
+            await Shell.Current.GoToAsync("videohome");
         }
     }
 }

@@ -1,61 +1,155 @@
-﻿using MauiApp1.BackEnd.Database;
-using MauiApp1.Service.Modals;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
+﻿
+using MauiApp1.BackEnd.Database;
+using MauiApp1.BackEnd.Interface;
+using MauiApp1.BackEnd.Models;
 
 namespace MauiApp1.BackEnd.Repository
 {
-    public class BookRepository
+    public class BookRepository: IBookRepository
     {
-        DataContext _dbContext;
-
-        public BookRepository(DataContext dataContext)
-        {
-            _dbContext = dataContext;
-        }
-
         public async Task<List<Book>> GetBooksAsync()
-        {
-            return new ObservableCollection<Book>(_dbContext.BookTable).ToList();
-        }
-
-        public Book GetSeriesAsync(int id)
         {
             try
             {
-                var context = _dbContext;
-                var result = (Book)context.BookTable.Where(x => x.Id == id);
-                return result;
+                await MediaItemDatabase.Init();
+
+                return await MediaItemDatabase.database.Table<Book>().ToListAsync();
             }
             catch (Exception ex)
             {
-                return new Book() { Title = "" };
+                return new List<Book>();
             }
         }
 
-        public bool SaveBookAsync(Book item)
+        public async Task<List<Book>> GetBooksNotReadAsync()
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.Table<Book>().Where(t => !t.Read).ToListAsync();
+        }
+
+        public async Task<Book> GetBookAsync(int id)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.Table<Book>().Where(i => i.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<int> SaveBookAsync(Book item)
+        {
+            await MediaItemDatabase.Init();
+            if (item.Id != 0)
+                return await MediaItemDatabase.database.UpdateAsync(item);
+            else
+                item.Id = null;
+                return await MediaItemDatabase.database.InsertAsync(item);
+        }
+
+        public async Task<int> DeleteBookAsync(Book item)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.DeleteAsync(item);
+        }
+
+        public async Task<List<Publisher>> GetPublishersAsync()
         {
             try
             {
-                var context = _dbContext;
-                if (item.Id > 0)
-                    context.BookTable.Update(item);
+                await MediaItemDatabase.Init();
+                return await MediaItemDatabase.database.Table<Publisher>().ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                return new List<Publisher>();
+            }
+        }
+
+        public async Task<int> SavePublisherAsync(Publisher item)
+        {
+            try
+            {
+                await MediaItemDatabase.Init();
+                if (item.Id != 0)
+                {
+                    await MediaItemDatabase.database.UpdateAsync(item);
+                    return item.Id;
+                }
                 else
                 {
-                    int maxId = 1;
-                    if (context.BookTable.Any())
-                    {
-                        maxId = context.BookTable.Max(x => x.Id);
-                    }
-                    item.SeriesId = maxId + 1;
-
-                    context.BookTable.Add(item);
-
+                    await MediaItemDatabase.database.InsertAsync(item);
+                    return item.Id;
                 }
-                int result = context.SaveChanges();
-                return result > 0;
+            }
+            catch (Exception ex)
+            {
+                return -1;
+            }
+        }
+
+        public async Task<int> DeletePublisherAsync(Publisher item)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.DeleteAsync(item);
+        }
+
+
+
+        public async Task<List<BookSeries>> GetAllBookSeriesAsync()
+        {
+            try
+            {
+                await MediaItemDatabase.Init();
+                return await MediaItemDatabase.database.Table<BookSeries>().ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                return new List<BookSeries>();
+            }
+        }
+        public async Task<BookSeries> GetBookSeriesAsync(int id)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.Table<BookSeries>().Where(i => i.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<int> SaveBookSeriesAsync(BookSeries item)
+        {
+            try
+            {
+                await MediaItemDatabase.Init();
+                if (item.Id != 0)
+                {
+                    await MediaItemDatabase.database.UpdateAsync(item);
+                    return item.Id;
+                }
+                else
+                {
+                    await MediaItemDatabase.database.InsertAsync(item);
+                    return item.Id;
+                }
+            }
+            catch (Exception ex)
+            {
+                return -1;
+            }
+        }
+
+        public async Task<int> DeleteBookSeriesAsync(BookSeries item)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.DeleteAsync(item);
+        }
+
+        public async Task<bool> SaveBooksAsync(List<Book> books)
+        {
+            try
+            {
+                await MediaItemDatabase.Init();
+                var db = MediaItemDatabase.database;
+                // Use InsertOrReplace to avoid duplicates (requires primary key)
+                foreach (var b in books)
+                {
+                    await db.InsertOrReplaceAsync(b);
+                }
+                return true;
             }
             catch (Exception ex)
             {
@@ -63,33 +157,41 @@ namespace MauiApp1.BackEnd.Repository
             }
         }
 
-        /*
-        public async Task<List<Book>> GetBooksAsync()
+        public async Task<bool> SaveBookSeriesAsync(List<BookSeries> series)
         {
-            await databaseService.Init();
-           //eturn await database.Table<Book>().ToListAsync();
+            try
+            {
+                await MediaItemDatabase.Init();
+                var db = MediaItemDatabase.database;
+                foreach (var s in series)
+                {
+                    await db.InsertOrReplaceAsync(s);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
-        public async Task<Book> GetBookAsync(int id)
+        public async Task<bool> SavePublishersAsync(List<Publisher> publishers)
         {
-            await databaseService.Init();
-            return await database.Table<Book>().Where(i => i.Id == id).FirstOrDefaultAsync();
+            try
+            {
+                await MediaItemDatabase.Init();
+                var db = MediaItemDatabase.database;
+                foreach (var p in publishers)
+                {
+                    await db.InsertOrReplaceAsync(p);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
-
-        public async Task<int> SaveBookAsync(Book item)
-        {
-            await databaseService.Init();
-            if (item.Id != 0)
-                return await database.UpdateAsync(item);
-            else
-                return await database.InsertAsync(item);
-        }
-
-        public async Task<int> DeleteBookAsync(Book item)
-        {
-            await databaseService.Init();
-            return await database.DeleteAsync(item);
-        }*/
 
     }
 }

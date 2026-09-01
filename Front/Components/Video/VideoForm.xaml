@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiApp1.Front.Components.Videos.VideoForm"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+    xmlns:shared="clr-namespace:MauiApp1.Front.Components.Shared"
+    xmlns:viewModels="clr-namespace:MauiApp1.Front.Components.Videos.ViewModels"
+    Title="Video Form">
+
+    <ContentPage.BindingContext>
+        <viewModels:VideoFormViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout>
+                <material:TextField
+                    x:Name="VideoName"
+                    Title="Title"
+                    Padding="8"
+                    IsEnabled="{Binding IsEdit.Value}"
+                    Text="{Binding Name.Value, Mode=TwoWay}" />
+
+                <material:PickerField
+                    x:Name="VideoSeriesPicker"
+                    Title="Video Series"
+                    Padding="8"
+                    IsEnabled="{Binding IsEdit.Value, Mode=TwoWay}"
+                    ItemDisplayBinding="{Binding Text}"
+                    SelectedItem="{Binding SelectedVideoSeries.Value, Mode=TwoWay}" />
+                <material:TextField
+                    x:Name="NewVideoSeries"
+                    Title="New Video Series"
+                    Padding="8"
+                    IsEnabled="{Binding EnableNewSeries}"
+                    IsVisible="{Binding IsEdit.Value, Mode=TwoWay}"
+                    Text="{Binding NewVideoSeriesName.Value, Mode=TwoWay}" />
+
+
+                <StackLayout Padding="8">
+                    <Label x:Name="VideoGenreLabel" Text="Genre:" />
+                    <shared:MultiSelect
+                        x:Name="VideoGenrePicker"
+                        Margin="8"
+                        Editable="{Binding IsEdit.Value, Mode=TwoWay}"
+                        ItemsSource="{Binding GenreOptions}"
+                        SelectedValues="{Binding Genre, Mode=TwoWay}"
+                        VerticalOptions="Fill" />
+                </StackLayout>
+                <StackLayout Padding="8">
+                    <material:RadioButtonGroupView IsEnabled="{Binding IsEdit.Value}" SelectedItem="{Binding Format.Value, Mode=TwoWay}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <!--  Uranium UI Material RadioButton  -->
+                                <material:RadioButton
+                                    Margin="0,5"
+                                    Text="{Binding Text}"
+                                    Value="{Binding Value}" />
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </material:RadioButtonGroupView>
+                    <shared:RadioButtonGroup
+                        x:Name="VideoFormatGroup"
+                        Header="Format"
+                        IsEdit="{Binding IsEdit.Value}"
+                        SelectedValue="{Binding Format.Value, Mode=TwoWay}" />
+                </StackLayout>
+                <material:TextField
+                    x:Name="VideoSeason"
+                    Title="Season"
+                    Padding="8"
+                    IsEnabled="{Binding IsEdit}"
+                    Text="{Binding Season.Value, Mode=TwoWay}" />
+                <material:CheckBox
+                    Padding="8"
+                    IsChecked="{Binding Read.Value, Mode=TwoWay}"
+                    IsEnabled="{Binding IsEdit}"
+                    Text="Watched" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <FlexLayout
+            Grid.Row="1"
+            Margin="10"
+            Direction="Row"
+            JustifyContent="End">
+            <Button
+                x:Name="CancelButton"
+                Clicked="OnCancelClicked"
+                Text="Back" />
+            <Button
+                x:Name="SubmitButton"
+                Clicked="OnSubmitClicked"
+                IsVisible="{Binding IsEdit}"
+                Text="Save" />
+        </FlexLayout>
+    </Grid>
+</ContentPage>

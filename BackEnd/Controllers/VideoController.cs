@@ -1,50 +1,139 @@
-﻿using MauiApp1.BackEnd.Controllers.ViewModels;
-using MauiApp1.BackEnd.Database;
+﻿using MauiApp1.BackEnd.Database;
+using MauiApp1.BackEnd.Models;
+using MauiApp1.BackEnd.Models.Video;
 using MauiApp1.BackEnd.Service;
+using MauiApp1.BackEnd.Shared;
 using MauiApp1.Controllers.ViewModels;
-using MauiApp1.Service.Modals;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MauiApp1.BackEnd.Controllers
+namespace MauiApp1.BackEnd.Controllers.ViewModels
 {
     public class VideoController
     {
-        DataContext _dataContext;
-        private SeriesService _SeriesService;
+        private Lazy<VideoService> VideoService;
         private VideoService _VideoService;
 
-        public VideoController(DataContext dataContext)
-        {
-            _dataContext = dataContext;
-            _SeriesService = new Lazy<SeriesService>(() =>
-            {
-                return new SeriesService(_dataContext);
-            }).Value;
+        private Lazy<SharedService> SharedService;
+        private SharedService _SharedService;
 
-            _VideoService = new Lazy<VideoService>(() =>
-            {
-                return new VideoService(_dataContext);
-            }).Value;
+        public VideoController()
+        {
+            VideoService = new Lazy<VideoService>(() => new VideoService());
+            _VideoService = VideoService.Value;
+
+            SharedService = new Lazy<SharedService>(() => new SharedService());
+            _SharedService = SharedService.Value;
         }
 
-        public VideoSetupViewModel GetVideoSetup()
+        public async Task<VideoSetupViewModel> GetVideosAsync()
         {
-            VideoSetupViewModel viewModel
-                = new VideoSetupViewModel();
-            viewModel.Series = _SeriesService.GetListOfSeries();
-            viewModel.Category = _VideoService.GetVideoGroups();
-            viewModel.VideoFormat = _VideoService.GetVideoFormat();
-            viewModel.VideoType = _VideoService.GetVideoType();
+            var videos = await _VideoService.GetVideosAsync();
+            var series = await _VideoService.GetAllVideoSeriesAsync();
+            var genres = _SharedService.GetGenres();
+            var formats = _VideoService.GetVideoFormats();
+            var types = _VideoService.GetVideoTypes();
+            var languages = _SharedService.GetLanguages();
 
+            VideoSetupViewModel videoSetupViewModel = new VideoSetupViewModel
+            {
+                Video = new System.Collections.ObjectModel.ObservableCollection<Video>(videos),
+                VideoSeries = new System.Collections.ObjectModel.ObservableCollection<VideoSeries>(series),
+                Genre = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(genres),
+                Format = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(formats),
+                Type = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(types),
+                Langauge = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(languages)
+            };
 
-            return viewModel;
+            return videoSetupViewModel;
         }
 
-        public bool AddVideo(Video newVideo)
+        public async Task<VideoSetupViewModel> GetBooksNotReadAsync()
         {
-            return _VideoService.AddVideo(newVideo);
+            var videos = await _VideoService.GetVideosNotReadAsync();
+            var series = await _VideoService.GetAllVideoSeriesAsync();
+            var genres = _SharedService.GetGenres();
+            var formats = _VideoService.GetVideoFormats();
+            var types = _VideoService.GetVideoTypes();
+            var languages = _SharedService.GetLanguages();
+
+            VideoSetupViewModel videoSetupViewModel = new VideoSetupViewModel
+            {
+                Video = new System.Collections.ObjectModel.ObservableCollection<Video>(videos),
+                VideoSeries = new System.Collections.ObjectModel.ObservableCollection<VideoSeries>(series),
+                Genre = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(genres),
+                Format = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(formats),
+                Type = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(types),
+                Langauge = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(languages)
+            };
+            return videoSetupViewModel;
+        }
+
+        public async Task<Video> GetVideoAsync(int id)
+        {
+            return await _VideoService.GetVideoAsync(id);
+        }
+
+        public async Task<bool> SaveVideoAsync(Video item, string newSeries)
+        {
+            return await _VideoService.SaveVideoAsync(item, newSeries);
+        }
+
+        public async Task<int> DeleteVideoAsync(Video item)
+        {
+            return await _VideoService.DeleteVideoAsync(item);
+        }
+
+        public async Task<VideoSeries> GetVideoSeriesAsync(int id)
+        {
+            return await _VideoService.GetVideoSeriesAsync(id);
+        }
+
+        public async Task<List<VideoSeries>> GetAllVideoSeriesAsync()
+        {
+            return await _VideoService.GetAllVideoSeriesAsync();
+        }
+
+        public async Task<int> SaveVideoSeriesAsync(VideoSeries item)
+        {
+            await MediaItemDatabase.Init();
+            if (item.Id != 0)
+                return await MediaItemDatabase.database.UpdateAsync(item);
+            else
+                return await MediaItemDatabase.database.InsertAsync(item);
+        }
+
+        public async Task<int> DeleteVideoSeriesAsync(VideoSeries item)
+        {
+            await MediaItemDatabase.Init();
+            return await MediaItemDatabase.database.DeleteAsync(item);
+        }
+
+        public async Task<VideoSetupViewModel> GetVideoSetup()
+        {
+            var series = await _VideoService.GetAllVideoSeriesAsync();
+            var genres = _SharedService.GetGenres();
+            var formats = _VideoService.GetVideoFormats();
+            var types = _VideoService.GetVideoTypes();
+            var languages = _SharedService.GetLanguages();
+
+            VideoSetupViewModel setup = new VideoSetupViewModel
+            {
+                VideoSeries = new System.Collections.ObjectModel.ObservableCollection<VideoSeries>(series),
+                Genre = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(genres),
+                Format = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(formats),
+                Type = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(types),
+                Langauge = new System.Collections.ObjectModel.ObservableCollection<TextValuePair<string, int>>(languages),
+                Video = new System.Collections.ObjectModel.ObservableCollection<Video>(await _VideoService.GetVideosAsync())
+            };
+            return setup;
+        }
+
+        public async Task<Video> GetVideo(int id)
+        {
+            if (id <= 0) return null;
+            return await _VideoService.GetVideoAsync(id);
         }
     }
 }

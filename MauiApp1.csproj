@@ -58,68 +58,101 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\MediaDatabase.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Resources\MediaDatabase.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Include="MediaTrackerMaui.slnx" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="ClosedXML" Version="0.105.0" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="14.0.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="LiveChartsCore.SkiaSharpView.Maui" Version="2.0.4" />
+		<PackageReference Include="Microcharts.Maui" Version="1.0.1" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.3" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.31" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.2" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.31" />
 		<PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.31" />
+		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+		<PackageReference Include="UraniumUI" Version="2.15.0" />
+		<PackageReference Include="UraniumUI.Dialogs.CommunityToolkit" Version="2.15.0" />
+		<PackageReference Include="UraniumUI.Icons.FontAwesome" Version="2.15.0" />
+		<PackageReference Include="UraniumUI.Icons.MaterialIcons" Version="2.15.0" />
+		<PackageReference Include="UraniumUI.Material" Version="2.15.0" />
+		<PackageReference Include="UraniumUI.WebComponents" Version="2.15.0" />
+	</ItemGroup>
+
+	<!-- Pin platform-specific SQLite native provider to a safe version for Android -->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
+		<PackageReference Include="SQLitePCLRaw.lib.e_sqlite3.android" Version="2.1.12-pre20260709125052" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Front\Components\ScrollDisplay\ScrollViewDisplay.xaml.cs">
-	    <DependentUpon>ScrollViewDisplay.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Shared\Checkbox.xaml.cs">
-	    <DependentUpon>Checkbox.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Front\Components\Shared\FilePickerCom.xaml.cs">
-	    <DependentUpon>FilePickerCom.xaml</DependentUpon>
-	  </Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <MauiXaml Update="Front\Components\Books\AddBook.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\ListItem.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\ScrollDisplay\ScrollViewDisplay.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\ScrollDisplay\ScrollViewItem.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Series\AddSeries.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Shared\Checkbox.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Shared\Combobox.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Shared\FilePickerCom.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Shared\RadioButtons.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Shared\TextField.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Front\Components\Video\AddVideo.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	</ItemGroup>
-
-	<ItemGroup>
+	  <Folder Include="Front\Components\Collections\" />
+	  <Folder Include="Front\Components\Menu\" />
+	  <Folder Include="Front\Components\Music\" />
+	  <Folder Include="Front\Components\Other\" />
+	  <Folder Include="Front\Components\ScrollDisplay\" />
 	  <Folder Include="LocalStorage\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Front\Components\Books\BookSeriesForm.xaml.cs">
+	    <DependentUpon>BookSeriesForm.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Front\Components\Books\BookSeriesForm.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Books\BookForm.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Books\BookHome.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Books\BookList.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	<!-- BookSeriesHome.xaml removed; series embedded in BookHome -->
+	  <MauiXaml Update="Front\Components\Books\BookSeriesList.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Books\BookVisualization.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Shared\ListDisplay.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Shared\MultiSelect.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Shared\RadioButtonGroup.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Video\VideoForm.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Video\VideoHome.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Front\Components\Video\VideoSeriesForm.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	<!-- VideoSeriesHome.xaml removed; series embedded in VideoHome -->
+	  <MauiXaml Update="Front\Components\Video\VideoSeriesList.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>

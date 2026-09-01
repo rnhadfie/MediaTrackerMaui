@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="MauiApp1.Front.Components.Books.BookVisualization"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:micro="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
+    xmlns:shared="clr-namespace:MauiApp1.Front.Components.Shared"
+    xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+    x:Name="this">
+    <ScrollView>
+        <uranium:GridLayout
+            Margin="2"
+            ColumnCount="2"
+            ColumnGridLength="1*"
+            ColumnSpacing="2"
+            RowCount="6"
+            RowGridLength="1*"
+            RowSpacing="2">
+
+            <Border
+                Grid.Row="0"
+                Grid.Column="1"
+                BackgroundColor="AliceBlue">
+                <Label
+                    x:Name="ReadText"
+                    FontSize="Medium"
+                    HorizontalOptions="Start"
+                    Text="{Binding ReadPecentage, Source={x:Reference this}}"
+                    VerticalOptions="Center" />
+            </Border>
+            <shared:ListDisplay
+                x:Name="PublisherList"
+                Title="Publishers"
+                Grid.Row="0"
+                Grid.RowSpan="3"
+                Grid.Column="0"
+                Grid.ColumnSpan="1"
+                EmptyViewText="No data available"
+                ItemsSource="{Binding PublisherListData, Source={x:Reference this}}" />
+            <Border
+                Grid.Row="1"
+                Grid.Column="1"
+                BackgroundColor="AliceBlue">
+                <Label
+                    x:Name="TotalText"
+                    FontSize="Medium"
+                    HorizontalOptions="End"
+                    Text="{Binding TotalSeries, Source={x:Reference this}}"
+                    VerticalOptions="Center" />
+            </Border>
+
+            <Border
+                Grid.Row="2"
+                Grid.Column="1"
+                BackgroundColor="AliceBlue">
+                <Label
+                    x:Name="OngoingText"
+                    FontSize="Medium"
+                    HorizontalOptions="End"
+                    Text="{Binding OngoingSeries, Source={x:Reference this}}"
+                    VerticalOptions="Center" />
+            </Border>
+
+
+            <micro:ChartView
+                x:Name="BookFormatChart"
+                Grid.Row="3"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Chart="{Binding BookFormatChartData, Source={x:Reference this}}"
+                HeightRequest="300" />
+
+            <micro:ChartView
+                x:Name="BooksStatusChart"
+                Grid.Row="4"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Chart="{Binding CollectionStatusChartData, Source={x:Reference this}}"
+                HeightRequest="300" />
+
+            <shared:ListDisplay
+                x:Name="GenreList"
+                Title="Genres"
+                Grid.Row="5"
+                Grid.Column="0"
+                EmptyViewText="No data available"
+                ItemsSource="{Binding GenreChartData, Source={x:Reference this}}" />
+
+            <shared:ListDisplay
+                x:Name="BookTypeList"
+                Title="Genres"
+                Grid.Row="5"
+                Grid.Column="1"
+                EmptyViewText="No data available"
+                ItemsSource="{Binding BookTypeChartData, Source={x:Reference this}}" />
+
+        </uranium:GridLayout>
+    </ScrollView>
+</ContentView>

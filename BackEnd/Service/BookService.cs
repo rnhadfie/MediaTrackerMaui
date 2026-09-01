@@ -1,11 +1,9 @@
-﻿using MauiApp1.BackEnd.Database;
+﻿
+using ClosedXML.Excel;
+using MauiApp1.BackEnd.Models;
 using MauiApp1.BackEnd.Repository;
-using MauiApp1.Repository;
-using MauiApp1.Service.Modals;
-using MauiApp1.Shared;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using MauiApp1.BackEnd.Shared;
+using static MauiApp1.BackEnd.Shared.Enums;
 
 namespace MauiApp1.BackEnd.Service
 {
@@ -14,62 +12,294 @@ namespace MauiApp1.BackEnd.Service
         private Lazy<BookRepository> BookRepository;
         private BookRepository _BookRepository;
 
-        public BookService(DataContext dataContext)
+        public BookService()
         {
-            _BookRepository = new Lazy<BookRepository>(() =>
-            {
-                // You can specify any additional
-                // initialization steps here.
-                return new BookRepository(dataContext);
-            }).Value;
-        }
-        public bool AddNewBook(Book book)
-        {
-            byte[] CompressedImageData = book.Cover ?? [];
-            book.Cover = SharedService.CompressImage(CompressedImageData, 100, 60);
-            return _BookRepository.SaveBookAsync(book);
+            BookRepository = new Lazy<BookRepository>(() => new BookRepository());
+            _BookRepository = BookRepository.Value;
         }
 
-        public List<TextValuePair<int>> GetGenres()
+        public async Task<List<BookDT>> GetBooksAsync()
         {
-            var bookGenres = new List<TextValuePair<int>>
+            List<Book> books = await _BookRepository.GetBooksAsync();
+            List<BookDT> bookDTs = new List<BookDT>();
+            if (books != null && books.Count > 0)
             {
-                new TextValuePair<int>("Fiction", 1),
-                new TextValuePair<int>("Non-Fiction", 2),
-                new TextValuePair<int>("Science Fiction",  3 ),
-                new TextValuePair<int>("Fantasy", 4 ),
-                new TextValuePair<int>( "Biography",  5 ),
-                new TextValuePair<int>("History",  6 ),
-                new TextValuePair<int>("Mystery", 7 ),
-                new TextValuePair<int>("Romance", 8 ),
-                new TextValuePair<int>("Thriller", 9 ),
-                new TextValuePair<int>("Self-Help", 10 )
+                foreach (var book in books)
+                {
+                    bookDTs.Add(book.GetBook());
+                }
+            }
+            return bookDTs;
+        }
+
+        public async Task<List<BookDT>> GetBooksNotReadAsync()
+        {
+            List<Book> books = await _BookRepository.GetBooksNotReadAsync();
+            List<BookDT> bookDTs = new List<BookDT>();
+            if (books != null && books.Count > 0)
+            {
+                foreach (var book in books)
+                {
+                    bookDTs.Add(book.GetBook());
+                }
+            }
+            return bookDTs;
+        }
+
+        public async Task<BookDT> GetBookAsync(int id)
+        {
+            Book book = await _BookRepository.GetBookAsync(id);
+            return book.GetBook();
+        }
+
+        public async Task<BookSeries> GetBookSeriesAsync(int id)
+        {
+            BookSeries bookSeries = await _BookRepository.GetBookSeriesAsync(id);
+            return bookSeries;
+        }
+
+        public async Task<bool> SaveBookAsync(BookDT item, string newSeries, string newPublisher)
+        {
+            bool result = true;
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(newSeries) && item.BookSeries <= 0)
+                {
+                    BookSeries bookSeries = new BookSeries
+                    {
+                        Title = newSeries,
+                        Author = item.Author,
+                        Artist = item.Artist
+
+                    };
+                    int id = await _BookRepository.SaveBookSeriesAsync(bookSeries);
+                    item.BookSeries = id;
+                    
+                    result = result && id > 0;
+
+                }
+                if (!string.IsNullOrWhiteSpace(newPublisher) && (item.Publisher == null || item.Publisher <= 0))
+                {
+                    Publisher newPublisherObj = new Publisher
+                    {
+                        PublisherName = newPublisher
+                    };
+                    int pubId = await _BookRepository.SavePublisherAsync(newPublisherObj);
+                    item.Publisher = pubId;
+                    result = result && pubId > 0;
+                }
+
+
+                return result && await _BookRepository.SaveBookAsync(item.GetBook()) > 0;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            
+        }
+
+        public async Task<int> DeleteBookAsync(BookDT item)
+        {
+
+            return await _BookRepository.DeleteBookAsync(item.GetBook());
+        }
+
+        public async Task<List<Publisher>> GetPublishersAsync()
+        {
+            return await _BookRepository.GetPublishersAsync();
+        }
+
+        public async Task<int> SavePublisherAsync(Publisher item)
+        {
+            return await _BookRepository.SavePublisherAsync(item);
+        }
+
+        public async Task<int> DeletePublisherAsync(Publisher item)
+        {
+            return await _BookRepository.DeletePublisherAsync(item);
+        }
+
+        public async Task<List<BookSeries>> GetAllBookSeriesAsync()
+        {
+            return await _BookRepository.GetAllBookSeriesAsync();
+        }
+
+        public async Task<int> SaveBookSeriesAsync(BookSeries item)
+        {
+            return await _BookRepository.SaveBookSeriesAsync(item);
+        }
+         public async Task<int> DeleteBookSeriesAsync(BookSeries item)
+        {
+            return await _BookRepository.DeleteBookSeriesAsync(item);
+        }
+
+        public List<TextValuePair<string, int>> GetBookFormats()
+        {
+            return Enum.GetValues(typeof(BookFormat)).Cast<BookFormat>().Select(g => new TextValuePair<string, int>(g.ToString(), (int)g)).ToList();
+        }
+
+         public List<TextValuePair<string, int>> GetBookTypes()
+        {
+            return Enum.GetValues(typeof(BookType)).Cast<BookType>().Select(g => new TextValuePair<string, int>(g.ToString(), (int)g)).ToList();
+        }
+
+        public async Task<XLWorkbook> ExportBookData(XLWorkbook workBook)
+        {
+            List<Book> books = await _BookRepository.GetBooksAsync();
+            List<Publisher> publishers = await _BookRepository.GetPublishersAsync();
+            List<BookSeries> bookSeries = await _BookRepository.GetAllBookSeriesAsync();
+
+            var bookSheet = workBook.AddWorksheet("Books");
+            bookSheet.Cell(1, 1).InsertData(books, true);
+
+            var pubSheet = workBook.AddWorksheet("Publishers");
+            pubSheet.Cell(1, 1).InsertData(publishers, true);
+
+            var seriesSheet = workBook.AddWorksheet("BookSeries");
+            seriesSheet.Cell(1, 1).InsertData(publishers, true);
+
+            return workBook;
+        }
+
+
+
+        public async Task<bool> ImportBookDataFromExcel(XLWorkbook wb)
+        {
+            try
+            {
+                var bookDtos = ReadBooksFromExcel(wb);
+                var books = bookDtos.Select(dto => MapDtoToBook(dto)).ToList();
+               bool success = await _BookRepository.SaveBooksAsync(books);
+                
+                var bookSeries = ReadBookSeriesFromExcel(wb);
+                success = success && await _BookRepository.SaveBookSeriesAsync(bookSeries);
+                
+                var publishers = ReadPublishersFromExcel(wb);
+                success = success &&  await _BookRepository.SavePublishersAsync(publishers);
+               
+                return success;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error importing books from Excel: {ex.Message}");
+                return false;
+            }
+        }
+
+        public List<BookExcelDto> ReadBooksFromExcel(XLWorkbook wb)
+        {
+            var ws = wb.Worksheet(1);
+            var headerRow = ws.Row(1);
+            var headers = headerRow.CellsUsed()
+                .Select((c, i) => new { Name = c.GetString().Trim(), Index = i + 1 })
+                .ToDictionary(x => x.Name, x => x.Index);
+
+            var list = new List<BookExcelDto>();
+            foreach (var row in ws.RowsUsed().Skip(1))
+            {
+                var dto = new BookExcelDto
+                {
+                    Id = headers.ContainsKey("Id") ? row.Cell(headers["Id"]).GetString() : null,
+                    Title = headers.ContainsKey("Title") ? row.Cell(headers["Title"]).GetString() : null,
+                    Author = headers.ContainsKey("Author") ? row.Cell(headers["Author"]).GetString() : null,
+                    Artist = headers.ContainsKey("Artist") ? row.Cell(headers["Artist"]).GetString() : null,
+                    Publisher = headers.ContainsKey("Publisher") ? row.Cell(headers["Publisher"]).GetString() : null,
+                    Genre = headers.ContainsKey("Genre") ? row.Cell(headers["Genre"]).GetString() : null,
+                    Format = headers.ContainsKey("Format") ? row.Cell(headers["Format"]).GetString() : null,
+                    Volume = headers.ContainsKey("Volume") ? row.Cell(headers["Volume"]).GetString() : null,
+                    Read = headers.ContainsKey("Read") ? row.Cell(headers["Read"]).GetString() : null,
+                    Language = headers.ContainsKey("Language") ? row.Cell(headers["Language"]).GetString() : null,
+                    BookSeries = headers.ContainsKey("BookSeries") ? row.Cell(headers["BookSeries"]).GetString() : null,
+                    Type = headers.ContainsKey("Type") ? row.Cell(headers["Type"]).GetString() : null
+                };
+                list.Add(dto);
+            }
+            return list;
+        }
+
+        public List<Publisher> ReadPublishersFromExcel(XLWorkbook wb)
+        {
+            var ws = wb.Worksheet(3);
+            var headerRow = ws.Row(1);
+            var headers = headerRow.CellsUsed()
+                .Select((c, i) => new { Name = c.GetString().Trim(), Index = i + 1 })
+                .ToDictionary(x => x.Name, x => x.Index);
+
+            var list = new List<Publisher>();
+            foreach (var row in ws.RowsUsed().Skip(1))
+            {
+                var dto = new Publisher
+                {
+                    Id = headers.ContainsKey("Id") ? int.TryParse(row.Cell(headers["Id"]).GetString(), out var id) ? id : 0 : 0,
+                    PublisherName = headers.ContainsKey("PublisherName") ? row.Cell(headers["PublisherName"]).GetString() : null,
+                };
+                list.Add(dto);
+            }
+            return list;
+        }
+
+        public List<BookSeries> ReadBookSeriesFromExcel(XLWorkbook wb)
+        {
+            var ws = wb.Worksheet(2);
+            var headerRow = ws.Row(1);
+            var headers = headerRow.CellsUsed()
+                .Select((c, i) => new { Name = c.GetString().Trim(), Index = i + 1 })
+                .ToDictionary(x => x.Name, x => x.Index);
+
+            var list = new List<BookSeries>();
+            foreach (var row in ws.RowsUsed().Skip(1))
+            {
+                var dto = new BookSeries
+                {
+                    Id = headers.ContainsKey("Id") ? int.TryParse(row.Cell(headers["Id"]).GetString(), out var id) ? id : 0 : 0,
+                    Title = headers.ContainsKey("Title") ? row.Cell(headers["Title"]).GetString() : null,
+                    Ongoing = headers.ContainsKey("Ongoing") ? row.Cell(headers["Ongoing"]).GetString() == "Y" : false,
+                    Collecting = headers.ContainsKey("Collecting") ? row.Cell(headers["Collecting"]).GetString() : null,
+                    UpToDateComplete = headers.ContainsKey("UpToDateComplete") ? row.Cell(headers["UpToDateComplete"]).GetString() == "Y" : false,
+                    TotalVolumes = headers.ContainsKey("TotalVolumes") ? int.TryParse(row.Cell(headers["TotalVolumes"]).GetString(), out var tv) ? tv : 0 : 0,
+                    Demographic = headers.ContainsKey("Demographic") ? int.TryParse(row.Cell(headers["Demographic"]).GetString(), out var d) ? d : 0 : 0,
+                    Parent = headers.ContainsKey("Parent") ? row.Cell(headers["Parent"]).GetString() : null
+                };
+                list.Add(dto);
+            }
+            return list;
+        }
+
+        public Book MapDtoToBook(BookExcelDto dto)
+        {
+
+            var genres = dto.Genre.Split(",");
+            List<int> bookGenre = new List<int>();
+            foreach (var item in genres)
+            {
+                bookGenre.Add((int.TryParse(item, out var gen) ? gen : 0));
+            }
+
+            var volumes = dto.Volume.Split(",");
+            List<int> bookVolumes = new List<int>();
+            foreach (var item in volumes)
+            {
+                bookVolumes.Add(int.TryParse(item, out var gen) ? gen : 0);
+            }
+            var book = new BookDT
+            {
+                Id = (int.TryParse(dto.Id, out var id) ? id : default),
+                Title = dto.Title,
+                Author = string.IsNullOrWhiteSpace(dto.Author) ? null : dto.Author,
+                Artist = string.IsNullOrWhiteSpace(dto.Artist) ? null : dto.Artist,
+                Publisher = int.TryParse(dto.Publisher, out var p) ? p : 0,
+                Genre = bookGenre,
+                Format = (BookFormat)(int.TryParse(dto.Format, out var f) ? f : default),
+                Volume = bookVolumes,
+                Read = dto.Read == "Y",
+                Language = (Language)(int.TryParse(dto.Language, out var l) ? l : 0),
+                BookSeries = int.TryParse(dto.BookSeries, out var bs) ? bs : 0,
+                Type = (BookType)(int.TryParse(dto.Type, out var t) ? t : default)
             };
-            return bookGenres;
-
+            return book.GetBook();
         }
 
-        public List<TextValuePair<int>> GetBookFormats()
-        {
-            var bookFormats = new List<TextValuePair<int>>
-            {
-                new TextValuePair<int>("Paperback", 1),
-                new TextValuePair<int>("Hardcover", 2),
-                new TextValuePair<int>("E-Book", 3)
-            };
-            return bookFormats;
-        }
 
-        public List<TextValuePair<int>> GetBookTypes()
-        {
-            var bookTypes = new List<TextValuePair<int>>
-            {
-                new TextValuePair<int>("Novel", 1),
-                new TextValuePair<int>("Anthology", 2),
-                new TextValuePair<int>("Graphic Novel", 3),
-                new TextValuePair<int>("Manga", 4)
-            };
-            return bookTypes;
-        }
     }
 }

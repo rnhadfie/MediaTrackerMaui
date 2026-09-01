@@ -1,33 +1,25 @@
-﻿using Microsoft.Maui.Graphics;
-using Microsoft.Maui.Graphics.Platform;
-using IImage = Microsoft.Maui.Graphics.IImage;
-using ImageFormat = Microsoft.Maui.Graphics.ImageFormat;
+﻿using MauiApp1.BackEnd.Shared;
+using MauiApp1.Shared;
+using static MauiApp1.BackEnd.Shared.Enums;
 
 namespace MauiApp1.BackEnd.Service
 {
-    public static class SharedService
+    public class SharedService
     {
-        public static byte[] CompressImage(byte[] imageData, float maxSize, int quality)
+        public List<TextValuePair<string, int>> GetLanguages()
         {
-            var stream = new MemoryStream(imageData);
-
-            IImage image = PlatformImage.FromStream(stream);
-
-            if (image == null)
-            {
-                return null;
-            }
-
-            IImage newImage = image.Downsize(maxSize, true); 
-
-            if (newImage == null)
-            {
-                return null;
-            }
-            MemoryStream compressedStream = new MemoryStream();
-            newImage.AsStream(ImageFormat.Jpeg, quality).CopyTo(compressedStream);
-
-            return compressedStream.ToArray();
+            return Enum.GetValues(typeof(Language)).Cast<Language>().Select(g => new TextValuePair<string, int>(g.ToString(), (int)g)).ToList();
         }
+
+        public List<TextValuePair<string, int>> GetGenres()
+        {
+            return Enum.GetValues(typeof(Genre)).Cast<Genre>().Select(g => new TextValuePair<string, int>(g.ToString(), (int)g)).ToList();
+        }
+
+        public List<TextValuePair<string, int>> GetMediaTypes()
+        {
+            return Enum.GetValues(typeof(MediaType)).Cast<MediaType>().Select(g => new TextValuePair<string, int>(g.ToString(), (int)g)).ToList();
+        }
+
     }
 }

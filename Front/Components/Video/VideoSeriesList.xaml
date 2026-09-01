@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="MauiApp1.Front.Components.Videos.VideoSeriesList"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+    x:Name="this">
+    <ScrollView>
+        <VerticalStackLayout>
+            <HorizontalStackLayout>
+                <material:TextField
+                    Title="Search"
+                    Text="{Binding SearchText, Source={x:Reference this}}"
+                    TextChanged="TextField_TextChanged" HorizontalOptions="Fill"/>
+                <Button Text="Add" Clicked="AddButton_Clicked" HorizontalOptions="End" />
+            </HorizontalStackLayout>
+            <material:DataGrid x:Name="VideoSeriesListDataGrid" ItemsSource="{Binding ItemsSource, Source={x:Reference this}}">
+
+                <material:DataGrid.EmptyView>
+                    <Label
+                        Padding="12"
+                        HorizontalOptions="Center"
+                        HorizontalTextAlignment="Center"
+                        Text="{Binding EmptyViewText, Source={x:Reference this}}"
+                        VerticalOptions="Center"
+                        VerticalTextAlignment="Center" />
+                </material:DataGrid.EmptyView>
+
+                <material:DataGrid.Columns>
+                    <material:DataGridColumn Width="*">
+                        <material:DataGridColumn.CellItemTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout>
+                                    <Label FontAttributes="Bold" Text="{Binding Title}" />
+                                    <Label FontAttributes="Italic" Text="{Binding Director}" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </material:DataGridColumn.CellItemTemplate>
+                    </material:DataGridColumn>
+                    <material:DataGridColumn Title="Actions" ValueBinding="{Binding Id}">
+                        <material:DataGridColumn.CellItemTemplate>
+                            <DataTemplate>
+                                <Button
+                                    Clicked="Button_Clicked"
+                                    CommandParameter="{Binding .}"
+                                    Text="..." />
+                            </DataTemplate>
+                        </material:DataGridColumn.CellItemTemplate>
+                    </material:DataGridColumn>
+                </material:DataGrid.Columns>
+            </material:DataGrid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentView>

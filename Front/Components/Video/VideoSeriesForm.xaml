@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiApp1.Front.Components.Videos.VideoSeriesForm"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+    xmlns:viewModels="clr-namespace:MauiApp1.Front.Components.Videos.ViewModels"
+    xmlns:shared="clr-namespace:MauiApp1.Front.Components.Shared"
+    Title="Video Series">
+
+    <ContentPage.BindingContext>
+        <viewModels:VideoSeriesFormViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout>
+                <material:TextField
+                    x:Name="VideoSeriesTitle"
+                    Title="Title"
+                    Padding="8"
+                    IsEnabled="{Binding IsEdit.Value}"
+                    Text="{Binding Title.Value, Mode=TwoWay}" />
+                <material:CheckBox
+                    Padding="8"
+                    IsChecked="{Binding Ongoing.Value, Mode=TwoWay}"
+                    IsEnabled="{Binding IsEdit}"
+                    Text="Ongoing Series" />
+                <StackLayout Padding="8">
+                    <shared:RadioButtonGroup
+                        x:Name="VideoSeriesCollecting"
+                        Header="Current Collection Status"
+                        IsEdit="{Binding IsEdit.Value}"
+                        SelectedValue="{Binding Collecting.Value, Mode=TwoWay}" />
+                </StackLayout>
+                <material:CheckBox
+                    Padding="8"
+                    IsChecked="{Binding UpToDateComplete.Value, Mode=TwoWay}"
+                    IsEnabled="{Binding IsEdit}"
+                    Text="Up to date or complete" />
+                <material:TextField
+                    x:Name="VideoSeriesParent"
+                    Title="Parent Series"
+                    Padding="8"
+                    IsEnabled="{Binding IsEdit.Value}"
+                    Text="{Binding Parent.Value, Mode=TwoWay}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <FlexLayout Grid.Row="1" Margin="10" Direction="Row" JustifyContent="End">
+            <Button x:Name="CancelButton" Clicked="OnCancelClicked" Text="Back" />
+            <Button x:Name="SubmitButton" Clicked="OnSubmitClicked" IsVisible="{Binding IsEdit}" Text="Save" />
+        </FlexLayout>
+    </Grid>
+</ContentPage>

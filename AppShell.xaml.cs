@@ -1,6 +1,8 @@
-﻿using MauiApp1.Components.Books;
-using MauiApp1.Front.Components.Series;
-using MauiApp1.Front.Components.Video;
+﻿using CommunityToolkit.Maui.Storage;
+using DocumentFormat.OpenXml.Spreadsheet;
+using MauiApp1.BackEnd.Controllers;
+using MauiApp1.Front.Components.Books;
+using MauiApp1.Front.Components.Videos;
 
 namespace MauiApp1
 {
@@ -10,12 +12,141 @@ namespace MauiApp1
         {
             InitializeComponent();
 
-            Routing.RegisterRoute(nameof(MainPage), typeof(MainPage));
-            Routing.RegisterRoute(nameof(AddBook), typeof(AddBook));
-            Routing.RegisterRoute(nameof(AddSeries), typeof(AddSeries));
-            Routing.RegisterRoute(nameof(AddVideo), typeof(AddVideo));
+
+            ShellRouting.RegisterRouteSafe(nameof(MainPage), typeof(MainPage));
+            /*
+            ShellRouting.RegisterRouteSafe(nameof(CollectionForm), typeof(CollectionForm));
+            ShellRouting.RegisterRouteSafe(nameof(CollectionDetailView), typeof(CollectionDetailView));
+            ShellRouting.RegisterRouteSafe(nameof(CollectionView), typeof(CollectionView));
+            ShellRouting.RegisterRouteSafe(nameof(VideoDetailView), typeof(VideoDetailView));
+            ShellRouting.RegisterRouteSafe(nameof(VideoForm), typeof(VideoForm));
+            ShellRouting.RegisterRouteSafe(nameof(VideoView), typeof(VideoView));
+
+            ShellRouting.RegisterRouteSafe(nameof(OtherForm), typeof(OtherForm));
+            ShellRouting.RegisterRouteSafe(nameof(OtherView), typeof(OtherView));
+            ShellRouting.RegisterRouteSafe(nameof(OtherDetailView), typeof(OtherDetailView));
+
+            ShellRouting.RegisterRouteSafe(nameof(MusicForm), typeof(MusicForm));
+            ShellRouting.RegisterRouteSafe(nameof(MusicView), typeof(MusicView));
+            ShellRouting.RegisterRouteSafe(nameof(MusicDetailView), typeof(MusicDetailView));
+
+
+            ShellRouting.RegisterRouteSafe(nameof(BookForm), typeof(BookForm));
+            ShellRouting.RegisterRouteSafe(nameof(BookView), typeof(BookView));
+            ShellRouting.RegisterRouteSafe(nameof(BookDetailView), typeof(BookDetailView));*/
+
+            // Register named routes for BookHome, BookSeriesHome and a shared 'books' route so they can be navigated to by route name
+            // 'books' should open BookHome by default
+            Routing.RegisterRoute("books", typeof(BookHome));
+            //Routing.RegisterRoute("videos", typeof(VideoHome));
+            // Keep individual named routes available
+            Routing.RegisterRoute("bookhome", typeof(BookHome));
+            // bookSerieshome removed - series are embedded in BookHome
+            Routing.RegisterRoute("videohome", typeof(VideoHome));
+            // videoSerieshome removed - series are embedded in VideoHome
+            Routing.RegisterRoute("home", typeof(MainPage));
+            Routing.RegisterRoute(nameof(BookForm), typeof(BookForm));
+            // Ensure BookForm route is registered
+            ShellRouting.RegisterRouteSafe(nameof(BookForm), typeof(BookForm));
+
+            ShellRouting.RegisterRouteSafe(nameof(BookSeriesForm), typeof(BookSeriesForm));
+            // Video routes
+            Routing.RegisterRoute("videoform", typeof(VideoForm));
+            ShellRouting.RegisterRouteSafe(nameof(VideoForm), typeof(VideoForm));
+            ShellRouting.RegisterRouteSafe(nameof(VideoSeriesForm), typeof(VideoSeriesForm));
+        }
+        
+        private async void OnImportDataClicked(object sender, EventArgs e)
+        {
+            string path = Path.GetFullPath("downloads");
+            try
+            {
+                var message = $"Import succeeded";
+                var result = await FilePicker.PickAsync(default);
+                if (result != null)
+                {
+                    using var stream = await result.OpenReadAsync();
+                    using (var workbook = new ClosedXML.Excel.XLWorkbook(stream))
+                    {
+                        bool importResult = await ExcelController.ImportExcelData(workbook);
+                        if (!importResult) {
+                            message = $"Import failed";
+                        }
+                    }
+                }
+                
+
+                await Shell.Current.DisplayAlert("Import", message ?? "", "OK");
+            }
+            catch (Exception ex)
+            {
+                var message = ex is OperationCanceledException
+                    ? "Import canceled"
+                    : $"Failed to import the data";
+
+                await Shell.Current.DisplayAlert("Import", message ?? "", "OK");
+            }
+        }
+        
+        private async void OnExportDataClicked(object sender, EventArgs e)
+        {
+            string path = Path.GetFullPath("downloads");
+            try
+            {
+                var result = await FolderPicker.PickAsync(default);
+                if (result != null)
+                {
+                    path = result.Folder.Path;
+                }
+                var message = $"Export succeeded";
+                bool importResult = await ExcelController.ExportExcelData(path);
+                if (!importResult)
+                {
+                    message = $"Export failed";
+                }
+
+                
+
+
+                await Shell.Current.DisplayAlert("Export", message ?? "", "OK");
+            }
+            catch (Exception ex)
+            {
+                var message = ex is OperationCanceledException
+                   ? "Export canceled"
+                   : $"Failed to export the data";
+
+                await Shell.Current.DisplayAlert("Export", message ?? "", "OK");
+            }
         }
 
+        private async void OnMenuVideosClicked(object sender, EventArgs e)
+        {
+            // Navigate to the shared Books route so the Books flyout group is selected
+            await Shell.Current.GoToAsync("videohome");
+        }
 
+        private async void OnMenuBooksClicked(object sender, EventArgs e)
+        {
+            // Navigate to the shared Books route so the Books flyout group is selected
+            await Shell.Current.GoToAsync("books");
+        }
+
+        private async void OnMenuHomeClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("home");
+        }
+    }
+
+    static class ShellRouting
+    {
+        static readonly HashSet<string> _registeredRoutes = new();
+
+        public static void RegisterRouteSafe(string route, Type pageType)
+        {
+            if (string.IsNullOrWhiteSpace(route) || pageType is null) return;
+            if (_registeredRoutes.Add(route))
+                Routing.RegisterRoute(route, pageType);
+        }
     }
 }
